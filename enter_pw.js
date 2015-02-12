@@ -5,7 +5,8 @@ var user_form = null;
 var passwd_form = document.activeElement; //hrmm.. there goes an option..
 
 for(var i=0 ; i<list.length ; i++){
-    if(list[i].name == "user" && list[i].type == "text"){ user_form = list[i]; }
+    if((list[i].name == "user" || list[i].name == "login" ) &&
+       list[i].type == "text"){ user_form = list[i]; }
     if({%seekForm}) {  // Finding can be turned off just in case.
         if(list[i].type == "password") // TODO this might not be fool-proof.
         { passwd_form = list[i]; }
