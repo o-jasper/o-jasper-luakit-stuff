@@ -18,6 +18,10 @@ local pass_args  = config.pass_args or ""
 local account_default = config.account_default or {}
 local pass_pre_domain = config.pass_pre_domain or ""
 
+local function default_true(x) if x == nil then return true else return x end end
+
+local check_domain = default_true(config.check_domain)
+
 -- Call pass with this arg string
 function pass_call(args)
    return executable .. ' ' .. pass_args .. args
@@ -34,8 +38,6 @@ local js = lousy.load_asset("luakit_search_login/enter_pw.js") or
 
 -- TODO Would be handy to have this as util/common.
 local function domain_of_uri(uri) return string.lower(lousy.uri.parse(uri).host) end
-local function default_true(x) if x == nil then return true else return x end end
-
 function figure_account(domain)
    local exit, stdout, stderr = luakit.spawn_sync(pass_call("ls " .. domain));
    if exit ~= 0 then return nil end 
@@ -51,7 +53,12 @@ function search_login(w, account, seek_form, fill_user_form)
    fill_user_form = default_true(fill_user_form)
    
    local domain = domain_of_uri(w.view.uri)
-   if not account then  --If account not pre-given, use first in pass.
+   -- Check domain name in case someone tries to run arbitrary code in `pass` somehow.
+   if check_domain and not string.match(domain, "^[.%l%d]+$") then
+      return say(w, "Domain is strange?", domain)
+   end
+   
+   if not account then  -- If account not pre-given, use first in pass.
       account = account_default[domain] or figure_account(pass_pre_domain .. domain)
       if not account then
          return say(w, "Cant find account for", pass_pre_domain .. domain)
