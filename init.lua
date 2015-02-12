@@ -18,8 +18,11 @@ local pass_args  = config.pass_args or ""
 local account_default = config.account_default or {}
 local pass_pre_domain = config.pass_pre_domain or ""
 
+local buf_bind = config.buf or "^,l$"
+
 local function default_true(x) if x == nil then return true else return x end end
 
+-- Checks if the domain is not something nasty that abuses `pass`
 local check_domain = default_true(config.check_domain)
 
 -- Call pass with this arg string
@@ -67,13 +70,22 @@ function search_login(w, account, seek_form, fill_user_form)
 
    local pw_of = pass_pre_domain .. domain .. "/" .. account
    local exit, stdout_passwd, stderr = luakit.spawn_sync(pass_call("show " .. pw_of))
+
    if exit ~= 0 then
-      say(w, "Program failed, couldnt get password")
-   end
+      -- Just fill in the account.
+      w.view:eval_js(string.gsub(js, "{%%(%w+)}",
+                                 {seekPasswdForm="false",
+                                  doAccount="true", account=account,
+                                  doPasswd="false", passwd=""}),
+                     {no_return=true})
+      return say(w, "Program failed, couldnt get password")
+   end   
+
    local result = w.view:eval_js(string.gsub(js, "{%%(%w+)}",
-                                             {seekForm=str_bool(seek_form),
-                                              fillUserForm=str_bool(fill_user_form),
+                                             {seekPasswdForm=str_bool(seek_form),
+                                              doAccount=str_bool(fill_user_form),
                                               account=account,
+                                              doPasswd="true",
                                               passwd=stdout_passwd:gsub("\n", "")}),
                                  {no_return=false})
    
@@ -87,7 +99,13 @@ function search_login(w, account, seek_form, fill_user_form)
 end
 
 -- A provided command. You might want something more handy, like :login or shorter.
-local cmd, any = lousy.bind.cmd, lousy.bind.any
+local cmd, buf, any =  lousy.bind.cmd, lousy.bind.buf, lousy.bind.any
 
 add_cmds({cmd("search_login", "Searches for password and way to login, and.. logs in",
               search_login)})
+
+if buf_bind then
+   add_binds("normal", -- TODO magically disappearing function?
+             { buf(buf_bind, "Try the auto-login", function(w) search_login(w) end) })
+end
+

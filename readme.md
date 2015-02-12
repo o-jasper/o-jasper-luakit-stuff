@@ -23,17 +23,22 @@ so you can organize that if you want to.
 * The search for the input forms is might not be sure to succeed. It does
   have the option of you-pre-filling in the name, and selecting the password
   form manually.
-
+  
+  Misreading it could mean accidentally sending the password the wrong place.
+  It only searches forms on the same domain, but.. maybe some ad or some shit
+  can insert shit into the page? (I dunno) If it doesnt get a password, it
+  will just fill in a login.
+  
   Github doesnt seem to have the login form on every page.
 
-* If it fails, get at least the name filled in.
-  
-* Doesnt look like `pass ls ..` stdout is meant for use? A safe approach to
-  stdout there would be usefull.
+* Doesnt look like `pass ls ..` stdout is meant for use? Probably fine, but
+  could be safer.
 
-* Suppose a chrome page wouldnt hurt. (But probably not terribly useful either?)
+* Suppose a chrome page wouldnt hurt. (But probably not terribly useful either)
 
-* Are these passwords floating in memory now a bit? Reducable?
+* Are these passwords floating in memory now a bit? Improvable?
+
+* Not very tested. Make issues if you encounter a bug.
 
 ### Other
 Heavily inspired on Matthias Beyers
