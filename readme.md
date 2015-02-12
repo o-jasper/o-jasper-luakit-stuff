@@ -25,6 +25,8 @@ so you can organize that if you want to.
   form manually.
 
   Github doesnt seem to have the login form on every page.
+
+* If it fails, get at least the name filled in.
   
 * Doesnt look like `pass ls ..` stdout is meant for use? A safe approach to
   stdout there would be usefull.
