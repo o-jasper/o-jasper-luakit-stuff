@@ -20,6 +20,13 @@ so you can organize that if you want to.
 
 ### Potential improvement
 
+* [Depends on this pull request](https://github.com/mason-larobina/luakit/pull/269)
+  If that is pulled you can probably ignore this point.
+  
+  Either get the relevant changes from that branch(`lib/lousy/init.lua` and 
+  `lib/lousy/load_asset.lua`), or you can
+  [change `local js = ..``](https://github.com/o-jasper/luakit_search_login/blob/master/init.lua#L39) to be a string with the contents of the `enter_pw.js` file.
+
 * The search for the input forms is might not be sure to succeed. It does
   have the option of you-pre-filling in the name, and selecting the password
   form manually.
