@@ -18,6 +18,8 @@ local pass_args  = config.pass_args or ""
 local account_default = config.account_default or {}
 local pass_pre_domain = config.pass_pre_domain or ""
 
+local js_file = config.js_file or "luakit_search_login/enter_pw.js"
+
 local buf_bind = config.buf or "^,l$"
 
 local function default_true(x) if x == nil then return true else return x end end
@@ -36,8 +38,7 @@ end
 
 local function str_bool(bool) if bool then return "true" else return "false" end end
 
-local js = lousy.load_asset("luakit_search_login/enter_pw.js") or
-   "alert(\"JS of search_login not found\"); 0xDEADBEEF;"
+local js = lousy.load_asset(js_file) or "alert(\"JS of search_login not found\");"
 
 -- TODO Would be handy to have this as util/common.
 local function domain_of_uri(uri) return string.lower(lousy.uri.parse(uri).host) end
