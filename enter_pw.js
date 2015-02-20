@@ -24,7 +24,7 @@ if(user_form && passwd_form && {%doPasswd} ) {
     var e = passwd_form;
     while( e && e.tagName != "FORM" ){ e = e.parentNode; }
     if(!e){ 3535; }
-    else { e.submit();
+    else { e.submit(); // TODO any way to register this security as user-event.
            "true";
          }
 } else {

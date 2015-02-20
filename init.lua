@@ -102,7 +102,9 @@ end
 -- A provided command. You might want something more handy, like :login or shorter.
 local cmd, buf, any =  lousy.bind.cmd, lousy.bind.buf, lousy.bind.any
 
-add_cmds({cmd("search_login", "Searches for password and way to login, and.. logs in",
+add_cmds({cmd("search_login", "Searches for password and way to login, tries to fill in.",
+              search_login)})
+add_cmds({cmd("login", "Searches for password and way to login, tries to fill in.",
               search_login)})
 
 if buf_bind then
