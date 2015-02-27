@@ -1,5 +1,8 @@
 # Log in using `pass`
 
+This one is not really good enough yet because the search does not find the
+login form decently.
+
 Uses javascript to search for the login form, then it searches using
 `pass ls domain` where it uses the first element to
 `pass show domain/account`, or prefers one provided in
@@ -8,8 +11,9 @@ Uses javascript to search for the login form, then it searches using
 [Pass page](http://www.passwordstore.org/).
 
 ### (a way of)Installation
-Symlink it from `~/.config/luakit/`, add `require "search_logon"` in
-`~/.config/luakit/rc.lua`. Add bindings if desired.
+Symlink the `search_login/` directory from `~/.config/luakit/`, 
+add `require "search_logon"` in `~/.config/luakit/rc.lua`.
+Add bindings if desired.
 
 ### More configs
 `globals.search_login.executable` and `...pass_args` tell what program is used
@@ -25,9 +29,9 @@ so you can organize that if you want to.
   
   Either get the relevant changes from that branch(`lib/lousy/init.lua` and 
   `lib/lousy/load_asset.lua`), or you can
-  [change `local js = ..``](https://github.com/o-jasper/o-jasper-luakit-stuff/blob/master/search_logininit.lua#L39) to be a string with the contents of the `enter_pw.js` file.
+  [change `local js = ..``](https://github.com/o-jasper/o-jasper-luakit-stuff/blob/master/search_login/init.lua#L39) to be a string with the contents of the `enter_pw.js` file.
 
-* The search for the input forms is might not be sure to succeed. It does
+* **The search for the input forms does not succeed sufficiently**. It does
   have the option of you-pre-filling in the name, and selecting the password
   form manually.
   
