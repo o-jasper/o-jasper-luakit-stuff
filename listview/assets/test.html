@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{%title}</title>
+    <style type="text/css">
+        {%stylesheet}
+    </style>
+    <script type="text/javascript">{%js}</script>
+</head>
+<body>
+
+<!-- TODO "Enter" should submit them -->
+
+<h3>Adding stuff manually</h3>
+<table style="width:90%">
+<tr><td>Title: <input type="text" id="title"></td>
+<td>Tags:<input type="text" id="tags"></td>
+</tr>
+</table>
+<h4>Description</h4>
+<textArea rows="5" cols="120" id="desc"></textarea><br>
+<button onsubmit="enter_msg()" onclick="enter_msg()">Enter</button><br>
+
+<h3>Search <span class="minor"><span id="cnt">{%cnt}</span> results</span></h3>
+<textarea cols="120" id="search" oninput="search_touch('search', true);" class="live">
+</textarea>
+<button onclick="search()">Search</button>
+<table><tr>
+<td class="ck">
+   <label>
+      <input id="live_sql" type="checkbox" checked="true"
+             onclick="sql_liven()"><span>Live SQL</span>
+   </label>
+</td>
+<td class="ck">
+   <label>
+      <input id="live_search" type="checkbox" checked="true"
+             onclick="sql_liven()"><span>Live Search</span>
+   </label>
+</td>
+<td class="ck">
+   <label>
+      <input id="as_msg" type="checkbox" checked="true" onclick="search()"><span>As msg</span>
+   </label>
+</td></tr></table>
+<textarea id="sql_input" rows="5" cols="120"
+          oninput="search_touch('sql', false);">
+</textarea>
+
+<span id="list">{%list}</span>
+
+<hr>
+<p class="minor">chrome run count: {%chromeRanCnt},
+search_cnt: <span id="search_cnt">1</span>
+</p>
+
+</body>
+</html>
