@@ -18,7 +18,7 @@ local pass_args  = config.pass_args or ""
 local account_default = config.account_default or {}
 local pass_pre_domain = config.pass_pre_domain or ""
 
-local js_file = config.js_file or "luakit_search_login/enter_pw.js"
+local js_file = config.js_file or "search_login/enter_pw.js"
 
 local buf_bind = config.buf or "^,l$"
 
