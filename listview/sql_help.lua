@@ -89,6 +89,9 @@ OR desc LIKE ?]])
          local pat = lousy.util.string.split(self.sql_pattern(), "?")
          local str = pat[1]
          for i, el in pairs(self.input) do
+            if string.find(el, "[%%]") then
+               el = "'" .. el .. "'"
+            end
             str = str .. el .. pat[i + 1]
          end
          return str
