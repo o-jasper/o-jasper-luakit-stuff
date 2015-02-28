@@ -39,8 +39,6 @@ end
 local chrome_ran_cnt, search_cnt = 0, 0
 
 -- How we end up searching.
-local current_manual_sql = { code = "" }
-
 local function total_query(search)
    local query = log.new_sql_help()
    if search ~= "" then query.search(search) end
@@ -49,6 +47,12 @@ local function total_query(search)
 end
 
 local current_search = ""
+
+local function js_listupdate(list, as_msg)
+   search_cnt = search_cnt + 1
+   return { list=(as_msg and html_msg_list or html_list_keyval)(list),
+            cnt=#list, search_cnt=search_cnt }
+end
 
 export_funcs={
    manual_test_enter = function(inp)
@@ -63,12 +67,10 @@ export_funcs={
                          })
    end,
 
-   manual_sql = function(inp)
-      local got = log.db:exec(inp.sql_input) or {}
-      current_manual_sql = { result = got, code = inp.sql_input }
-      return { list = 
-                  (inp.as_msg and  final_html_list(map(got, log._msg)) or
-                      html_list_keyval(got)) }
+   manual_sql = function(sql, as_msg)
+      local list = log.db:exec(sql);
+      if as_msg then list = map(list, log._msg) end
+      return js_listupdate(list, as_msg)
    end,
    
    show_sql = function(inp)
@@ -82,10 +84,7 @@ export_funcs={
    end,
 
    update = function(search, as_msg)
-      local list = total_query(search).result()
-      search_cnt = search_cnt + 1
-      return { list=(as_msg and html_msg_list or html_list_keyval)(list),
-               cnt=#list, search_cnt=search_cnt }
+      return js_listupdate(total_query(search).result(), as_msg)
    end,
 }
 local pages = {

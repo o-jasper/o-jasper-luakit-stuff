@@ -23,30 +23,15 @@
 <button onsubmit="enter_msg()" onclick="enter_msg()">Enter</button><br>
 
 <h3>Search <span class="minor"><span id="cnt">{%cnt}</span> results</span></h3>
-<textarea cols="120" id="search" oninput="search_touch('search', true);" class="live">
-</textarea>
-<button onclick="search()">Search</button>
-<table><tr>
-<td class="ck">
-   <label>
-      <input id="live_sql" type="checkbox" checked="true"
-             onclick="sql_liven()"><span>Live SQL</span>
-   </label>
-</td>
-<td class="ck">
-   <label>
-      <input id="live_search" type="checkbox" checked="true"
-             onclick="sql_liven()"><span>Live Search</span>
-   </label>
-</td>
-<td class="ck">
-   <label>
-      <input id="as_msg" type="checkbox" checked="true" onclick="search()"><span>As msg</span>
-   </label>
-</td></tr></table>
-<textarea id="sql_input" rows="5" cols="120"
-          oninput="search_touch('sql', false);">
-</textarea>
+<input id="search" oninput="touch_search();" onsubmit="search()" class="live">
+  <button onclick="search()">Search</button>
+<p><button id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
+<button id="toggle_search_leads" onclick="set_search_leads(!search_leads);">BUG</button>
+<button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
+<button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button>
+</p>
+
+<textarea id="sql_input" rows="5" cols="120" oninput="touch_sql();"></textarea>
 
 <span id="list">{%list}</span>
 
@@ -55,5 +40,11 @@
 search_cnt: <span id="search_cnt">1</span>
 </p>
 
+<script type="text/javascript">
+set_search_leads(true);
+set_sql_shown(true);
+set_as_msg(true);
+set_continuous(true);
+search();</script>
 </body>
 </html>

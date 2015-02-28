@@ -1,5 +1,5 @@
-input{ width:50%; }
-button{ font-weight:bold }
+input{ width:50%; font-weight:bold; }
+button{ font-weight:bold; width:7em; }
 
 h1,h2 {
   text-indent:10%;
@@ -26,34 +26,9 @@ input{}
 .hint{ color:#444 }
 
 .live{ background-color:#8F8; }
-.dead{ background-color:#FFF; }
+.dead {background-color:#FFF; color:#555 }
 
-/* Thank trying_hal9000
- http://stackoverflow.com/questions/7642277/css-styled-a-checkbox-to-look-like-a-button-is-there-a-hover
-*/
-
-.ck {
-    background-color:#F55;
-    border-radius:0.2em;
-    border:0.14em solid #D0D0D0;
-    overflow:auto;
-    
-    font-weight:bold;
-}
-
-.ck:hover { border-color:black }
-
-.ck label span {
-    text-align:center;
-    padding:0.1em 1em;
-    display:block;
-}
-
-.ck label input {
-    position:absolute;
-    top:-20px;
-}
-
-.ck input:checked + span {
-    background-color:#3C3;
-}
+.sql_live{ font-family:"Lucida Console", Monaco, monospace;
+background-color:#8F8; }
+.sql_dead{ font-family:"Lucida Console", Monaco, monospace;
+background-color:#FFF; color:#555 }

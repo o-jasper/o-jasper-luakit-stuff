@@ -20,32 +20,61 @@ function enter_msg() {
     set_ids(manual_test_enter(get_ids(['title', 'desc', 'tags'])));
 }
 
-var sql_live = true;
-function search_touch(which, up) {
-    if(ge('live_sql').checked) {
-        sql_live = (which == "sql");
-        ge('sql_input').className = (sql_live ? "live" : "dead");
-        ge('search').className    = (sql_live ? "dead" : "live");
-        
-        if( up ){ set_ids(show_sql(get_ids(['search']))); }
+var hide_buttons = false;
+function hide_button(name, yes) {
+    var el = ge(name);
+    el.hidden   = hide_buttons && yes;
+    el.disabled = yes;
+}
+
+var sql_shown, search_leads, as_msg, continuous;
+function set_sql_shown(yes) {
+    if( !search_leads && !yes ){ return; }
+    ge('sql_input').hidden = !yes;
+    ge('toggle_sql_shown').innerText = yes ? "Hide SQL" : "Show SQL";
+    hide_button('toggle_search_leads', !yes)
+    if( !search_leads && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
+    sql_shown = yes;
+}
+function set_search_leads(yes) {
+    search_leads = yes;
+    hide_button('toggle_sql_shown', !yes);
+    ge('toggle_search_leads').innerText = yes ? "By SQL" : "By search";
+
+    ge('sql_input').className = (yes ? "sql_dead" : "sql_live");
+    ge('search').className    = (yes ? "live" : "dead");
+}
+function set_as_msg(yes, up) {
+    ge('toggle_as_msg').innerText = yes ? "Raw" : "As msg";
+    if(as_msg != yes){
+        as_msg = yes;
+        if(up){ search(); }
     }
-    if(ge('live_search').checked && up) {
+}
+function set_continuous(yes, up) {
+    continuous = yes;
+    ge('toggle_continuous').innerText = yes ? "OnSubmit" : "Continuous";
+    if(up && yes && yes !=continuous){ 
+        continuous = yes;
         search();
     }
 }
 
-// TODO checkboxes as buttons with backgrounds instead.(checkboxes suck)
-function man_sql() {
-    var inp = get_ids(['sql_input'])
-    set_ids(manual_sql(inp));
+function touch_sql() {
+    set_search_leads(false);
+    if(continuous){ search(); }
+}
+function touch_search() {
+    set_search_leads(true);
+    if( sql_shown ) { set_ids(show_sql(get_ids(['search']))); }
+    if(continuous){ search(); }
 }
 
+// TODO time it and turn off continuous, which then has 'force continuous' option.
 function search() {
-    if(sql_live){ man_sql(); }
-    else{ set_ids(update(ge('search').value, ge('as_msg').checked)); }
+    if(search_leads){ set_ids(update(ge('search').value, as_msg)); }
+    else{
+        set_ids(manual_sql(ge('sql_input').value, as_msg));
+    }
 }
 
-function sql_liven() {
-    ge('sql_input').hidden = !ge('live_sql').checked;
-    search_touch('other', ge('live_sql').checked);
-}
