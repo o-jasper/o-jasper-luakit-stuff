@@ -49,6 +49,6 @@ function html_list_keyval(data, fun, toprow, row_class, table_class, el)
                                   v = string.format("%d%d", math.floor(v/10e14), v%1e15)
                                end
                                return string.gsub(el or "{%k}: {%v}", "{%%(%w+)}",
-                                                  {k=tostring(l), v=tostring(v)})
+                                                  {k=tostring(k), v=tostring(v)})
                            end, toprow, row_class, table_class)
 end
