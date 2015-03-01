@@ -14,7 +14,6 @@ function cur_time_s()  return math.floor(socket.gettime()) end
 -- But one way to use metatables.
 function metatable_for(meta)
    meta.direct         = meta.direct or {}
-   meta.set_determine  = meta.set_determine or {}
    meta.determine      = meta.determine or {}
    
    meta.table = {__index = function(self, key)
@@ -24,9 +23,6 @@ function metatable_for(meta)
          return got(self, key)
       else
          local determiner = meta.determine[key]
-         if determiner then return determiner(self, key) end
-         
-         determiner = meta.set_determine[key]
          if determiner then  -- To be determined by functions.
             local val = determiner(self, key)
             rawset(self,key, val)

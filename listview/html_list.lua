@@ -10,7 +10,8 @@ local function maybeclass(class) return class and " class=\"".. class .. "\"" or
 
 local html= {
    el    = [[<td{%elClass}>{%elContent}</td>]],
-   row   = [[<tr{%elClass}><td>{%elContent}</td></tr>]],
+   frow  = [[<tr{%elClass}><td>{%elContent}</td></tr>]],
+   row   = [[<tr{%elClass}>{%elContent}</tr>]],
    list  = [[<table{%tableClass}>{%tableContent}</table>]],
    table = [[<table{%tableClass}>{%topRow}{%tableContent}</table>]]
 }

@@ -41,7 +41,7 @@ local chrome_ran_cnt, search_cnt = 0, 0
 -- How we end up searching.
 local function total_query(search)
    local query = log.new_sql_help()
-   if search ~= "" then query.search(search) end
+   if search ~= "" then query.searchtxt(search) end
    -- TODO other ones..
    return query
 end

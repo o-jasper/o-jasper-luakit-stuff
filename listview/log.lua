@@ -13,12 +13,11 @@ local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 -- Makes a metatable..
 msg_meta = metatable_for({
-   determine = {},
-   set_determine = {
-      -- Non-realtime tags.
+   determine = {
       tags = function(self) return self.realtime_tags() end,
    },
    direct = {
+      
    realtime_tags = function(self) return function()
          if self.logger.tags_last < self.tags_last then
                return self.tags
@@ -50,7 +49,7 @@ local log_meta = metatable_for({
 direct = {
    -- Those helps are intended to be separate objects!
    new_sql_help = function(self) return function(initial)
-         return new_sql_help(self.db, initial, self._msg)
+         return new_sql_help(nil, initial, self.db, self._msg)
    end end,
 
    -- Enter a message.
