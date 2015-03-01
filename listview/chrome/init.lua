@@ -78,8 +78,6 @@ export_funcs = {
    end,
 }
 
-require "paged_chrome"
-
 local function asset(what, kind) 
    return lousy.load_asset("listview/assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
@@ -147,4 +145,6 @@ pages = {
       end
    }
 }
+
+require "paged_chrome"
 paged_chrome("listview", pages)
