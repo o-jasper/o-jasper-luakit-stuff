@@ -42,6 +42,7 @@ local chrome_ran_cnt, search_cnt = 0, 0
 local function total_query(search)
    local query = log.new_sql_help()
    if search ~= "" then query.searchtxt(search) end
+   query.order_by("id")
    -- TODO other ones..
    return query
 end

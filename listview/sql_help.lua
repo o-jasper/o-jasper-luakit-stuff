@@ -7,8 +7,6 @@
 
 require "listview.common"
 
--- Chrome page of all logs. User may do subselection.
-
 local sql_help_meta = metatable_for({
 determine = {},
 direct = {
@@ -63,12 +61,15 @@ direct = {
    -- Note assumes `taggings` exists.
    require_tags = function (self) return function(tags, w)
          table.insert(self.input, tags)
-         local h = sql_compose("AND", string.format([[%sEXISTS (
-SELECT * FROM taggings]], w))
+         local h = sql_compose("AND", true, string.format([[%sEXISTS (
+SELECT * FROM taggings]], w or ""))
          h.extcmd([[to_id == m.id)]])
          h.equal_one_or_list("tag", tags)
          
          self.incorporate(h)
+   end end,
+   require_not_tags = function(self) return function(tags)
+         self.require_tags(tags, "NOT ")
    end end,
 
    search = function(self) return function(search, what)
@@ -77,9 +78,10 @@ SELECT * FROM taggings]], w))
    end end,
 
    searchtxt = function(self) return function(search)
-         local h = sql_compose("OR")
+         local h = sql_compose("OR", self.first)
          for _, what in pairs({"title", "uri", "desc"}) do h.search(search, what) end
          self.incorporate(h)
+         self.first = false
    end end,
 
    -- NOTE/TODO not getting use, might remove.
@@ -94,7 +96,13 @@ SELECT * FROM taggings]], w))
          if config.re_assess_time then self.range("claimtime", config.re_assess_time) end
    end end,
 
-   sql_pattern = function(self) return function() 
+   order_by = function(self) return function(what, way)
+         if type(what) == "table" then what = table.concat(what, ", ") end
+         table.insert(self.cmd, 
+                      string.format("ORDER BY %s %s", what, way or "DESC"))
+   end end,
+      
+   sql_pattern = function(self) return function()
          return table.concat(self.cmd, "\n") 
    end end,
    
@@ -119,8 +127,8 @@ SELECT * FROM taggings]], w))
 
 }})
 
-function sql_compose(how, initial)  -- Less involved a bit.
-   local helper = {cmd = initial and {initial} or {}, first=true,
+function sql_compose(how, first, initial)  -- Less involved a bit.
+   local helper = {cmd = initial and {initial} or {}, first=first,
                    input = {},
                    how = how or "AND" }
    setmetatable(helper, sql_help_meta.table)

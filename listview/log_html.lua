@@ -74,6 +74,6 @@ function html_msg(state)
 end
 
 function html_msg_list(data)
-   local state = {}
+   local state = { last_time = cur_time_ms() }
    return html_list(data, html_msg(state))
 end
