@@ -34,6 +34,9 @@ function set_sql_shown(yes) {
     ge('toggle_sql_shown').innerText = yes ? "Hide SQL" : "Show SQL";
     hide_button('toggle_by_search', !yes)
     if( !by_search && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
+
+    if( yes && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
+
     sql_shown = yes;
 }
 

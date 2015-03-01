@@ -82,19 +82,18 @@ pages = {
       html = function(self, view, meta)
          local query = total_query("")
          local list = query.result()
-         local sql_shown = true
 
          return full_gsub(asset(self.name),
                           { addManual=asset("parts/add"), 
                             searchInput=asset("parts/search"),
-                            -- Non-parts.
+                            searchInitial=asset("parts/search_initial"),
                             stylesheet = asset("assets/style", ".css"), 
                             js         = asset("assets/js", ".js"),
                             title = string.format("%s:%s", self.chrome_name, self.name),
                             cnt = #list,
                             list = final_html_list(list, true),
-                            sqlInput = sql_show and query.sql_code() or "",
-                            sqlShown = sql_shown,
+                            sqlInput = config.sql_shown and query.sql_code() or "",
+                            sqlShown = config.sql_shown and "true" or "false",
                           })
       end,
       init = function(self, view, meta)
@@ -122,14 +121,14 @@ pages = {
 
          return full_gsub(asset(self.name),
                           { searchInput=asset("parts/search"),
+                            searchInitial=asset("parts/search_initial"),
                             stylesheet = asset("style", ".css"),
                             js         = asset("js", ".js"),
                             title = string.format("%s:%s", self.chrome_name, self.name),
-                            cnt = tostring(#list),
+                            cnt = #list,
                             list = final_html_list(list, true),
-                            sqlInput = sql_show and query.sql_code() or "",
-                            sqlShown = tostring(sql_shown),
-                            chromeRanCnt=13
+                            sqlInput = config.sql_show and query.sql_code() or "",
+                            sqlShown = config.sql_shown and "true" or "false",
                           })
       end,
       init = function(self, view, meta)
