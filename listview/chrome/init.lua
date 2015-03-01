@@ -96,14 +96,6 @@ function export_fun(view, names, funcs)
    for _, n in pairs(names) do view:register_function(n, funcs[n]) end
 end
 
-function replace(str, subst)
-   local n = 1
-   while n > 0 do
-      str, n = string.gsub(str, subst)
-   end
-   return str
-end
-
 pages = {
    default_name = "search",
 

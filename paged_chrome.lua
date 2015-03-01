@@ -2,6 +2,12 @@
 
 local chrome = require("chrome")
 
+-- local function full_gsub(str, subst)  -- Perhaps something for lousy.util.string
+--   local n = 1
+--    while n > 0 do str, n = string.gsub(str, subst) end
+--   return str
+-- end
+
 function paged_chrome(chrome_name, pages)
    chrome.add(chrome_name,
               function (view, meta)
@@ -20,7 +26,7 @@ function paged_chrome(chrome_name, pages)
                  function on_first_visual(view, status)
                     -- Wait for new page to be created
                     if status ~= "first-visual" then return end
-                    page.init(page, view, meta)
+                    -- page.init(page, view, meta)
                     -- Hack to run-once
                     view:remove_signal("load-status", on_first_visual)
                  end
