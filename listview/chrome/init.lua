@@ -57,9 +57,9 @@ export_funcs = {
                          })
    end,
    
-   show_sql = function(inp)
-      if inp.search ~= current_search then
-         current_search = inp.search
+   show_sql = function(sql)
+      if sql ~= current_search then
+         current_search = sql
          if not string.match(current_search, "^[ ,;:]+$") then
             return { sql_input = total_query(current_search).sql_code() }
          end

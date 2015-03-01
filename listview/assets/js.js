@@ -66,7 +66,7 @@ function touch_sql() {
 }
 function touch_search() {
     set_search_leads(true);
-    if( sql_shown ) { set_ids(show_sql(get_ids(['search']))); }
+    if( sql_shown ) { set_ids(show_sql(ge('search').value)); }
     if(continuous){ search(); }
 }
 
