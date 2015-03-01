@@ -41,7 +41,7 @@ local chrome_ran_cnt, search_cnt = 0, 0
 -- How we end up searching.
 local function total_query(search)
    local query = log.new_sql_help()
-   if search ~= "" then query.searchtxt(search) end
+   if search ~= "" then query.search(search) end
    query.order_by("id")
    -- TODO other ones..
    return query
@@ -49,9 +49,14 @@ end
 
 local current_search = ""
 
+function final_html_list(list, as_msg)
+   local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
+   return as_msg and html_msg_list(list, config) or html_list_keyval(list)
+end
+
 local function js_listupdate(list, as_msg)
    search_cnt = search_cnt + 1
-   return { list=(as_msg and html_msg_list or html_list_keyval)(list),
+   return { list=final_html_list(list, as_msg),
             cnt=#list, search_cnt=search_cnt }
 end
 
@@ -90,18 +95,23 @@ export_funcs={
 }
 local pages = {
    test = function(meta, dir_split, html)
-      local list = log.new_sql_help().result()
-      
       chrome_ran_cnt = chrome_ran_cnt + 1
+      local query = total_query("")
+      local list = query.result()
+      local sql_shown = true
       return string.gsub(html, "{%%(%w+)}",
                          { stylesheet = stylesheet, js=js,
-                           title=string.format("%s:%s", chrome_name, "test"),
-                           chromeRanCnt=chrome_ran_cnt,
-                           cnt=#list,
-                           list=html_msg_list(list)
+                           title = string.format("%s:%s", chrome_name, "test"),
+                           chromeRanCnt = chrome_ran_cnt,
+                           cnt = #list,
+                           list = final_html_list(list, true),
+                           sqlInput = sql_show and query.sql_code() or "",
+                           sqlShown = tostring(sql_shown)
                          })
    end,
 }
+
+local inits = {}
 
 chrome.add(chrome_name, function (view, meta)
     local dir_split = lousy.util.string.split(meta.path, "/")
@@ -118,10 +128,9 @@ chrome.add(chrome_name, function (view, meta)
        -- Wait for new page to be created
        if status ~= "first-visual" then return end
        
-       for name, func in pairs(export_funcs) do
-          view:register_function(name, func)
-       end
+       for name, func in pairs(export_funcs) do view:register_function(name, func) end
        
+       if inits[use_name] then inits[use_name]() end
        -- Hack to run-once
        view:remove_signal("load-status", on_first_visual)
     end

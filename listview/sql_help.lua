@@ -7,18 +7,61 @@
 
 require "listview.common"
 
+local string_split = lousy.util.string.split
+
+local function portions(str)
+   local list = {}
+   for i, el in pairs(string_split(str, "\"")) do
+      if i%2 == 1 then
+         for _, sel in pairs(string_split(el, " ")) do table.insert(list, sel) end
+      else
+         table.insert(list, el)
+      end
+   end
+   return list
+end
+
+function tagged(portions, matchable)
+   local ret, dibs = {}, false
+   for _, el in pairs(portions) do
+      local done = false
+      for _, m in pairs(matchable) do
+         if string.sub(el, 1, #m) == m then -- Match.
+            if #el == #m then
+               dibs = m  -- All of them, keep.
+               done = true
+               break
+            else
+               table.insert(ret, {m=m, v=string.sub(el, #m + 1)})
+               done = true
+               break
+            end
+         end
+      end
+      if not done then
+         if dibs then -- Previous matched, get it.
+            table.insert(ret, {m=m, v=el})
+            dibs = nil
+         else 
+            table.insert(ret, {v=el})
+         end
+      end
+   end
+   return ret
+end
+
 local sql_help_meta = metatable_for({
 determine = {},
 direct = {
    extcmd = function(self) return function(str, ...)
-         local start = self.first and "WHERE " or self.how .. " "
-         table.insert(self.cmd, string.format(start .. str, ...))
+         if self.first and self.first == "boolean" then self.first = "WHERE" end
+         table.insert(self.cmd, string.format((self.first or "") .. str, ...))
          self.first = false
    end end,
 
    incorporate = function(self) return function(subhelp)
-         for _, cmd in pairs(subhelp.cmd)   do table.insert(self.cmd,   cmd) end
-         for _, inp in pairs(subhelp.input) do table.insert(self.input, inp) end
+         for _, c in pairs(subhelp.cmd)   do table.insert(self.cmd,   c) end
+         for _, i in pairs(subhelp.input) do table.insert(self.input, i) end
    end end,
 
    equal_one_or_list = function (self) return function(which, input)
@@ -37,6 +80,7 @@ direct = {
          end
    end end,
 
+   -- TODO just higher-then and lower-then instead of this.
    sql_range  = function (self) return function(which, from, to)  -- TODO
          if type(from) == "table" then
             assert(not to)
@@ -59,27 +103,90 @@ direct = {
    end end,
 
    -- Note assumes `taggings` exists.
-   require_tags = function (self) return function(tags, w)
-         table.insert(self.input, tags)
-         local h = sql_compose("AND", true, string.format([[%sEXISTS (
+   tags = function (self) return function(tags, w)
+         if #tags == 0 then return end
+         local h = sql_compose(self.first or self.how, true, string.format([[%sEXISTS (
 SELECT * FROM taggings]], w or ""))
          h.extcmd([[to_id == m.id)]])
          h.equal_one_or_list("tag", tags)
          
          self.incorporate(h)
    end end,
-   require_not_tags = function(self) return function(tags)
-         self.require_tags(tags, "NOT ")
+   not_tags = function(self) return function(tags)
+         self.tags(tags, "NOT ")
    end end,
 
-   search = function(self) return function(search, what)
-         self.extcmd([[%s LIKE ?]], what)
-         table.insert(self.input, "%" .. search .. "%")
+   like = function(self) return function(value, what, n)
+         self.extcmd([[%s LIKE ?]], n and what .." NOT" or what)
+         table.insert(self.input, value)
+   end end,
+   not_like = function(self) return function(value, what)
+         self.like(value, what, true)
    end end,
 
-   searchtxt = function(self) return function(search)
-         local h = sql_compose("OR", self.first)
-         for _, what in pairs({"title", "uri", "desc"}) do h.search(search, what) end
+   text_like = function(self) return function(search, n)
+         local h = sql_compose("OR", (self.first or self.how))
+         for _, what in pairs({"title", "uri", "desc"}) do
+            h.like(search, n and what .. " NOT" or what)
+         end
+         table.insert(h.cmd, "(")
+         self.incorporate(h)
+         self.first = false
+   end end,
+
+   text_sw = function(self) return function(search, n)
+         return self.text_like('%' .. search .. '%', n)
+   end end,
+   like_sw = function(self) return function(search, what, n)
+         return self.like('%' .. search .. '%', what, n)
+   end end,
+
+   search = function(self) return function(str)
+         local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
+                            "uri:", "desc:", "title:",
+                            "urilike:", "desclike:", "titlelike:"}
+         local tagged_list = tagged(portions(str), matchable)
+
+         local n, tags, not_tags = false, {}, {}
+         local h = sql_compose("AND", self.first)
+         for i, el in pairs(tagged_list) do
+            local m, v = el.m, el.v
+            print(m, v)
+            local reset = true
+            if m == "-like:" or m == "-lk:" or m == "like:" or m == "lk:" then
+               h.text_like(v, try, string.sub(m, 1, 2) == "-")
+            elseif m == "tags:" then
+               for _, t in pairs(string_split(v, "[,;]")) do table.insert(tags, t) end
+            elseif m == "-tags:" then
+               for _, t in pairs(string_split(v, "[,;]")) do table.insert(not_tags, t) end
+            elseif m == "not: " or m == "-" then
+               n = n or (m == "not:")
+               h.text_sw(v, true)
+            elseif m == "\\-" then
+               h.text_sw("-" .. v, n)
+            elseif m == "or:" then  -- NOTE `or:` takes precidence here!!
+               h.how = "OR"
+               if v then 
+                  h.text_sw(w, n) 
+               else -- Wait a sec.
+                  reset = true
+               end
+            elseif m == "uri:" or m == "desc:" or m == "title:" then
+               h.like_sw(v, string.sub(m, 1, #m - 1), n)
+            elseif m == "urilike:" or m == "desclike:" or m == "titlelike:" then
+               h.like(v, string.sub(m, 1, #m-5), n)
+            --elseif m == "after:" then
+            --elseif m == "before:" then
+            else
+               h.text_sw(v, n)
+            end
+            if reset then h.how = "AND" end
+         end
+         h.how = "AND"
+         h.tags(tags)
+         h.not_tags(not_tags)
+         
+         -- TODO for .. tags
          self.incorporate(h)
          self.first = false
    end end,
@@ -108,7 +215,7 @@ SELECT * FROM taggings]], w or ""))
    
    -- Note: not what is used for the actual query.
    sql_code = function(self) return function()
-         local pat = lousy.util.string.split(self.sql_pattern(), "?")
+         local pat = string_split(self.sql_pattern(), "?")
          local str = pat[1]
          for i, el in pairs(self.input) do
             if string.find(el, "[%%]") then
@@ -128,6 +235,7 @@ SELECT * FROM taggings]], w or ""))
 }})
 
 function sql_compose(how, first, initial)  -- Less involved a bit.
+   if first == nil then first = true end
    local helper = {cmd = initial and {initial} or {}, first=first,
                    input = {},
                    how = how or "AND" }

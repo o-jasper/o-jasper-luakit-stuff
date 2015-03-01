@@ -3,9 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>{%title}</title>
-    <style type="text/css">
-        {%stylesheet}
-    </style>
+    <style type="text/css">{%stylesheet}</style>
     <script type="text/javascript">{%js}</script>
 </head>
 <body>
@@ -30,8 +28,7 @@
 <button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
 <button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button>
 <br>
-<textarea id="sql_input" rows="5" cols="120" oninput="touch_sql();"></textarea>
-
+<textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();">{%sqlInput}</textarea>
 <span id="list">{%list}</span>
 
 <hr>
@@ -41,9 +38,10 @@ search_cnt: <span id="search_cnt">1</span>
 
 <script type="text/javascript">
 set_search_leads(true);
-set_sql_shown(true);
+set_sql_shown({%sqlShown});
 set_as_msg(true);
 set_continuous(true);
-search();</script>
+set_ids(update("", true));
+</script>
 </body>
 </html>

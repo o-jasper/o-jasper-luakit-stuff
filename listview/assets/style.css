@@ -1,5 +1,5 @@
 input{ width:50%; font-weight:bold; }
-button{ font-weight:bold; width:7em; }
+button{ font-weight:bold; width:6em; }
 
 h1,h2 {
   text-indent:10%;
@@ -32,3 +32,9 @@ input{}
 background-color:#8F8; }
 .sql_dead{ font-family:"Lucida Console", Monaco, monospace;
 background-color:#FFF; color:#555 }
+
+.time{color:#080;}
+.timeunit{color:#080; font-size:60%; font-weight:bold; align:left;}
+.timemark{font-weight:bold}
+
+.index{font-weight:bold}

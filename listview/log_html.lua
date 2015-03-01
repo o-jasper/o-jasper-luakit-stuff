@@ -17,27 +17,29 @@ local function tags_html(tags) return function(class)
    return table.concat(ret, ", ")
 end end
 
-local function delta_t_html(dt)
+-- TODO pretty messy..
+local function delta_t_html(dt, pre, aft)
+   pre, aft = pre or "", aft or ""
    local adt = math.abs(dt)
    local s, min, h, d = 1000, 60000, 3600000, 24*3600000
    if adt < s then  -- milliseconds
-      return string.format("%dms", dt)
+      return string.format("%d%sms%s", dt, pre, aft)
    elseif adt < 10*s then  -- ~ 1s
-      return string.format("%g s", math.floor(10*dt/s)/10)
+      return string.format("%g%ss%s", math.floor(10*dt/s)/10, pre, aft)
    elseif adt < min then -- seconds
-      return string.format("%d s", math.floor(dt/s))
+      return string.format("%d%ss%s", math.floor(dt/s), pre, aft)
    elseif adt < 10*min then -- ~ 1 min
-      return string.format("%g min", math.floor(10*dt/min)/10)
+      return string.format("%g%s min%s", math.floor(10*dt/min)/10, pre, aft)
    elseif adt < h then -- minutes
-      return string.format("%d min", math.floor(dt/min))
+      return string.format("%d%smin%s", math.floor(dt/min), pre, aft)
    elseif adt < 10*h then -- ~1 hour
-      return string.format("%g hours", math.floor(10*dt/h)/10)
+      return string.format("%g%s hours%s", math.floor(10*dt/h)/10, pre, aft)
    elseif adt < 3*d then -- hours
-      return string.format("%d hours", math.floor(dt/h))
+      return string.format("%d%shours%s", math.floor(dt/h), pre, aft)
    elseif adt < 10*d then -- ~ day
-      return string.format("%g days", math.floor(10*dt/d)/10)
+      return string.format("%g%sdays%s", math.floor(10*dt/d)/10, pre, aft)
    else
-      return string.format("%g days", math.floor(dt/d))
+      return string.format("%g%sdays%s", math.floor(dt/d), pre, aft)
    end
 end
 
@@ -48,13 +50,34 @@ msg_meta.direct.dateHTML = function(self)
    local state = self.html_state
    local t, ret = math.floor(self.id/1000), ""
    if not state.last_time then
-         ret = os.date(nil, math.floor(t/1000)) 
+      ret = os.date(nil, math.floor(t/1000)) 
    else
-      ret = delta_t_html(t - state.last_time)
+      local datecfg = state.config.date or {}
+      ret = delta_t_html(t - state.last_time, datecfg.pre, datecfg.aft)
    end
    state.last_time = t
-   return "<span class=\"time\">" .. ret .. "</span>"
+   return ret
 end 
+
+msg_meta.direct.timemarks = function(self)
+   local state, t = self.html_state, math.floor(self.id/1000000)
+   local tm = state.timemarks
+   if not tm then
+      state.timemarks = os.date("*t", t)
+      return ""
+   end
+   local str, d = "", os.date("*t", t)
+   local default_care = {{"year", "Y"}, {"month", "M"}, {"yday", "d"},
+                         {"hour", "h"}, {"min", "<small>m</small>"}}
+   for _, el in pairs(state.config.timemarks or default_care) do
+      local k, v = el[1], el[2]
+      if d[k] ~= tm[k] then
+         str = str .. v
+         tm[k] = d[k]
+      end
+   end
+   return str
+end
 
 function html_msg(state)
    return function (index, msg)
@@ -73,7 +96,10 @@ function html_msg(state)
    end
 end
 
-function html_msg_list(data)
-   local state = { last_time = cur_time_ms() }
-   return html_list(data, html_msg(state))
+function html_msg_list(data, config)
+   local pass_state = { 
+      last_time = cur_time_ms(),
+      config = config or {}
+   }
+   return html_list(data, html_msg(pass_state))
 end
