@@ -17,7 +17,7 @@ function get_ids(ids) {
     return ret;
 }
 function enter_msg() {
-    set_ids(manual_test_enter(get_ids(['title', 'desc', 'tags'])));
+    set_ids(manual_enter(get_ids(['title', 'desc', 'tags'])));
 }
 
 var hide_buttons = false;
@@ -72,7 +72,7 @@ function touch_search() {
 
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function search() {
-    if(search_leads){ set_ids(update(ge('search').value, as_msg)); }
+    if(search_leads){ set_ids(do_search(ge('search').value, as_msg)); }
     else{
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
