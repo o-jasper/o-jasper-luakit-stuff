@@ -27,8 +27,8 @@ local function time_interpret(str, from_t)
    local min = 60000
    local h = 60*min
    local d = 24*h
-   local f = ({ms=1, s=1000, min=min, h=h, d=d, D=d,
-               M=31*d, Y=365.25*d})[string.sub(str, j + 1)]
+   local f = ({ms=1, s=1000, ks=1000000, min=min, h=h, d=d, D=d,
+               week=7*d, wk=7*d, w=7*d, M=31*d, Y=365.25*d})[string.sub(str, j + 1)]
    
    return f and 1000*((from_t or cur_time_ms()) + num*f)
 end
