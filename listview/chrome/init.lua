@@ -39,14 +39,12 @@ local function total_query(search)
    return query
 end
 
-local current_search = ""
-
 function final_html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    return as_msg and html_msg_list(list, config) or html_list_keyval(list)
 end
 
-local chrome_ran_cnt, search_cnt = 0, 0
+local search_cnt = 0
 
 local function js_listupdate(list, as_msg)
    search_cnt = search_cnt + 1
@@ -54,74 +52,122 @@ local function js_listupdate(list, as_msg)
             cnt=#list, search_cnt=search_cnt }
 end
 
+local current_search = ""
 
-function export_funcs(allow)
-   local ret, funs = {}, {
-      manual_enter = function(inp)
-         local v= log.enter("manual", 
-                            { claimtime=cur_time_s(),
-                              re_assess_time = cur_time_s() + 120,
-                              kind = "manual test", origin = "manual test",
-                              data = "", data_uri = "",
-                              uri = "", title = inp.title, desc = inp.desc,
-                              keep = true,
-                              tags = lousy.util.string.split(inp.tags, "[,; ]+")
-                            })
-      end,
-      
-      show_sql = function(inp)
-         if inp.search ~= current_search then
-            current_search = inp.search
-            if not string.match(current_search, "^[ ,;:]+$") then
-               return { sql_input = total_query(current_search).sql_code() }
-            end
+export_funcs = {
+   manual_enter = function(inp)
+      local v= log.enter("manual", 
+                         { claimtime=cur_time_s(),
+                           re_assess_time = cur_time_s() + 120,
+                           kind = "manual test", origin = "manual test",
+                           data = "", data_uri = "",
+                           uri = "", title = inp.title, desc = inp.desc,
+                           keep = true,
+                           tags = lousy.util.string.split(inp.tags, "[,; ]+")
+                         })
+   end,
+   
+   show_sql = function(inp)
+      if inp.search ~= current_search then
+         current_search = inp.search
+         if not string.match(current_search, "^[ ,;:]+$") then
+            return { sql_input = total_query(current_search).sql_code() }
          end
-         return {}
-      end,
-      
-      manual_sql = function(sql, as_msg)
-         local list = log.db:exec(sql);
-         if as_msg then list = map(list, log._msg) end
-         return js_listupdate(list, as_msg)
-      end,
-      do_search = function(search, as_msg)
-         return js_listupdate(total_query(search).result(), as_msg)
-      end,
-   }
-   if allow == "all" then return ret end
-   for _, el in pairs(allow) do ret[el] = funs[el] end
-   return ret
-end
+      end
+      return {}
+   end,
+   
+   manual_sql = function(sql, as_msg)
+      local list = log.db:exec(sql);
+      if as_msg then list = map(list, log._msg) end
+      return js_listupdate(list, as_msg)
+   end,
+   
+   do_search = function(search, as_msg)
+      return js_listupdate(total_query(search).result(), as_msg)
+   end,
+}
 
 require "paged_chrome"
 
+function export_fun(view, names, funcs)
+   funcs = funcs or export_funcs
+   if type(names) == "string" then names = {names} end
+   for _, n in pairs(names) do view:register_function(n, funcs[n]) end
+end
+
+function replace(str, subst)
+   local n = 1
+   while n > 0 do
+      str, n = string.gsub(str, subst)
+   end
+   return str
+end
+
 pages = {
+   default_name = "search",
+
    all = { 
-      html = function(view, meta)
-         chrome_ran_cnt = chrome_ran_cnt + 1
+      html = function(self, view, meta)
          local query = total_query("")
          local list = query.result()
          local sql_shown = true
-         return string.gsub(lousy.load_asset("assets/all.html"),
-                            "{%%(%w+)}",
+
+         local parts = string.gsub(lousy.load_asset("assets/all.html") or "", "{%%(%w+)}", 
+                                   { addManual=lousy.load_asset("assets/parts/add.html"),
+                                     searchInput=lousy.load_asset("assets/parts/search.html"),
+                                   })
+         return string.gsub(parts, "{%%(%w+)}",
                             { stylesheet = lousy.load_asset("assets/style.css") or "", 
                               js         = lousy.load_asset("assets/js.js") or "",
-                              title = string.format("%s:%s", chrome_name, "test"),
-                              chromeRanCnt = tostring(chrome_ran_cnt),
+                              title = string.format("%s:%s", self.chrome_name, self.use_name),
                               cnt = tostring(#list),
                               list = final_html_list(list, true),
                               sqlInput = sql_show and query.sql_code() or "",
                               sqlShown = tostring(sql_shown)
                             })
       end,
-      init = function(view, meta)
-         for name, func in pairs(export_funcs({"manual_enter", "show_sql",
-                                               "manual_sql", "do_search"})) do
-            view:register_function(name, func)
-         end
+      init = function(self, view, meta)
+         export_fun(view, {"manual_enter", "show_sql", "manual_sql", "do_search"})
       end,
+   },
+   add = {
+      html = function(self, view, meta)
+         local parts = string.gsub(lousy.load_asset("assets/add.html") or "", "{%%(%w+)}", 
+                                   { addManual=lousy.load_asset("assets/parts/add.html") })
+         return string.gsub(parts, "{%%(%w+)}",
+                            { stylesheet = lousy.load_asset("assets/style.css") or "", 
+                              js         = lousy.load_asset("assets/js.js") or "",
+                              title = string.format("%s:%s", self.chrome_name, self.use_name)
+                            })
+      end,
+      init = function(self, view, meta)
+         export_fun(view, "manual_enter")
+      end
+   },
+   search = {
+      html = function(self, view, meta)
+         local query = total_query("")
+         local list = query.result()
+         local sql_shown = true
+
+         local parts = string.gsub(lousy.load_asset("assets/search.html") or "", "{%%(%w+)}", 
+                                   { addManual=lousy.load_asset("assets/parts/add.html"),
+                                     searchInput=lousy.load_asset("assets/parts/search.html"),
+                                   })
+         return string.gsub(parts, "{%%(%w+)}",
+                            { stylesheet = lousy.load_asset("assets/style.css") or "", 
+                              js         = lousy.load_asset("assets/js.js") or "",
+                              title = string.format("%s:%s", self.chrome_name, self.use_name),
+                              cnt = tostring(#list),
+                              list = final_html_list(list, true),
+                              sqlInput = sql_show and query.sql_code() or "",
+                              sqlShown = tostring(sql_shown)
+                            })
+      end,
+      init = function(self, view, meta)
+         export_fun(view, {"show_sql", "manual_sql", "do_search"})
+      end      
    }
 }
-pages.default = all
-
 paged_chrome("listview", pages)

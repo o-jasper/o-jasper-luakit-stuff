@@ -77,4 +77,3 @@ function search() {
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
 }
-

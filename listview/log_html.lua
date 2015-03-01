@@ -6,7 +6,7 @@
 --  (at your option) any later version.
 
 
-local html = lousy.load_asset("listview/assets/show_1.html") or ""
+local html = lousy.load_asset("listview/assets/parts/show_1.html") or ""
 
 local function tags_html(tags) return function(class)
    class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]

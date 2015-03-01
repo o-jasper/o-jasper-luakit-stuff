@@ -44,6 +44,7 @@ function html_table(data, fun, toprow, row_class, table_class, usefun)
                        tableClass=maybeclass(table_class or html.table)})
 end
 
+-- TODO sort it.
 function html_list_keyval(data, fun, toprow, row_class, table_class, el)
    return html_table(data, function(k, v)
                                if isinteger(v) and v > 1e15 then
