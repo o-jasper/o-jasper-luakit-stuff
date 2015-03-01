@@ -19,16 +19,6 @@ require "listview.log_html"
 
 log = new_log(capi.luakit.data_dir .. "/msgs.db")
 
-local html_templates = {}
-function get_template(name)
-   if not html_templates[name] then
-      html_templates[name] =
-         lousy.load_asset(string.format("assets/%s.html", name))
-   end
-   return html_templates[name] or 
-      string.format("AINT GOT A TEMPLATE FOR THIS<br> expect in assets/%s", name)
-end
-
 -- How we end up searching.
 local function total_query(search)
    assert(type(search) == "string")
@@ -90,10 +80,9 @@ export_funcs = {
 
 require "paged_chrome"
 
-function export_fun(view, names, funcs)
-   funcs = funcs or export_funcs
-   if type(names) == "string" then names = {names} end
-   for _, n in pairs(names) do view:register_function(n, funcs[n]) end
+local function asset(what, kind) 
+   return lousy.load_asset("listview/assets/" .. what .. (kind or ".html"))
+      or "COULDNT FIND ASSET"
 end
 
 pages = {
@@ -105,19 +94,18 @@ pages = {
          local list = query.result()
          local sql_shown = true
 
-         local parts = string.gsub(lousy.load_asset("assets/all.html") or "", "{%%(%w+)}", 
-                                   { addManual=lousy.load_asset("assets/parts/add.html"),
-                                     searchInput=lousy.load_asset("assets/parts/search.html"),
-                                   })
-         return string.gsub(parts, "{%%(%w+)}",
-                            { stylesheet = lousy.load_asset("assets/style.css") or "", 
-                              js         = lousy.load_asset("assets/js.js") or "",
-                              title = string.format("%s:%s", self.chrome_name, self.use_name),
-                              cnt = tostring(#list),
-                              list = final_html_list(list, true),
-                              sqlInput = sql_show and query.sql_code() or "",
-                              sqlShown = tostring(sql_shown)
-                            })
+         return full_gsub(asset(self.name),
+                          { addManual=asset("parts/add"), 
+                            searchInput=asset("parts/search"),
+                            -- Non-parts.
+                            stylesheet = asset("assets/style", ".css"), 
+                            js         = asset("assets/js", ".js"),
+                            title = string.format("%s:%s", self.chrome_name, self.name),
+                            cnt = #list,
+                            list = final_html_list(list, true),
+                            sqlInput = sql_show and query.sql_code() or "",
+                            sqlShown = sql_shown,
+                          })
       end,
       init = function(self, view, meta)
          export_fun(view, {"manual_enter", "show_sql", "manual_sql", "do_search"})
@@ -125,13 +113,12 @@ pages = {
    },
    add = {
       html = function(self, view, meta)
-         local parts = string.gsub(lousy.load_asset("assets/add.html") or "", "{%%(%w+)}", 
-                                   { addManual=lousy.load_asset("assets/parts/add.html") })
-         return string.gsub(parts, "{%%(%w+)}",
-                            { stylesheet = lousy.load_asset("assets/style.css") or "", 
-                              js         = lousy.load_asset("assets/js.js") or "",
-                              title = string.format("%s:%s", self.chrome_name, self.use_name)
-                            })
+         return full_gsub(asset(self.name),
+                          { addManual=asset("parts/add"),
+                            stylesheet = asset("style", ".css") or "", 
+                            js         = asset("js", ".js") or "",
+                            title = string.format("%s:%s", self.chrome_name, self.name),
+                          })
       end,
       init = function(self, view, meta)
          export_fun(view, "manual_enter")
@@ -143,23 +130,21 @@ pages = {
          local list = query.result()
          local sql_shown = true
 
-         local parts = string.gsub(lousy.load_asset("assets/search.html") or "", "{%%(%w+)}", 
-                                   { addManual=lousy.load_asset("assets/parts/add.html"),
-                                     searchInput=lousy.load_asset("assets/parts/search.html"),
-                                   })
-         return string.gsub(parts, "{%%(%w+)}",
-                            { stylesheet = lousy.load_asset("assets/style.css") or "", 
-                              js         = lousy.load_asset("assets/js.js") or "",
-                              title = string.format("%s:%s", self.chrome_name, self.use_name),
-                              cnt = tostring(#list),
-                              list = final_html_list(list, true),
-                              sqlInput = sql_show and query.sql_code() or "",
-                              sqlShown = tostring(sql_shown)
-                            })
+         return full_gsub(asset(self.name),
+                          { searchInput=asset("parts/search"),
+                            stylesheet = asset("style", ".css"),
+                            js         = asset("js", ".js"),
+                            title = string.format("%s:%s", self.chrome_name, self.name),
+                            cnt = tostring(#list),
+                            list = final_html_list(list, true),
+                            sqlInput = sql_show and query.sql_code() or "",
+                            sqlShown = tostring(sql_shown),
+                            chromeRanCnt=13
+                          })
       end,
       init = function(self, view, meta)
          export_fun(view, {"show_sql", "manual_sql", "do_search"})
-      end      
+      end
    }
 }
 paged_chrome("listview", pages)
