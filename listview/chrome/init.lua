@@ -21,7 +21,7 @@ log = new_log(capi.luakit.data_dir .. "/msgs.db")
 
 -- How we end up searching.
 local function total_query(search)
-   assert(type(search) == "string")
+   assert(type(search) == "string", "Search not string; " .. tostring(search))
    local query = log.new_sql_help()
    if search ~= "" then query.search(search) end
    query.order_by("id")
@@ -42,8 +42,6 @@ local function js_listupdate(list, as_msg)
             cnt=#list, search_cnt=search_cnt }
 end
 
-local current_search = ""
-
 export_funcs = {
    manual_enter = function(inp)
       local v= log.enter("manual", 
@@ -58,13 +56,7 @@ export_funcs = {
    end,
    
    show_sql = function(sql)
-      if sql ~= current_search then
-         current_search = sql
-         if not string.match(current_search, "^[ ,;:]+$") then
-            return { sql_input = total_query(current_search).sql_code() }
-         end
-      end
-      return {}
+      return { sql_input = total_query(sql).sql_code() }
    end,
    
    manual_sql = function(sql, as_msg)

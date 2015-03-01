@@ -28,6 +28,8 @@ input{}
 .live{ background-color:#8F8; }
 .dead {background-color:#FFF; color:#555 }
 
+.sql_minor{ font-family:"Lucida Console", Monaco, monospace;
+background-color:#EEE; color:#999}
 .sql_live{ font-family:"Lucida Console", Monaco, monospace;
 background-color:#8F8; }
 .sql_dead{ font-family:"Lucida Console", Monaco, monospace;

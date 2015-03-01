@@ -27,22 +27,34 @@ function hide_button(name, yes) {
     el.disabled = yes;
 }
 
-var sql_shown, search_leads, as_msg, continuous;
+var sql_shown, by_search, sql_locked, as_msg, continuous;
 function set_sql_shown(yes) {
-    if( !search_leads && !yes ){ return; }
+    if( !by_search && !yes ){ return; }
     ge('sql_input').hidden = !yes;
     ge('toggle_sql_shown').innerText = yes ? "Hide SQL" : "Show SQL";
-    hide_button('toggle_search_leads', !yes)
-    if( !search_leads && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
+    hide_button('toggle_by_search', !yes)
+    if( !by_search && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
     sql_shown = yes;
 }
-function set_search_leads(yes) {
-    search_leads = yes;
-    hide_button('toggle_sql_shown', !yes);
-    ge('toggle_search_leads').innerText = yes ? "By SQL" : "By search";
 
-    ge('sql_input').className = (yes ? "sql_dead" : "sql_live");
+function sql_input_class(by_search, locked) {
+    if( locked && by_search ){ return "sql_minor"; }
+    return by_search ? "sql_dead" : "sql_live";
+}
+
+function set_by_search(yes) {
+    by_search = yes;
+    hide_button('toggle_sql_shown', !yes);
+    ge('toggle_by_search').innerText = yes ? "By SQL" : "By search";
+
+    ge('sql_input').className = sql_input_class(yes, sql_locked);
     ge('search').className    = (yes ? "live" : "dead");
+}
+function set_sql_locked(yes) {
+    sql_locked = yes
+    ge('toggle_sql_locked').innerText = yes ? "Link SQL" : "Unlink SQL";
+
+    ge('sql_input').className = sql_input_class(by_search, yes);
 }
 function set_as_msg(yes, up) {
     ge('toggle_as_msg').innerText = yes ? "Raw" : "As msg";
@@ -61,18 +73,19 @@ function set_continuous(yes, up) {
 }
 
 function touch_sql() {
-    set_search_leads(false);
+    set_sql_locked(true);
+    set_by_search(false);
     if(continuous){ search(); }
 }
 function touch_search() {
-    set_search_leads(true);
-    if( sql_shown ) { set_ids(show_sql(ge('search').value)); }
+    set_by_search(true);
+    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
     if(continuous){ search(); }
 }
 
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function search() {
-    if(search_leads){ set_ids(do_search(ge('search').value, as_msg)); }
+    if(by_search){ set_ids(do_search(ge('search').value, as_msg)); }
     else{
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
