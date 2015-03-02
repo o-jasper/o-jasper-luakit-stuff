@@ -8,7 +8,7 @@ h1,h2 {
 
 h3, h4, h5, h6 { margin-bottom:0.5em;margin-top:0.5em; }
 
-input{}
+td{padding:0.4em 0.7em ; vertical-align: text-top; align:left}
 
 .msg_tag{ background-color:#DDF; border-radius: 0.6em; border: 0.14em solid #88F;
           padding:0.1em 0.1em;
@@ -40,3 +40,5 @@ background-color:#FFF; color:#555 }
 .timemark{font-weight:bold}
 
 .index{font-weight:bold}
+
+.desc{text-indent:1em;}
