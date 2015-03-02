@@ -82,11 +82,6 @@ end
 function html_msg(state)
    return function (index, msg)
       msg.html_state = state
---      for _, el in pairs({"tags", "date"}) do  -- Make then 'real' as needed.
---         if string.find(html, el .. "HTML") then
---            msg[el .. "HTML"] = msg[el .. "HTML"](state)
---         end
---      end
       msg.index = index
       for _, k in pairs({"title", "desc", "uri", "origin"}) do 
          msg[k] = msg[k] or ""
