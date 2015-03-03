@@ -1,4 +1,4 @@
-# Bunch of luakit things
+# Bunch of [luakit](http://mason-larobina.github.io/luakit/) things
 
 Each directory has a readme. Note that
 [it depends on this pull request](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/search_login#log-in-using-pass).
@@ -9,6 +9,10 @@ Each directory has a readme. Note that
 * [listview](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/listview#list-view-lib--messages-lib)
   searching SQL, however, might end up just doing so over 
   logs, messages, bookmarks, history. (limited extent)
+
+Note that although it is called `o-jasper-luakit-stuff`, i dont mean that it is
+just my project. Just not-clogging the namespace, and getting all the damn
+things in one repo.
 
 # License
 
