@@ -9,17 +9,17 @@ function bad(msg, what)
    return what
 end
 
-function msg_tags_sanity(msg, which)
-   if msg[which] == "table" then
-      for _, tag in pairs(msg[which]) do 
+function msg_tags_sanity(msg, tags_index)
+   if msg[tags_index] == "table" then
+      for _, tag in pairs(msg[tags_index]) do 
          if type(tag) ~= "string" then
-            return bad(msg, string.format("One of the %s not a string", which))
+            return bad(msg, string.format("One of the %s not a string", tags_index))
          end
       end
-      msg[which] = table.concat(msg[which])
+      msg[tags_index] = table.concat(msg[tags_index])
    end
-   if msg[which] ~= "string" then 
-      return bad(msg, string.format("%s not a plain table or string.", which) )
+   if msg[tags_index] ~= "string" then 
+      return bad(msg, string.format("%s not a plain table or string.", tags_index) )
    end
 end
 

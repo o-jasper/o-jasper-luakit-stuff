@@ -18,7 +18,6 @@ local function time_interpret(str, from_t)
    if i == 2 then
       if string.sub(str, 1, 1) == "a" then from_t = 0 else return nil end
    end
-   print(string.sub(str, i, j), from_t, i, j)
 
    -- TODO next to time-differences could also do 'day before'
    local num = tonumber(string.sub(str, i or 1, j ~= 0 and j or #str))
@@ -33,6 +32,7 @@ local function time_interpret(str, from_t)
    return f and 1000*((from_t or cur_time_ms()) + num*f)
 end
 
+-- Splits things up by whitespace and quotes.
 local function portions(str)
    local list = {}
    for i, el in pairs(string_split(str, "\"")) do
@@ -45,6 +45,7 @@ local function portions(str)
    return list
 end
 
+-- Finds commands in the search (TODO better name)
 function tagged(portions, matchable)
    local ret, dibs = {}, false
    for _, el in pairs(portions) do
@@ -194,9 +195,9 @@ WHERE to_id == m.id]], w or "", self.config.taggings or "taggings")
             local reset = true
             if m == "-like:" or m == "-lk:" or m == "like:" or m == "lk:" then
                self.text_like(v, try, string.sub(m, 1, 2) == "-")
-            elseif m == "tags:" then
+            elseif m == "tags:" or m == "tag:" then
                for _, t in pairs(string_split(v, "[,;]")) do table.insert(tags, t) end
-            elseif m == "-tags:" then
+            elseif m == "-tags:" or m == "-tag:" then
                for _, t in pairs(string_split(v, "[,;]")) do table.insert(not_tags, t) end
             elseif m == "not: " or m == "-" then
                n = n or (m == "not:")
@@ -277,4 +278,43 @@ function new_sql_help(how, initial, db, fun, config)
                    how = how or "AND", config = config or {}}
    setmetatable(helper, sql_help_meta.table)
    return helper
+end
+
+
+
+-- Makes a metatable for entries, to get functions handy.
+function sqlentry_meta(how)
+   how = how or {}
+   local meta = {determine={}, direct={}}
+   if how.taggings then
+      local sql_tagfinder = string.format([[SELECT tag FROM %s WHERE to_id == ?]],
+                                          how.taggings)
+      -- TODO dunno if lua gets real smart about it.
+      meta.direct.realtime_tags = function(self) return function()
+            if self.logger.tags_last < self.tags_last then
+               return self.tags
+            end
+            -- Get the tags.
+            self.tags_last = cur_time()
+            self.tags = {}
+            local got = self.logger.db:exec(sql_tagfinder, {self.id})
+            for _, el in pairs(got) do
+               table.insert(self.tags, el.tag)
+            end
+            return self.tags
+      end end
+
+      meta.direct.rt_tags = meta.direct.realtime_tags
+      meta.determine.tags = function(self) return self.realtime_tags() end
+   end
+   
+   -- nil when supposed to be string reset to "".
+   for _, el in pairs(how.string_els or {}) do
+      meta.determine[el] = function(self) self[el] = "" end
+   end
+   for _, el in pairs(how.int_els or {}) do  -- nil ...  int ... to `0`.
+      meta.determine[el] = function(self) self[el] = 0 end
+   end
+
+   return metatable_for(meta)
 end

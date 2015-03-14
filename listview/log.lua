@@ -11,37 +11,7 @@ require "listview.sanity"
 
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
--- Makes a metatable..
-msg_meta = metatable_for({
-   determine = {
-      tags = function(self) return self.realtime_tags() end,
-   },
-   direct = {
-      
-   realtime_tags = function(self) return function()
-         if self.logger.tags_last < self.tags_last then
-               return self.tags
-         end
-         -- Get the tags.
-         self.tags_last = cur_time()
-         self.tags = {}
-         local got = self.logger.db:exec([[SELECT tag FROM taggings WHERE to_id == ?]], 
-                                         {self.id})
-         for _, el in pairs(got) do
-            table.insert(self.tags, el.tag)
-         end
-         return self.tags
-   end end,
-   }
-})
-
-for _, el in pairs(string_els) do  -- nil when supposed to be string reset to "".
-   msg_meta.determine[el] = function(self) self[el] = "" end
-end
-for _, el in pairs(int_els) do  -- nil ...  int ... to `0`.
-   msg_meta.determine[el] = function(self) self[el] = 0 end
-end
-msg_meta.direct.rt_tags = msg_meta.direct.realtime_tags
+msg_meta = sqlentry_meta({taggings="taggings", string_els=string_els, int_els=int_els})
 
 -- Logs entries have, likely meta-indexes,
 
@@ -125,18 +95,18 @@ local function mk_db(path)
 
         CREATE TABLE IF NOT EXISTS msgs (
             id INTEGER PRIMARY KEY,
-            claimtime INTEGER NOT NULL,
-            re_assess_time INTEGER NOT NULL,
+            claimtime INTEGER,
+            re_assess_time INTEGER,
 
             kind TEXT NOT NULL,
             origin TEXT NOT NULL,
 
-            data TEXT NOT NULL,
-            data_uri TEXT NOT NULL,
+            data TEXT,
+            data_uri TEXT,
 
-            uri TEXT NOT NULL,
+            uri TEXT,
             title TEXT NOT NULL,
-            desc TEXT NOT NULL
+            desc TEXT
         );
 
         CREATE TABLE IF NOT EXISTS taggings (
