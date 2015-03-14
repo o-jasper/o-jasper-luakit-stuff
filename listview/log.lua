@@ -28,7 +28,7 @@ direct = {
          -- to try separate different lua scripts.
          if msg.id then return "you dont get to set `id`(time), only `claimtime`" end
          msg.id = new_time_id()
-         local sanity = msg_sanity(msg)
+         local sanity = log_input_sanity(msg)
          if sanity ~= "good" then return sanity end
          
          --if self.msg_re_assess then self.msg_re_assess(msg) end

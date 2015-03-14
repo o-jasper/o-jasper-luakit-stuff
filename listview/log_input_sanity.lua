@@ -9,7 +9,7 @@ function bad(msg, what)
    return what
 end
 
-function msg_tags_sanity(msg, tags_index)
+function log_input_sanity_tags(msg, tags_index)
    if msg[tags_index] == "table" then
       for _, tag in pairs(msg[tags_index]) do 
          if type(tag) ~= "string" then
@@ -26,7 +26,7 @@ end
 string_els = {"kind", "origin", "data", "data_uri", "uri", "title", "desc"}
 int_els = {"claimtime", "id", "re_assess_time"}
 
-function msg_sanity(msg)
+function log_input_sanity(msg)
    for _, k in pairs(string_els) do
       if type(msg[k]) ~= "string" then
          return bad(msg, string.format("%s element of `msg` not a string: %s(%s)", 
@@ -37,7 +37,6 @@ function msg_sanity(msg)
    for _, k in pairs(int_els) do
       if not isinteger(msg[k]) then  return bad(msg, k .. " is not an integer") end
    end
-   msg_tags_sanity(msg, "tags")
-   msg_tags_sanity(msg, "datatags")
+   log_input_sanity_tags(msg, "tags")
    return "good"
 end
