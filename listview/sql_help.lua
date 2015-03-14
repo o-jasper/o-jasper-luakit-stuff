@@ -1,4 +1,4 @@
---  Copyright (C) 27-02-2015 Jasper den Ouden.
+--  Copyright (C) 14-03-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -75,7 +75,12 @@ function tagged(portions, matchable)
    return ret
 end
 
-local sql_help_meta = metatable_for({
+local sql_help_meta = {
+values = {
+      textlike = {"title", "uri", "desc"},
+      taggings = "taggings",
+      time = "id",
+},
 determine = {},
 direct = {
    extcmd = function(self) return function(str, ...)
@@ -134,10 +139,10 @@ direct = {
    end end,
 
    after = function(self) return function(time)
-         self.gt(self.config.time or "id", time)
+         self.gt(self.values.time, time)
    end end,
    before = function(self) return function(time)
-         self.gt(self.config.time or "id", time)
+         self.gt(self.values.time, time)
    end end,
 
    like = function(self) return function(value, what, n)
@@ -149,10 +154,16 @@ direct = {
    end end,
 
    text_like = function(self) return function(search, n)
-         if self.first then self.first = self.first .. "(" end
-         for i, what in pairs(self.config.textlike or {"title", "uri", "desc"}) do
-            self.comb((i == 1 and self.c .. "(") or "OR")
-            self.like(search, n and what .. " NOT" or what)
+         if self.first then 
+            if n then
+               self.first = self.first .. "NOT ("
+            else
+               self.first = self.first .. "(" 
+            end
+         end
+         for i, what in pairs(self.values.textlike) do
+            self.comb((i == 1 and self.c .. ((n and " NOT(") or "(")) or "OR")
+            self.like(search, what)
          end
          self.addstr(")")
    end end,
@@ -172,7 +183,7 @@ direct = {
          if #tags == 0 then return end
          self.extcmd([[%sEXISTS (
 SELECT * FROM %s
-WHERE to_id == m.id]], w or "", self.config.taggings or "taggings")
+WHERE to_id == m.id]], w or "", self.values.taggings)
          self.comb("AND")
          self.equal_one_or_list("tag", tags)
          self.addstr(")")
@@ -199,7 +210,7 @@ WHERE to_id == m.id]], w or "", self.config.taggings or "taggings")
                for _, t in pairs(string_split(v, "[,;]")) do table.insert(tags, t) end
             elseif m == "-tags:" or m == "-tag:" then
                for _, t in pairs(string_split(v, "[,;]")) do table.insert(not_tags, t) end
-            elseif m == "not: " or m == "-" then
+            elseif m == "not:" or m == "-" then
                n = n or (m == "not:")
                self.text_sw(v, true)
             elseif m == "\\-" then
@@ -266,55 +277,66 @@ WHERE to_id == m.id]], w or "", self.config.taggings or "taggings")
          return self.fun and map(list, self.fun) or list
    end end,
 
-}})
+}}
 
-function new_sql_help(how, initial, db, fun, config)
+function new_sql_help(how, initial, db, fun)
    if type(initial) == "table" then -- Is a list of stuff we want.
       initial = string.format("SELECT %s FROM msgs m", table.concat(initial, ", "))
    end
    local helper = {db = db, fun = fun, first=first or  "WHERE", c = false,
                    cmd = {initial or [[SELECT * FROM msgs m]]},
                    input = {},
-                   how = how or "AND", config = config or {}}
-   setmetatable(helper, sql_help_meta.table)
+                   how = how or "AND"}
+   setmetatable(helper, metatable_of(sql_help_meta))
    return helper
 end
 
-
-
 -- Makes a metatable for entries, to get functions handy.
-function sqlentry_meta(how)
-   how = how or {}
-   local meta = {determine={}, direct={}}
-   if how.taggings then
-      local sql_tagfinder = string.format([[SELECT tag FROM %s WHERE to_id == ?]],
-                                          how.taggings)
-      -- TODO dunno if lua gets real smart about it.
-      meta.direct.realtime_tags = function(self) return function()
-            if self.logger.tags_last < self.tags_last then
-               return self.tags
+sqlentry_meta = {
+   defaults = {},
+   values={
+      taggings="taggings",
+      string_els={}, int_els={},
+      tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
+   },
+   determine = {},
+   direct = {
+      realtime_tags = function(self) return function()
+            local logger = self.logger
+            if logger.tags_last < logger.tags_last and rawget(self, "tags_last") then
+               return rawget(self, "tags_last")
             end
             -- Get the tags.
             self.tags_last = cur_time()
             self.tags = {}
-            local got = self.logger.db:exec(sql_tagfinder, {self.id})
+            local got = logger.db:exec(self.values.tagfinder, {self.id})
             for _, el in pairs(got) do
                table.insert(self.tags, el.tag)
             end
             return self.tags
-      end end
-
-      meta.direct.rt_tags = meta.direct.realtime_tags
-      meta.determine.tags = function(self) return self.realtime_tags() end
-   end
-   
-   -- nil when supposed to be string reset to "".
-   for _, el in pairs(how.string_els or {}) do
-      meta.determine[el] = function(self) self[el] = "" end
-   end
-   for _, el in pairs(how.int_els or {}) do  -- nil ...  int ... to `0`.
-      meta.determine[el] = function(self) self[el] = 0 end
-   end
-
-   return metatable_for(meta)
-end
+      end end,
+      -- Delete in DB.
+      db_delete = function(self) return function()
+            self.logger.delete(self.id)
+      end end,
+      -- Pass any changes to object to the database.
+      db_update = function(self) return function()
+            self.logger.update_entirely_by(self)
+      end end,
+   },
+   otherwise=function(self, key)
+      local meta = getmetatable(self).meta
+      if meta.values.string_els[key] then
+         meta.defaults[key] = ""
+         return meta.defaults[key]
+      end
+      if meta.values.int_els[key] then
+         meta.defaults[key] = 0
+         return meta.defaults[key]
+      end
+      for k, _ in pairs(meta.values.string_els) do print(k, key) end
+      error(string.format("Dont know this key %s", key))
+   end,
+}
+sqlentry_meta.direct.rt_tags = sqlentry_meta.direct.realtime_tags
+sqlentry_meta.determine.tags = function(self) return self.realtime_tags() end

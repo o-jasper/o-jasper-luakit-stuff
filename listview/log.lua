@@ -1,4 +1,4 @@
---  Copyright (C) 27-02-2015 Jasper den Ouden.
+--  Copyright (C) 14-03-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -7,15 +7,21 @@
 
 require "listview.common"
 require "listview.sql_help"
-require "listview.sanity"
+require "listview.log_input_sanity"
 
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
-msg_meta = sqlentry_meta({taggings="taggings", string_els=string_els, int_els=int_els})
+msg_meta = copy_table_1(sqlentry_meta)
+
+msg_meta.values={
+   taggings="taggings",
+   string_els=values_now_set(string_els), int_els=values_now_set(int_els),
+   tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
+}
 
 -- Logs entries have, likely meta-indexes,
 
-local log_meta = metatable_for({
+local log_meta = {
 direct = {
    -- Those helps are intended to be separate objects!
    new_sql_help = function(self) return function(initial)
@@ -56,12 +62,12 @@ direct = {
          return ret
    end end,
 
-   delete = function(self) return function (id)
+   db_delete = function(self) return function (id)
          self.db:exec([[DELETE FROM msgs WHERE id == ?;
                         DELETE FROM taggings WHERE to_id == ?;]], id, id)
    end end,
 
-   update_entirely_by = function(self) return function(msg)
+   db_update = function(self) return function(msg)
          self.db:exec([[UPDATE msgs SET
 claimtime=?, re_assess_time=?,
 kind=?, origin=?, data=?, data_uri=?,
@@ -82,10 +88,10 @@ WHERE id == ?;]], {msg.claimtime, msg.re_assess_time,
    _msg = function(self) return function (msg)
          msg.logger = self
          msg.tags_last = 0
-         setmetatable(msg, msg_meta.table)
+         setmetatable(msg, metatable_of(msg_meta))
          return msg
    end end,
-}})
+}}
 
 local function mk_db(path)
    local db = capi.sqlite3{ filename = path }
@@ -122,7 +128,7 @@ function new_log(path)
                 tags_last = 0,
                 re_assess={list={}, forward=30, min_wait=60}
                }
-   setmetatable(log, log_meta.table)
+   setmetatable(log, metatable_of(log_meta))
    return log
 end
 

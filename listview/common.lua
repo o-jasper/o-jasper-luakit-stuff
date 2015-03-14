@@ -1,4 +1,4 @@
---  Copyright (C) 27-02-2015 Jasper den Ouden.
+--  Copyright (C) 14-03-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -12,26 +12,39 @@ function cur_time_ms() return math.floor(1000*socket.gettime()) end
 function cur_time_s()  return math.floor(socket.gettime()) end
 
 -- But one way to use metatables.
-function metatable_for(meta)
-   meta.direct         = meta.direct or {}
-   meta.determine      = meta.determine or {}
+function metatable_of(meta)
+   -- Ensure there is something in there.
+   meta.defaults  = meta.defaults or {}
+   meta.direct    = meta.direct or {}
+   meta.determine = meta.determine or {}
+
+   meta.defaults.values = meta.values or {}
    
-   meta.table = {__index = function(self, key)
-      local got = rawget(self, key) or meta.direct[key]
-      -- Return value, because set, or because specified by metatable.c
-      if got or type(got) == "boolean" then
-         return got(self, key)
-      else
+   return {
+      __index = function(self, key)
+         local got = rawget(self, key)
+         -- Return value, because set, or because specified by metatable.
+         if got ~= nil then return got end
+         local got = meta.defaults[key]
+         if got ~= nil then return got end
+         
+         local got = meta.direct[key]
+         if got then return got(self, key) end
+         
          local determiner = meta.determine[key]
          if determiner then  -- To be determined by functions.
             local val = determiner(self, key)
             rawset(self,key, val)
             return val
          end
-         error(string.format("... No way to get the index? %q", key))
-      end
-   end}
-   return meta
+         if meta.otherwise then
+            return meta.otherwise(self, key)
+         else
+            error(string.format("... No way to get the index? %q", key))
+         end
+      end,
+      meta = meta,
+   }
 end
 
 function isinteger(x) return type(x) == "number" and math.floor(x) == x end
@@ -51,6 +64,18 @@ end
 function map_l_kv(list, fun)
    local ret = {}
    for k, v in pairs(list) do table.insert(ret, fun(k,v)) end
+   return ret
+end
+
+function copy_table_1(tab)  -- One-deep copy of table.
+   local ret = {}
+   for k,v in pairs(tab) do ret[k] = v end
+   return ret
+end
+
+function values_now_set(tab)
+   local ret = {}
+   for _,v in pairs(tab) do ret[v] = true end
    return ret
 end
 
