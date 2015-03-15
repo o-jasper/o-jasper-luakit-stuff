@@ -17,18 +17,6 @@ require "listview.log"
 require "listview.log_html"
 --require "listview.work"
 
-log = new_log(capi.luakit.data_dir .. "/msgs.db")
-
--- How we end up searching.
-local function total_query(search)
-   assert(type(search) == "string", "Search not string; " .. tostring(search))
-   local query = log.new_sql_help()
-   if search ~= "" then query.search(search) end
-   query.order_by("id")
-   -- TODO other ones..
-   return query
-end
-
 function final_html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    return as_msg and html_msg_list(list, config) or html_list_keyval(list)
@@ -42,100 +30,104 @@ local function js_listupdate(list, as_msg)
             cnt=#list, search_cnt=search_cnt }
 end
 
-export_funcs = {
-   manual_enter = function(inp)
-      local v= log.enter("manual", 
-                         { claimtime=cur_time_s(),
-                           re_assess_time = cur_time_s() + 120,
-                           kind = "manual test", origin = "manual test",
-                           data = "", data_uri = "",
-                           uri = "", title = inp.title, desc = inp.desc,
-                           keep = true,
-                           tags = lousy.util.string.split(inp.tags, "[,; ]+")
-                         })
-   end,
+local to_js = {
+   manual_enter = function(self) return function(inp)
+         local v= self.log.enter("manual", 
+                                 { claimtime=cur_time_s(),
+                                   re_assess_time = cur_time_s() + 120,
+                                   kind = "manual test", origin = "manual test",
+                                   data = "", data_uri = "",
+                                   uri = "", title = inp.title, desc = inp.desc,
+                                   keep = true,
+                                   tags = lousy.util.string.split(inp.tags, "[,; ]+")
+                                 })
+   end end,
    
-   show_sql = function(sql)
-      return { sql_input = total_query(sql).sql_code() }
-   end,
+   show_sql = function(self) return function(sql)
+         return { sql_input = self.total_query(sql).sql_code() }
+   end end,
    
-   manual_sql = function(sql, as_msg)
-      local list = log.db:exec(sql);
-      if as_msg then list = map(list, log._msg) end
-      return js_listupdate(list, as_msg)
-   end,
+   manual_sql = function(self) return function(sql, as_msg)
+         local list = self.log.db:exec(sql);
+         if as_msg then list = map(list, self.log._msg) end
+         return js_listupdate(list, as_msg)
+   end end,
    
-   do_search = function(search, as_msg)
-      return js_listupdate(total_query(search).result(), as_msg)
-   end,
-}
-
-local function asset(what, kind) 
-   return lousy.load_asset("listview/assets/" .. what .. (kind or ".html"))
-      or "COULDNT FIND ASSET"
-end
-
-pages = {
-   default_name = "search",
-
-   all = { 
-      html = function(self, view, meta)
-         local query = total_query("")
-         local list = query.result()
-
-         return full_gsub(asset(self.name),
-                          { addManual=asset("parts/add"), 
-                            searchInput=asset("parts/search"),
-                            searchInitial=asset("parts/search_initial"),
-                            stylesheet = asset("assets/style", ".css"), 
-                            js         = asset("assets/js", ".js"),
-                            title = string.format("%s:%s", self.chrome_name, self.name),
-                            cnt = #list,
-                            list = final_html_list(list, true),
-                            sqlInput = config.sql_shown and query.sql_code() or "",
-                            sqlShown = config.sql_shown and "true" or "false",
-                          })
-      end,
-      init = function(self, view, meta)
-         export_fun(view, {"manual_enter", "show_sql", "manual_sql", "do_search"})
-      end,
-   },
-   add = {
-      html = function(self, view, meta)
-         return full_gsub(asset(self.name),
-                          { addManual=asset("parts/add"),
-                            stylesheet = asset("style", ".css") or "", 
-                            js         = asset("js", ".js") or "",
-                            title = string.format("%s:%s", self.chrome_name, self.name),
-                          })
-      end,
-      init = function(self, view, meta)
-         export_fun(view, "manual_enter")
-      end
-   },
-   search = {
-      html = function(self, view, meta)
-         local query = total_query("")
-         local list = query.result()
-         local sql_shown = true
-
-         return full_gsub(asset(self.name),
-                          { searchInput=asset("parts/search"),
-                            searchInitial=asset("parts/search_initial"),
-                            stylesheet = asset("style", ".css"),
-                            js         = asset("js", ".js"),
-                            title = string.format("%s:%s", self.chrome_name, self.name),
-                            cnt = #list,
-                            list = final_html_list(list, true),
-                            sqlInput = config.sql_show and query.sql_code() or "",
-                            sqlShown = config.sql_shown and "true" or "false",
-                          })
-      end,
-      init = function(self, view, meta)
-         export_fun(view, {"show_sql", "manual_sql", "do_search"})
-      end
-   }
+   do_search = function(self) return function(search, as_msg)
+      return js_listupdate(self.total_query(search).result(), as_msg)
+   end end,
 }
 
 require "paged_chrome"
-paged_chrome("listview", pages)
+listview_meta = copy_table(page_meta)
+listview_meta.values.to_js = {}
+
+function listview_meta.direct.total_query(self) return function(search)
+-- How we end up searching.
+      assert(type(search) == "string", "Search not string; " .. tostring(search))
+      local query = self.log.new_sql_help()
+      if search ~= "" then query.search(search) end
+      query.order_by("id")
+      -- TODO other ones..
+      return query
+end end
+
+function listview_meta.determine.log(self)
+   return new_log(capi.luakit.data_dir .. "/msgs.db")
+end
+
+
+function accept_js_funs(into_page_meta, names)
+   for _, name in pairs(names) do
+      into_page_meta.values.to_js[name] = to_js[name]
+   end
+end
+
+-- Listview.
+listview_search_meta = copy_table(listview_meta)
+listview_search_meta.direct.repl_list = function(self) return function(view, meta)
+      local query = self.total_query("")
+      local list = query.result()
+      local sql_shown = true
+      return { searchInput=asset("parts/search"),
+               searchInitial=asset("parts/search_initial"),
+               stylesheet = asset("style", ".css"),
+               js         = asset("js", ".js"),
+               title = string.format("%s:%s", self.chrome_name, self.name),
+               cnt = #list,
+               list = final_html_list(list, true),
+               sqlInput = config.sql_show and query.sql_code() or "",
+               sqlShown = config.sql_shown and "true" or "false",
+      }
+end end
+accept_js_funs(listview_search_meta, {"show_sql", "manual_sql", "do_search"})
+
+-- Adding entries
+listview_add_meta = copy_table(listview_meta)
+function listview_add_meta.direct.repl_list(self) return function(view, meta)
+      return { addManual=asset("parts/add"),
+               stylesheet = asset("style", ".css") or "", 
+               js         = asset("js", ".js") or "",
+               title = string.format("%s:%s", self.chrome_name, self.name),
+      }
+end end
+
+accept_js_funs(listview_add_meta, {"manual_enter"})
+
+-- Both those.
+listview_all_meta = copy_table_1(listview_meta)
+listview_all_meta.values.to_js = to_js
+function listview_all_meta.direct.repl_list(self) return function(view, meta)
+      local ret = listview_search_meta.direct.repl_list(self)(view, meta)
+      for k, v in pairs(listview_add_meta.direct.repl_list(self)(view, meta)) do
+         ret[k] = v
+      end
+      return ret
+end end
+
+paged_chrome("listview", {
+   default_name = "search",
+   search = setmetatable({}, metatable_of(listview_search_meta)),
+   add = setmetatable({}, metatable_of(listview_add_meta)),
+   all = setmetatable({}, metatable_of(listview_all_meta)),
+})

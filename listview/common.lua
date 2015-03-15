@@ -22,9 +22,6 @@ function metatable_of(meta)
    
    return {
       __index = function(self, key)
-         local got = rawget(self, key)
-         -- Return value, because set, or because specified by metatable.
-         if got ~= nil then return got end
          local got = meta.defaults[key]
          if got ~= nil then return got end
          
@@ -70,6 +67,18 @@ end
 function copy_table_1(tab)  -- One-deep copy of table.
    local ret = {}
    for k,v in pairs(tab) do ret[k] = v end
+   return ret
+end
+
+function copy_table(tab)  -- One-deep copy of table.
+   local ret = {}
+   for k,v in pairs(tab) do
+      if type(v) == "table" then
+         ret[k] = copy_table(v)
+      else
+         ret[k] = v
+      end
+   end
    return ret
 end
 
