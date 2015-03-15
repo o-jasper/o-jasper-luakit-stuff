@@ -14,27 +14,27 @@ local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 msg_meta = copy_table(sqlentry_meta)
 
-msg_meta.values={
-   taggings="taggings",
-   string_els=values_now_set(string_els), int_els=values_now_set(int_els),
+msg_meta.values = {
+   table_name = "msgs",
+   taggings = "taggings",
    tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
+   time = "id",
+   row_names = {"id", "claimtime", "re_assess_time", "kind", "origin",
+                "data", "data_uri",
+                "uri", "title", "desc"
+   },
+   time_overkill = false,
+
+   textlike = {"title", "uri", "desc"},
+   string_els=values_now_set(string_els),
+   int_els=values_now_set(int_els)
 }
 
 -- Logs entries have, likely meta-indexes,
 
 log_meta = copy_table(sql_help_meta)
 
-log_meta.values = {
-   textlike = {"title", "uri", "desc"},
-   table_name = "msgs",
-   taggings = "taggings",
-   time = "id",
-   row_names = {"id", "claimtime", "re_assess_time", "kind", "origin",
-                "data", "data_uri",
-                "uri", "title", "desc"
-   },
-   time_overkill = false
-}
+log_meta.values = msg_meta.values
 
 function log_meta.determine.last_time(self) return 0 end
 
@@ -72,7 +72,6 @@ log_meta.direct.fun = log_meta.direct.msg
    
 function log_meta.direct._msg(self) return function (msg)
       msg.logger = self
-      msg.tags_last = 0
       setmetatable(msg, metatable_of(msg_meta))
       return msg
 end end
@@ -109,7 +108,6 @@ end
 
 function new_log(path)
    local log = {db = mk_db(path),
-                tags_last = 0,
                 re_assess={list={}, forward=30, min_wait=60}
                }
    setmetatable(log, metatable_of(log_meta))
