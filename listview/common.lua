@@ -1,4 +1,4 @@
---  Copyright (C) 14-03-2015 Jasper den Ouden.
+--  Copyright (C) 16-03-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -40,7 +40,7 @@ function metatable_of(meta)
             if meta.otherwise then
                return meta.otherwise(self, key)
             else
-               error(string.format("... No way to get the index? %q", key))
+               error(string.format("Doesnt seem to lead to the index.. %q", key))
             end
          end,
          meta=meta
