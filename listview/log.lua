@@ -22,77 +22,60 @@ msg_meta.values={
 
 -- Logs entries have, likely meta-indexes,
 
-local log_meta = {
-direct = {
-   -- Those helps are intended to be separate objects!
-   new_sql_help = function(self) return function(initial)
-         return new_sql_help(nil, initial, self.db, self._msg)
-   end end,
+log_meta = copy_table(sql_help_meta)
 
-   -- Enter a message.
-   enter = function(self) return function(origin, msg)
-         -- NOTE: origin doesnt do anything at this point. It may be attempted
-         -- to try separate different lua scripts.
-         if msg.id then return "you dont get to set `id`(time), only `claimtime`" end
-         msg.id = new_time_id()
-         local sanity = log_input_sanity(msg)
-         if sanity ~= "good" then return sanity end
-         
-         --if self.msg_re_assess then self.msg_re_assess(msg) end
-         
-         ret = {}
-         if msg.keep then  -- Only bother getting it if it is keepworthy.
-            ret.msgs = self.db:exec(
-               [[INSERT INTO msgs VALUES (?, ?, ?,  ?, ?,  ?, ?,  ?, ?, ?);]],
-               { msg.id, msg.claimtime, msg.re_assess_time,
-                 msg.kind, msg.origin,
-                 msg.data, msg.data_uri,
-                 msg.uri, msg.title, msg.desc
-               })
-            ret.tags = {}
-            -- And all the tags.
-            if msg.tags and #msg.tags > 0 then
-               self.tags_last = cur_time()  -- Note time last changed.
-               for _, tag in pairs(msg.tags) do
-                  table.insert(ret.tags,
-                               self.db:exec([[INSERT INTO taggings VALUES (?, ?);]],
-                                            {msg.id, tag}))
-               end
-            end
-         end
-         return ret
-   end end,
+log_meta.values = {
+   textlike = {"title", "uri", "desc"},
+   table_name = "msgs",
+   taggings = "taggings",
+   time = "id",
+   row_names = {"id", "claimtime", "re_assess_time", "kind", "origin",
+                "data", "data_uri",
+                "uri", "title", "desc"
+   },
+   time_overkill = false
+}
 
-   db_delete = function(self) return function (id)
-         self.db:exec([[DELETE FROM msgs WHERE id == ?;
-                        DELETE FROM taggings WHERE to_id == ?;]], id, id)
-   end end,
+function log_meta.determine.last_time(self) return 0 end
 
-   db_update = function(self) return function(msg)
-         self.db:exec([[UPDATE msgs SET
-claimtime=?, re_assess_time=?,
-kind=?, origin=?, data=?, data_uri=?,
-uri=?, title=?, desc=?, tags=?
-WHERE id == ?;]], {msg.claimtime, msg.re_assess_time,
-                   msg.kind, msg.origin, msg.data, msg.data_uri,
-                   msg.uri, msg.title, msg.desc, 
-                   msg.id})
-   end end,
+function log_meta.direct.new_time_id(self) return function()
+      local time = cur_time_ms()*1000
+      if time == self.last_time then time = time + 1 end
+      -- Search for matching.
+      while self.values.time_overkill and
+      #db:exec([[SELECT id FROM ? WHERE id == ?]], {self.values.table_name, time}) > 0 do
+         time = time + 1
+      end
+      last_time = time
+      return time
+end end
+-- Enter a message.
+function log_meta.direct.db_enter(self) return function(msg)
+      if msg.id then return "you dont get to set `id`(time), only `claimtime`" end
+      msg.id = self.new_time_id()
+      local sanity = log_input_sanity(msg)
+      if sanity ~= "good" then return sanity end
+      
+      --if self.msg_re_assess then self.msg_re_assess(msg) end
+      
+      return sql_help_meta.direct.db_enter(self)(msg)
+end end
 
-   msg = function(self) return function (msg)
-         if isinteger(msg) then
-            return self._msg(self.db:exec([[SELECT * WHERE id == ?]], msg))
-         end
-         return self._msg(msg)
-   end end,
+function log_meta.direct.msg(self) return function (msg)
+      if isinteger(msg) then
+         return self._msg(self.db:exec([[SELECT * WHERE id == ?]], msg))
+      end
+      return self._msg(msg)
+end end
+
+log_meta.direct.fun = log_meta.direct.msg
    
-   _msg = function(self) return function (msg)
-         msg.logger = self
-         msg.tags_last = 0
-         setmetatable(msg, metatable_of(msg_meta))
-         return msg
-   end end,
-}}
+function log_meta.direct._msg(self) return function (msg)
+      msg.logger = self
+      msg.tags_last = 0
+      setmetatable(msg, metatable_of(msg_meta))
+      return msg
+end end
 
 local function mk_db(path)
    local db = capi.sqlite3{ filename = path }
@@ -132,16 +115,3 @@ function new_log(path)
    setmetatable(log, metatable_of(log_meta))
    return log
 end
-
-local time_overkill, last_time = false, 0
-function new_time_id()
-   local time = cur_time_ms()*1000
-   if time == last_time then time = time + 1 end
-   -- Search for matching.
-   while time_overkill and #db:exec([[SELECT id FROM msgs WHERE id == ?]], {time}) > 0 do
-      time = time + 1
-   end
-   last_time = time
-   return time
-end
-

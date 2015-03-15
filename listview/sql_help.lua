@@ -78,14 +78,14 @@ end
 local function qmarks(n)
    if n == 0 then return "" end
    local str = "?"
-   while n > 0 do
+   while n > 1 do
       str = str .. ", ?"
       n = n - 1
    end
    return str
 end
 
-local sql_help_meta = {
+sql_help_meta = {
 values = {
       textlike = {"title", "uri", "desc"},
       taggings = "taggings",
@@ -295,7 +295,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    end end,
 
    args_in_order = function(self) return function(entry)
-         return map(function(name) return entry[name] end, self.name.row_names)
+         return map(self.values.row_names, function(name) return entry[name] end)
    end end,
 
    -- Enter a message.
@@ -303,18 +303,18 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          assert(self.values.table_name and self.values.row_names)
          
          local ret = {}
-         if msg.keep then  -- Only bother getting it if it is keepworthy.
+         if add.keep then  -- Only bother getting it if it is keepworthy.
             local sql = string.format("INSERT INTO %s VALUES (%s)",
                                       self.values.table_name, qmarks(#self.values.row_names))
             ret.add = self.db:exec(sql, self.args_in_order(add))
             -- And all the tags, if we do those.
-            if msg.tags and #msg.tags > 0 and self.values.taggings then
+            if add.tags and #add.tags > 0 and self.values.taggings then
                self.tags_last = cur_time()  -- Note time last changed.
                local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
                                                  self.value.taggings)
                ret.tags = {}
-               for _, tag in pairs(msg.tags) do
-                  table.insert(ret.tags, self.db:exec(tags_insert, {msg.id, tag}))
+               for _, tag in pairs(add.tags) do
+                  table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
                end
             end
          end
