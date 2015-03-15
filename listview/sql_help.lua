@@ -92,14 +92,69 @@ values = {
       time = "id",
 },
 determine = { input = function(self) return {} end,
-              c = function(self) return fales end,
+              c = function(self) return false end,
+              tags_last = function(self) return 0 end,
             },
 direct = {
+   -- Note: use this is you want to "build" a search.
+   -- Otherwise the state is hanging around. (you can use it just the same)
    new_sql_help = function(self) return function(initial, fun)
          return new_sql_help(nil, initial, self.db, fun or self.fun,
                              getmetatable(self))
    end end,
 
+   -- Enter a message.
+   db_enter = function(self) return function(add)
+         assert(self.values.table_name and self.values.row_names)
+         
+         local ret = {}
+         if add.keep then  -- Only bother getting it if it is keepworthy.
+            local sql = string.format("INSERT INTO %s VALUES (%s)",
+                                      self.values.table_name, qmarks(#self.values.row_names))
+            ret.add = self.db:exec(sql, self.args_in_order(add))
+            -- And all the tags, if we do those.
+            if add.tags and #add.tags > 0 and self.values.taggings then
+               self.tags_last = cur_time()  -- Note time last changed.
+               local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
+                                                 self.value.taggings)
+               ret.tags = {}
+               for _, tag in pairs(add.tags) do
+                  table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
+               end
+            end
+         end
+         return ret
+   end end,
+
+   db_delete = function(self) return function (id)
+         local str = string.format([[DELETE FROM %s WHERE id == ?;
+                                     DELETE FROM %s WHERE to_id == ?;]],
+                                   self.values.table_name, self.values.taggings)
+         return self.db:exec(str, id, id)
+   end end,
+
+   db_update = function(self) return function(msg)
+         local sql = string.format("UPDATE %s SET\n", self.values.table_name)
+         for i, name in pairs(self.values.row_names) do
+            if i ~= 0 then 
+               sql = sql .. name
+               if i ~= #self.values.row_names then
+                  sql = sql .. "=?,\n"
+               else
+                  sql = sql .. "=?\n"
+               end
+            end
+         end
+         local args = self.args_in_order(add)
+         table.insert(args, args[1])
+         table.remove(args)
+         local ret = {}
+         ret.change =  self.db:exec(sql .. "WHERE id = ?", args)
+         -- TODO tags?
+         return ret
+   end end,
+
+   -- Stuff to help me construct queries based on searches.
    extcmd = function(self) return function(str, ...)
          if self.c then
             str = self.c .. " " .. str
@@ -128,6 +183,7 @@ direct = {
          self.c = self.first or how or self.how
    end end,
 
+   -- Lots of stuff to build searches from.
    equal_one_or_list = function (self) return function(which, input)
          if type(input) == "table" then
             if #input > 1 then
@@ -209,6 +265,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          self.tags(tags, "NOT ")
    end end,
 
+   -- The actual search build from it.
    search = function(self) return function(str)
          local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
                             "uri:", "desc:", "title:",
@@ -296,57 +353,6 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
 
    args_in_order = function(self) return function(entry)
          return map(self.values.row_names, function(name) return entry[name] end)
-   end end,
-
-   -- Enter a message.
-   db_enter = function(self) return function(add)
-         assert(self.values.table_name and self.values.row_names)
-         
-         local ret = {}
-         if add.keep then  -- Only bother getting it if it is keepworthy.
-            local sql = string.format("INSERT INTO %s VALUES (%s)",
-                                      self.values.table_name, qmarks(#self.values.row_names))
-            ret.add = self.db:exec(sql, self.args_in_order(add))
-            -- And all the tags, if we do those.
-            if add.tags and #add.tags > 0 and self.values.taggings then
-               self.tags_last = cur_time()  -- Note time last changed.
-               local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
-                                                 self.value.taggings)
-               ret.tags = {}
-               for _, tag in pairs(add.tags) do
-                  table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
-               end
-            end
-         end
-         return ret
-   end end,
-
-   db_delete = function(self) return function (id)
-         local str = string.format([[DELETE FROM %s WHERE id == ?;
-                                     DELETE FROM %s WHERE to_id == ?;]],
-                                   self.values.table_name, self.values.taggings)
-         return self.db:exec(str, id, id)
-   end end,
-
-   db_update = function(self) return function(msg)
-         local sql = string.format("UPDATE %s SET\n", self.values.table_name)
-         for i, name in pairs(self.values.row_names) do
-            if i ~= 0 then 
-               sql = sql .. name
-               if i ~= #self.values.row_names then
-                  sql = sql .. "=?,\n"
-               else
-                  sql = sql .. "=?\n"
-               end
-            end
-         end
-         local args = self.args_in_order(add)
-         table.insert(args, args[1])
-         table.remove(args)
-         local ret = {}
-         ret.change =  self.db:exec(sql .. "WHERE id = ?", args)
-         -- TODO tags?
-         return ret
    end end,
 }}
 

@@ -13,12 +13,12 @@ sqlentry_meta = {
       string_els={}, int_els={},
       tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
    },
-   determine = {},
+   determine = { tags_last = function(self) return 0 end },
    direct = {
       realtime_tags = function(self) return function()
             local logger = self.logger
-            if logger.tags_last < logger.tags_last and rawget(self, "tags_last") then
-               return rawget(self, "tags_last")
+            if self.tags_last > logger.tags_last and rawget(self, "tags") then
+               return rawget(self, "tags")
             end
             -- Get the tags.
             self.tags_last = cur_time()
