@@ -75,14 +75,31 @@ function tagged(portions, matchable)
    return ret
 end
 
+local function qmarks(n)
+   if n == 0 then return "" end
+   local str = "?"
+   while n > 0 do
+      str = str .. ", ?"
+      n = n - 1
+   end
+   return str
+end
+
 local sql_help_meta = {
 values = {
       textlike = {"title", "uri", "desc"},
       taggings = "taggings",
       time = "id",
 },
-determine = {},
+determine = { input = function(self) return {} end,
+              c = function(self) return fales end,
+            },
 direct = {
+   new_sql_help = function(self) return function(initial, fun)
+         return new_sql_help(nil, initial, self.db, fun or self.fun,
+                             getmetatable(self))
+   end end,
+
    extcmd = function(self) return function(str, ...)
          if self.c then
             str = self.c .. " " .. str
@@ -277,66 +294,69 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          return self.fun and map(list, self.fun) or list
    end end,
 
+   args_in_order = function(self) return function(entry)
+         return map(function(name) return entry[name] end, self.name.row_names)
+   end end,
+
+   -- Enter a message.
+   db_enter = function(self) return function(add)
+         assert(self.values.table_name and self.values.row_names)
+         
+         local ret = {}
+         if msg.keep then  -- Only bother getting it if it is keepworthy.
+            local sql = string.format("INSERT INTO %s VALUES (%s)",
+                                      self.values.table_name, qmarks(#self.values.row_names))
+            ret.add = self.db:exec(sql, self.args_in_order(add))
+            -- And all the tags, if we do those.
+            if msg.tags and #msg.tags > 0 and self.values.taggings then
+               self.tags_last = cur_time()  -- Note time last changed.
+               local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
+                                                 self.value.taggings)
+               ret.tags = {}
+               for _, tag in pairs(msg.tags) do
+                  table.insert(ret.tags, self.db:exec(tags_insert, {msg.id, tag}))
+               end
+            end
+         end
+         return ret
+   end end,
+
+   db_delete = function(self) return function (id)
+         local str = string.format([[DELETE FROM %s WHERE id == ?;
+                                     DELETE FROM %s WHERE to_id == ?;]],
+                                   self.values.table_name, self.values.taggings)
+         return self.db:exec(str, id, id)
+   end end,
+
+   db_update = function(self) return function(msg)
+         local sql = string.format("UPDATE %s SET\n", self.values.table_name)
+         for i, name in pairs(self.values.row_names) do
+            if i ~= 0 then 
+               sql = sql .. name
+               if i ~= #self.values.row_names then
+                  sql = sql .. "=?,\n"
+               else
+                  sql = sql .. "=?\n"
+               end
+            end
+         end
+         local args = self.args_in_order(add)
+         table.insert(args, args[1])
+         table.remove(args)
+         local ret = {}
+         ret.change =  self.db:exec(sql .. "WHERE id = ?", args)
+         -- TODO tags?
+         return ret
+   end end,
 }}
 
-function new_sql_help(how, initial, db, fun)
+function new_sql_help(how, initial, db, fun, meta_table)
    if type(initial) == "table" then -- Is a list of stuff we want.
       initial = string.format("SELECT %s FROM msgs m", table.concat(initial, ", "))
    end
-   local helper = {db = db, fun = fun, first=first or  "WHERE", c = false,
+   local helper = {db = db, first=first or  "WHERE", fun=fun,
                    cmd = {initial or [[SELECT * FROM msgs m]]},
-                   input = {},
                    how = how or "AND"}
-   setmetatable(helper, metatable_of(sql_help_meta))
+   setmetatable(helper, meta_table or metatable_of(sql_help_meta))
    return helper
 end
-
--- Makes a metatable for entries, to get functions handy.
-sqlentry_meta = {
-   defaults = {},
-   values={
-      taggings="taggings",
-      string_els={}, int_els={},
-      tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
-   },
-   determine = {},
-   direct = {
-      realtime_tags = function(self) return function()
-            local logger = self.logger
-            if logger.tags_last < logger.tags_last and rawget(self, "tags_last") then
-               return rawget(self, "tags_last")
-            end
-            -- Get the tags.
-            self.tags_last = cur_time()
-            self.tags = {}
-            local got = logger.db:exec(self.values.tagfinder, {self.id})
-            for _, el in pairs(got) do
-               table.insert(self.tags, el.tag)
-            end
-            return self.tags
-      end end,
-      -- Delete in DB.
-      db_delete = function(self) return function()
-            self.logger.delete(self.id)
-      end end,
-      -- Pass any changes to object to the database.
-      db_update = function(self) return function()
-            self.logger.update_entirely_by(self)
-      end end,
-   },
-   otherwise=function(self, key)
-      local meta = getmetatable(self).meta
-      if meta.values.string_els[key] then
-         meta.defaults[key] = ""
-         return meta.defaults[key]
-      end
-      if meta.values.int_els[key] then
-         meta.defaults[key] = 0
-         return meta.defaults[key]
-      end
-      for k, _ in pairs(meta.values.string_els) do print(k, key) end
-      error(string.format("Dont know this key %s", key))
-   end,
-}
-sqlentry_meta.direct.rt_tags = sqlentry_meta.direct.realtime_tags
-sqlentry_meta.determine.tags = function(self) return self.realtime_tags() end

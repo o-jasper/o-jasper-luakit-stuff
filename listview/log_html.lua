@@ -43,10 +43,10 @@ local function delta_t_html(dt, pre, aft)
    end
 end
 
-msg_meta.direct.tagsHTML = function(self)
+function msg_meta.direct.tagsHTML(self)
    return tags_html(self.tags)(self.html_state.tagsclass) 
 end
-msg_meta.direct.dateHTML = function(self)
+function msg_meta.direct.dateHTML(self, key)
    local state = self.html_state
    local t, ret = math.floor(self.id/1000), ""
    if not state.last_time then
@@ -59,7 +59,7 @@ msg_meta.direct.dateHTML = function(self)
    return ret
 end 
 
-msg_meta.direct.timemarks = function(self)
+function msg_meta.direct.timemarks(self)
    local state, t = self.html_state, math.floor(self.id/1000000)
    local tm = state.timemarks
    if not tm then

@@ -7,11 +7,12 @@
 
 require "listview.common"
 require "listview.sql_help"
+require "listview.sql_entry"
 require "listview.log_input_sanity"
 
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
-msg_meta = copy_table_1(sqlentry_meta)
+msg_meta = copy_table(sqlentry_meta)
 
 msg_meta.values={
    taggings="taggings",
