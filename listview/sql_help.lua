@@ -94,6 +94,8 @@ values = {
 determine = { input = function(self) return {} end,
               c = function(self) return false end,
               tags_last = function(self) return 0 end,
+              --(note: this thing itself doesnt generate id's for you, but provides plumbing)
+              last_id_time = function(self) return 0 end,
             },
 direct = {
    -- Note: use this is you want to "build" a search.
@@ -353,6 +355,20 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
 
    args_in_order = function(self) return function(entry)
          return map(self.values.row_names, function(name) return entry[name] end)
+   end end,
+
+   -- Stuff that can be used later on.
+   new_time_id = function(self) return function()
+         local time = cur_time_ms()*1000
+         if time == self.last_id_time then time = time + 1 end
+         -- Search for matching.
+         while self.values.time_overkill and
+               #db:exec([[SELECT id FROM ? WHERE id == ?]], 
+                        {self.values.table_name, time}) > 0 do
+            time = time + 1
+         end
+         last_time = time
+         return time
    end end,
 }}
 

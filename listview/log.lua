@@ -36,19 +36,6 @@ log_meta = copy_table(sql_help_meta)
 
 log_meta.values = msg_meta.values
 
-function log_meta.determine.last_time(self) return 0 end
-
-function log_meta.direct.new_time_id(self) return function()
-      local time = cur_time_ms()*1000
-      if time == self.last_time then time = time + 1 end
-      -- Search for matching.
-      while self.values.time_overkill and
-      #db:exec([[SELECT id FROM ? WHERE id == ?]], {self.values.table_name, time}) > 0 do
-         time = time + 1
-      end
-      last_time = time
-      return time
-end end
 -- Enter a message.
 function log_meta.direct.db_enter(self) return function(msg)
       if msg.id then return "you dont get to set `id`(time), only `claimtime`" end
