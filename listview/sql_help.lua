@@ -5,6 +5,10 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+-- TODO taggings can be used for similar purposes..
+--  Likely good to rename the concept, and have ability to use the concept
+--   multiple times, the same way.
+
 require "listview.common"
 
 local string_split = lousy.util.string.split
@@ -129,12 +133,11 @@ direct = {
    end end,
 
    db_delete = function(self) return function (id)
-         local str = string.format([[DELETE FROM %s WHERE id == ?;
-                                     DELETE FROM %s WHERE to_id == ?;]],
-                                   self.values.table_name, self.values.taggings)
-         return self.db:exec(str, id, id)
+         return self.db:exec([[DELETE FROM ? WHERE id == ?;
+                               DELETE FROM ? WHERE to_id == ?;]],
+                             self.values.table_name, id, self.values.taggings, id)
    end end,
-
+   
    db_update = function(self) return function(msg)
          local sql = string.format("UPDATE %s SET\n", self.values.table_name)
          for i, name in pairs(self.values.row_names) do
@@ -151,7 +154,13 @@ direct = {
          table.insert(args, args[1])
          table.remove(args)
          local ret = {}
-         ret.change =  self.db:exec(sql .. "WHERE id = ?", args)
+         ret.change  = self.db:exec(sql .. "WHERE id = ?", args)
+         -- Delete old ones, enter new ones.
+         ret.deltags = self.db:exec("DELETE FROM ? WHERE to_id == ?")
+         for _, tag in pairs(msg.tags) do
+            ret.tags = self.db:exec("INSERT INTO ? VALUES (?, ?)",
+                                    self.values.taggings, msg.id, tag)
+         end
          -- TODO tags?
          return ret
    end end,
@@ -358,6 +367,8 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    end end,
 
    -- Stuff that can be used later on.
+
+   -- Time-based IDs.
    new_time_id = function(self) return function()
          local time = cur_time_ms()*1000
          if time == self.last_id_time then time = time + 1 end
