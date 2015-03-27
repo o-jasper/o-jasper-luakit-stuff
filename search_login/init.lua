@@ -9,6 +9,7 @@
 -- and searches in html tags for login forms.
 
 local lousy = require("lousy")
+require "o_jasper_common"
 
 local config = globals.search_login or {}
 
@@ -38,7 +39,7 @@ end
 
 local function str_bool(bool) if bool then return "true" else return "false" end end
 
-local js = lousy.load_asset(js_file) or "alert(\"JS of search_login not found\");"
+local js = load_asset(js_file) or "alert(\"JS of search_login not found\");"
 
 -- TODO Would be handy to have this as util/common.
 local function domain_of_uri(uri) return string.lower(lousy.uri.parse(uri).host) end

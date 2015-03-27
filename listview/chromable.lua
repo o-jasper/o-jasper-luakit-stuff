@@ -11,7 +11,7 @@ config = (globals.listview or {})
 
 local lousy = require("lousy")
 
-require "listview.common"
+require "o_jasper_common"
 require "listview.html_list"
 require "listview.log"
 require "listview.log_html"

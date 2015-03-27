@@ -2,8 +2,10 @@
 
 local chrome = require("chrome")
 
+require "o_jasper_common"
+
 function asset(what, kind)
-   return lousy.load_asset("listview/assets/" .. what .. (kind or ".html"))
+   return load_asset("listview/assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
 end
 
@@ -33,10 +35,14 @@ page_meta = {
    determine = {}
 }
 
+paged_chrome_dict = {}
+
 function paged_chrome(chrome_name, pages)
+   paged_chrome_dict[chrome_name] = pages
    chrome.add(chrome_name,
               function (view, meta)
                  local use_name = lousy.util.string.split(meta.path, "/")[1]
+                 local pages = paged_chrome_dict
                  local page = pages[use_name]
                  if not page then
                     use_name = pages.default_name

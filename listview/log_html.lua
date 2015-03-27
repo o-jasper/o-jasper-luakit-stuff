@@ -5,8 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-
-local html = lousy.load_asset("listview/assets/parts/show_1.html") or ""
+require "o_jasper_common"
+local html = load_asset("listview/assets/parts/show_1.html") or ""
 
 local function tags_html(tags) return function(class)
    class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]

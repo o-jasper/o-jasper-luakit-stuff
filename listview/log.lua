@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "listview.common"
+require "o_jasper_common"
 require "listview.sql_help"
 require "listview.sql_entry"
 require "listview.log_input_sanity"

@@ -9,7 +9,7 @@
 --  Likely good to rename the concept, and have ability to use the concept
 --   multiple times, the same way.
 
-require "listview.common"
+require "o_jasper_common"
 
 local string_split = lousy.util.string.split
 
