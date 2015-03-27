@@ -49,7 +49,7 @@ local function portions(str)
    return list
 end
 
--- Finds commands in the search (TODO better name)
+-- Finds commands in the search (TODO name is confusing)
 function tagged(portions, matchable)
    local ret, dibs = {}, false
    for _, el in pairs(portions) do
@@ -79,7 +79,7 @@ function tagged(portions, matchable)
    return ret
 end
 
-local function qmarks(n)
+function qmarks(n)
    if n == 0 then return "" end
    local str = "?"
    while n > 1 do
@@ -92,7 +92,8 @@ end
 sql_help_meta = {
 values = {
       textlike = {"title", "uri", "desc"},
-      taggings = "taggings",
+      taggings = "taggings", tagname="tag",
+      idname = "id", 
       time = "id",
 },
 determine = { input = function(self) return {} end,
@@ -133,9 +134,10 @@ direct = {
    end end,
 
    db_delete = function(self) return function (id)
-         return self.db:exec([[DELETE FROM ? WHERE id == ?;
-                               DELETE FROM ? WHERE to_id == ?;]],
-                             self.values.table_name, id, self.values.taggings, id)
+         local cmd = string.format([[DELETE FROM ? WHERE %s == ?;
+DELETE FROM ? WHERE to_%s == ?;]],
+                                   self.values.idname, self.values.idname)
+         return self.db:exec(cmd, self.values.table_name, id, self.values.taggings, id)
    end end,
    
    db_update = function(self) return function(msg)
@@ -153,13 +155,15 @@ direct = {
          local args = self.args_in_order(add)
          table.insert(args, args[1])
          table.remove(args)
-         local ret = {}
-         ret.change  = self.db:exec(sql .. "WHERE id = ?", args)
-         -- Delete old ones, enter new ones.
-         ret.deltags = self.db:exec("DELETE FROM ? WHERE to_id == ?")
+         sql = sql .. string.format("WHERE %s = ?", self.values.idname)
+         local ret = {
+            change  = self.db:exec(sql, args),
+            -- Delete old ones, enter new ones.
+            deltags = self.db:exec(string.format("DELETE FROM ? WHERE to_%s == ?", idname))
+         }
          for _, tag in pairs(msg.tags) do
-            ret.tags = self.db:exec("INSERT INTO ? VALUES (?, ?)",
-                                    self.values.taggings, msg.id, tag)
+            table.insert(ret.tags, self.db:exec("INSERT INTO ? VALUES (?, ?)",
+                                                self.values.taggings, msg.id, tag))
          end
          -- TODO tags?
          return ret
@@ -172,6 +176,7 @@ direct = {
             self.c = false
          end
          self.first = false
+         self.c = ""
          table.insert(self.cmd, string.format(str, ...))
    end end,
 
@@ -263,20 +268,32 @@ direct = {
          end
    end end,
 
-   tags = function (self) return function(tags, w)
+   tags = function (self) return function(tags, taggingsname, tagname, w)
          if #tags == 0 then return end
-         self.extcmd([[%sEXISTS (
-SELECT * FROM %s
-WHERE to_id == m.id]], w or "", self.values.taggings)
-         self.comb("AND")
-         self.equal_one_or_list("tag", tags)
+         self.addstr("\nJOIN %s t ON t.to_id == m.id AND %s (",
+                     taggingsname or self.values.taggings, w or "")
+         local fw, cw = self.first, self.c
+         self.first = false
+         self.c = ""
+         print(self.values.tagname)
+         self.equal_one_or_list("t." .. (tagname or self.values.tagname), tags)
          self.addstr(")")
+         self.first, self.c = fw, cw
+--         self.extcmd([[%sEXISTS (
+--SELECT * FROM %s
+--WHERE to_id == m.id]], w or "", self.values.taggings)
+--         self.comb("AND")
+--         self.equal_one_or_list("tag", tags)
+--         self.addstr(")")
    end end,
-   not_tags = function(self) return function(tags)
-         self.tags(tags, "NOT ")
+   not_tags = function(self) return function(tags, taggingsname, tagname)
+         self.tags(tags, taggingsname, tagname, "NOT ")
    end end,
 
    -- The actual search build from it.
+   -- TODO thing is.. kindah becomes a myriad of things it has do..
+   --  To keep things organized, separate this off into a file
+   ---  particularly for this purpose.
    search = function(self) return function(str)
          local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
                             "uri:", "desc:", "title:",
@@ -344,6 +361,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    end end,
    
    -- Note: not what is used for the actual query.
+   -- TODO.. if it is a string at all, add the quotes? When quotes?
    sql_code = function(self) return function()
          local pat = string_split(self.sql_pattern(), "?")
          local str = pat[1]
