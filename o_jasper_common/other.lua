@@ -1,3 +1,5 @@
+-- Jasper den Ouden, placed in public domain.
+
 function isinteger(x) return type(x) == "number" and math.floor(x) == x end
 
 function map(list, fun)

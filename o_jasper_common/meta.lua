@@ -1,12 +1,15 @@
+-- Jasper den Ouden, placed in public domain.
+
 -- But one way to use metatables.
 function metatable_of(meta)
-   -- Ensure there is something in there.
-   meta.defaults  = meta.defaults or {}
-   meta.direct    = meta.direct or {}
-   meta.determine = meta.determine or {}
-   meta.values    = meta.values or {}
+   -- Doesnt have any concept of setting things.
+   -- (will use the normal table -setting mechanism)
+   meta.defaults  = meta.defaults or {}  -- Default value if not set.(does not set them)
+   meta.direct    = meta.direct or {}    -- Values returned-as-function.(setting overrides)
+   meta.determine = meta.determine or {} -- Run-once-stored determining values.
+   meta.values    = meta.values or {}    -- Values that have to explicitly refered to.
 
-   meta.defaults.values = meta.values
+   meta.defaults.values = meta.values  -- (this is how you get at the values)
    
    if not meta.metatable then
       meta.metatable = {
