@@ -270,21 +270,21 @@ DELETE FROM ? WHERE to_%s == ?;]],
 
    tags = function (self) return function(tags, taggingsname, tagname, w)
          if #tags == 0 then return end
-         self.addstr("\nJOIN %s t ON t.to_id == m.id AND %s (",
-                     taggingsname or self.values.taggings, w or "")
-         local fw, cw = self.first, self.c
-         self.first = false
-         self.c = ""
-         print(self.values.tagname)
-         self.equal_one_or_list("t." .. (tagname or self.values.tagname), tags)
-         self.addstr(")")
-         self.first, self.c = fw, cw
---         self.extcmd([[%sEXISTS (
---SELECT * FROM %s
---WHERE to_id == m.id]], w or "", self.values.taggings)
---         self.comb("AND")
---         self.equal_one_or_list("tag", tags)
+--         self.addstr("\nJOIN %s t ON t.to_id == m.id AND %s (",
+--                     taggingsname or self.values.taggings, w or "")
+--         local fw, cw = self.first, self.c
+--         self.first = false
+--         self.c = ""
+--         self.equal_one_or_list("t." .. (tagname or self.values.tagname), tags)
 --         self.addstr(")")
+--         self.first, self.c = fw, cw
+
+         self.extcmd([[%sEXISTS (
+SELECT * FROM %s
+WHERE to_id == m.id]], w or "", self.values.taggings)
+         self.comb("AND")
+         self.equal_one_or_list(tagname or self.values.tagname, tags)
+         self.addstr(")")
    end end,
    not_tags = function(self) return function(tags, taggingsname, tagname)
          self.tags(tags, taggingsname, tagname, "NOT ")
