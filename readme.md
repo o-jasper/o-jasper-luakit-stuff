@@ -23,7 +23,8 @@ principles.
   The user can then create objects where accessing that way gives the
   correct behavior.(by table directly, or metatable, doesnt matter)
   
-* *TODO*, there is basically no namespacing at the moment, which is not nice..
+* *TODO*, there is basically no namespacing at the moment, which is
+  *not* nice..
   
 # License
 

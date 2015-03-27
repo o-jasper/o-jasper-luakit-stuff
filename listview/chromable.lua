@@ -59,27 +59,31 @@ local to_js = {
 }
 
 require "paged_chrome"
-listview_meta = copy_table(page_meta)
-listview_meta.values.to_js = {}
 
-function listview_meta.direct.total_query(self) return function(search)
--- How we end up searching.
-      assert(type(search) == "string", "Search not string; " .. tostring(search))
-      local query = self.log.new_sql_help()
-      if search ~= "" then query.search(search) end
-      query.order_by("id")
-      -- TODO other ones..
-      return query
-end end
+-- Making the objects that do the pages.
 
-function listview_meta.determine.log(self)
-   return new_log(capi.luakit.data_dir .. "/msgs.db")
-end
-
+listview_meta = {
+   defaults = { repl_pattern = false, to_js = {} },
+   direct = {
+      total_query = function(self) return function(search)
+            -- How we end up searching.
+            assert(type(search) == "string", "Search not string; " .. tostring(search))
+            local query = self.log.new_sql_help()
+            if search ~= "" then query.search(search) end
+            query.order_by("id")
+            -- TODO other ones..
+            return query
+      end end,
+   },
+   determine = {
+      log = function(self) return new_log(capi.luakit.data_dir .. "/msgs.db") end
+   },
+   values = { to_js = {} },
+}
 
 function accept_js_funs(into_page_meta, names)
    for _, name in pairs(names) do
-      into_page_meta.values.to_js[name] = to_js[name]
+      into_page_meta.defaults.to_js[name] = to_js[name]
    end
 end
 
@@ -118,6 +122,7 @@ accept_js_funs(listview_add_meta, {"manual_enter"})
 listview_all_meta = copy_table(listview_meta)
 listview_all_meta.values.to_js = to_js
 function listview_all_meta.direct.repl_list(self) return function(view, meta)
+      -- Combine the two.
       local ret = listview_search_meta.direct.repl_list(self)(view, meta)
       for k, v in pairs(listview_add_meta.direct.repl_list(self)(view, meta)) do
          ret[k] = v

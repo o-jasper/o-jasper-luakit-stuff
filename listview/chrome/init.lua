@@ -8,10 +8,11 @@
 -- Chrome page of all logs. User may do subselection.
 
 require "listview.chromable"
+require "paged_chrome"
 
 paged_chrome("listview", {
    default_name = "search",
-   search = setmetatable({}, metatable_of(listview_search_meta)),
-   add = setmetatable({}, metatable_of(listview_add_meta)),
-   all = setmetatable({}, metatable_of(listview_all_meta)),
+   search = templated_page(setmetatable({}, metatable_of(listview_search_meta))),
+   add    = templated_page(setmetatable({}, metatable_of(listview_add_meta))),
+   all    = templated_page(setmetatable({}, metatable_of(listview_all_meta))),
 })
