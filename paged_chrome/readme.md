@@ -24,11 +24,11 @@ above;
 `page.repl_list` dictionary of values to replace in a template
 
 `page.repl_pattern` is the template itself, *however*, advised to instead
-create the file `"asset/{%page_name}.html"`, where a variant looks.
+create the file `"assets/{%page_name}.html"`, where a variant looks.
+
+**TODO** actually looks at `listview/assets/`
 
 ## Other
 
 `paged_chrome.asset(what,kind)` uses the `o_jasper_common` `load_asset`, but looks in
 the local `"assets/"` directory and `kind` is defaultly `.html`.
-
-
