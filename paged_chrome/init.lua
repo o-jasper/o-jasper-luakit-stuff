@@ -37,7 +37,7 @@ end
 
 require "o_jasper_common"
 
-function asset(what, kind)
+function asset(what, kind)  -- TODO get rid of listview.. somehow..
    return load_asset("listview/assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
 end
@@ -67,7 +67,6 @@ local templated_page_metatable = {
 }
 
 function templated_page(page)
-   x = {page=page}
-   setmetatable(x, templated_page_metatable)
-   return x
+   assert(page)
+   return setmetatable({page = page}, templated_page_metatable)
 end
