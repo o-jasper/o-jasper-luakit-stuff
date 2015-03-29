@@ -48,8 +48,9 @@ sqlentry_meta = {
          meta.defaults[key] = 0
          return meta.defaults[key]
       end
-      for k, _ in pairs(meta.values.string_els) do print(k, key) end
-      error(string.format("Dont know this key %s", key))
+      --for k, _ in pairs(meta.values.string_els) do print(k, key) end
+      --error(string.format("Dont know this key %s", key))
+      return "N/A" -- Less control, but allows the html to request stuff we dont have.
    end,
 }
 sqlentry_meta.direct.rt_tags = sqlentry_meta.direct.realtime_tags

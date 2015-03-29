@@ -93,6 +93,7 @@ sql_help_meta = {
 values = {
       textlike = {"title", "uri", "desc"},
       taggings = "taggings", tagname="tag",
+      order_by = "id",
       idname = "id", 
       time = "id",
 },
@@ -106,7 +107,9 @@ direct = {
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
    new_sql_help = function(self) return function(initial, fun)
-         return new_sql_help(nil, initial, self.db, fun or self.fun,
+         initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
+         return setmetatable({db = self.db, cmd={initial},
+                              first=first or  "WHERE", fun=fun},
                              getmetatable(self))
    end end,
 
@@ -352,10 +355,18 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
 
    order_by = function(self) return function(what, way)
          if type(what) == "table" then what = table.concat(what, ", ") end
+         assert(what)
          self.c = ""
          self.extcmd("ORDER BY %s %s", what, way or "DESC")
    end end,
-      
+   
+   row_range = function(self) return function(fr, cnt) 
+         self.c = ""
+         self.extcmd("LIMIT ?, ?")
+         self.inp(fr)
+         self.inp(cnt)
+   end end,
+
    sql_pattern = function(self) return function()
          return table.concat(self.cmd, "\n") 
    end end,
@@ -400,14 +411,3 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          return time
    end end,
 }}
-
-function new_sql_help(how, initial, db, fun, meta_table)
-   if type(initial) == "table" then -- Is a list of stuff we want.
-      initial = string.format("SELECT %s FROM msgs m", table.concat(initial, ", "))
-   end
-   local helper = {db = db, first=first or  "WHERE", fun=fun,
-                   cmd = {initial or [[SELECT * FROM msgs m]]},
-                   how = how or "AND"}
-   setmetatable(helper, meta_table or metatable_of(sql_help_meta))
-   return helper
-end

@@ -18,4 +18,4 @@ paged_chrome("listview", {
    add    = templated_page(listview_chrome(log, "add")),
    all    = templated_page(listview_chrome(log, "all")),
 })
-   
+

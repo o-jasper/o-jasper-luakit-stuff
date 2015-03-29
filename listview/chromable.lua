@@ -76,7 +76,8 @@ local listview_metas = {
                assert(type(search) == "string", "Search not string; " .. tostring(search))
                local query = self.log.new_sql_help()
                if search ~= "" then query.search(search) end
-               query.order_by("id")
+               query.order_by(self.log.values.order_by)
+               query.row_range(0, 20)
                -- TODO other ones..
                return query
          end end,
@@ -139,5 +140,6 @@ local listview_metatables = {}
 for k,v in pairs(listview_metas) do listview_metatables[k] = metatable_of(v) end
 
 function listview_chrome(log, which)
+   assert(log)
    return setmetatable({log = log}, listview_metatables[which])
 end
