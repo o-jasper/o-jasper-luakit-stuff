@@ -18,39 +18,18 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
    table_name = "history",
 --   taggings = "history_implied",
 --   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
-   time = "last_time",
-   row_names = {"uri", "title", "last_time", "visits"},
+   time = "last_visit",
+   row_names = {"id", "uri", "title", "last_visit", "visits"},
+   order_by = "last_visit",
    time_overkill = false,
 
    textlike = {"uri", "title"},
    string_els = values_now_set({"uri", "title"}),
-   int_els = values_now_set({"id", "last_time", "visits"}),
+   int_els = values_now_set({"id", "last_visit", "visits"}),
 }
 
 history_meta = copy_table(sql_help_meta)
 history_meta.values = history_entry_meta.values
-
--- Enter a message.
-function history_meta.direct.db_enter(self) return function(add)
-      local ret = {}
-      -- Whether implied not yet implemented.
-      local sql = string.format("INSERT INTO %s VALUES (%s)",
-                                self.values.table_name, qmarks(#self.values.row_names))
-      ret.add = self.db:exec(sql, self.args_in_order(add))
-      return ret
-end end
-
-function history_meta.direct.see(self) return function(entry)
-      local got = self.db:exec("SELECT * FROM history WHERE uri == ?", {entry.uri})
-      if #got == 0 then
-         return self.db_enter(self.history_entry(entry))
-      else
-         assert(#got == 1)
-         self.db:exec("DELETE FROM history WHERE uri == ?", {entry.uri})
-         entry.visits = (got.visits or 0) + 1
-         return self.db_enter(self.history_entry(entry))
-      end
-end end
 
 function history_meta.direct.history_entry(self) return function(history_entry)
       history_entry.logger = self
@@ -60,70 +39,9 @@ end end
 history_meta.direct.fun = history_meta.direct.history_entry
 history_meta.values = history_entry_meta.values
 
--- Bookmark stuff.
-bookmarks_entry_meta = copy_table(sqlentry_meta)
+local existing_history = require("history")
+local db = existing_history.db
+print("****", existing_history, db)
+for k,v in pairs(existing_history._M) do print(k,v) end
 
-bookmarks_entry_meta.values = {
-   table_name = "bookmarks",
-   taggings = "taggings", tagname="tag",
-
-   idname = "id", 
-   time = "id", time_overkill = false,
-
-   hist_row_names = {"id", "to_uri", "title", "desc", "data_uri"},
-   textlike = {"to_uri", "title", "desc"},
-   string_els = {"to_uri", "title", "desc", "data_uri"},
-   int_els = {"id"},
-
-   textlike = {"uri", "title"},
-   string_els = values_now_set({"uri", "title"}),
-   int_els = values_now_set({"id", "last_time", "visits"}),
-}
-
-bookmarks_meta = copy_table(sql_help_meta)
-bookmarks_meta.values = bookmarks_entry_meta.values
-
--- Creation.
-local config = globals.hist_n_bookmarks or {}
-
-local db = nil
-local function mk_db(path)
-   if not db then
-      path = path or config.dbfile or "grand.db"
-      db = capi.sqlite3{ filename = path }
-      db:exec [[
-        PRAGMA synchronous = OFF;
-        PRAGMA secure_delete = 1;
-
-        CREATE TABLE IF NOT EXISTS history (
-            uri TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-
-            last_time INTEGER,
-            visits INTEGER
-        );
-
-        CREATE TABLE IF NOT EXISTS history_implied (
-            to_uri TEXT PRIMARY KEY,
-            uri TEXT NOT NULL
-        );
-
-        CREATE TABLE IF NOT EXISTS bookmarks (
-            id INTEGER PRIMARY KEY,
-
-            to_uri TEXT NOT NULL,
-            title TEXT NOT NULL,
-            desc TEXT NOT NULL,
-
-            data_uri TEXT NOT NULL
-        );
-        CREATE TABLE IF NOT EXISTS taggings (
-            to_id INTEGER NOT NULL,
-            tag TEXT NOT NULL
-        );
-    ]]
-   end
-   return db
-end
-history   = setmetatable({ db = mk_db() }, metatable_of(history_meta))
-bookmarks = setmetatable({ db = mk_db() }, metatable_of(bookmarks_meta))
+history = setmetatable({ db = db }, metatable_of(history_meta))
