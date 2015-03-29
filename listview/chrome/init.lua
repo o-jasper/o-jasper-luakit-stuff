@@ -10,9 +10,12 @@
 require "listview.chromable"
 require "paged_chrome"
 
+local log = new_log(capi.luakit.data_dir .. "/msgs.db")
+
 paged_chrome("listview", {
    default_name = "search",
-   search = templated_page(setmetatable({}, metatable_of(listview_search_meta))),
-   add    = templated_page(setmetatable({}, metatable_of(listview_add_meta))),
-   all    = templated_page(setmetatable({}, metatable_of(listview_all_meta))),
+   search = templated_page(listview_chrome(log, "search")),
+   add    = templated_page(listview_chrome(log, "add")),
+   all    = templated_page(listview_chrome(log, "all")),
 })
+   

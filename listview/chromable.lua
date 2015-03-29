@@ -15,7 +15,12 @@ require "o_jasper_common"
 require "listview.html_list"
 require "listview.log"
 require "listview.log_html"
---require "listview.work"
+
+-- TODO this not really usable as lib,
+-- Function depending on a 'db', returns object for both the adding, and
+-- searching.
+-- .. hmm this is pretty close to what they are?
+--    Perhaps paged_chrome just needs a 'combiner' function?
 
 function final_html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
@@ -62,34 +67,32 @@ require "paged_chrome"
 
 -- Making the objects that do the pages.
 
-listview_meta = {
-   defaults = { repl_pattern = false, to_js = {} },
-   direct = {
-      total_query = function(self) return function(search)
-            -- How we end up searching.
-            assert(type(search) == "string", "Search not string; " .. tostring(search))
-            local query = self.log.new_sql_help()
-            if search ~= "" then query.search(search) end
-            query.order_by("id")
-            -- TODO other ones..
-            return query
-      end end,
-   },
-   determine = {
-      log = function(self) return new_log(capi.luakit.data_dir .. "/msgs.db") end
-   },
-   values = { to_js = {} },
-}
+local listview_metas = {
+   base = {
+      defaults = { repl_pattern = false, to_js = {} },
+      direct = {
+         total_query = function(self) return function(search)
+               -- How we end up searching.
+               assert(type(search) == "string", "Search not string; " .. tostring(search))
+               local query = self.log.new_sql_help()
+               if search ~= "" then query.search(search) end
+               query.order_by("id")
+               -- TODO other ones..
+               return query
+         end end,
+      },
+      values = { to_js = {} },
+}}
 
-function accept_js_funs(into_page_meta, names)
+local function accept_js_funs(into_page_meta, names)
    for _, name in pairs(names) do
       into_page_meta.defaults.to_js[name] = to_js[name]
    end
 end
 
 -- Listview.
-listview_search_meta = copy_table(listview_meta)
-listview_search_meta.direct.repl_list = function(self) return function(view, meta)
+listview_metas.search = copy_table(listview_metas.base)
+listview_metas.search.direct.repl_list = function(self) return function(view, meta)
       local query = self.total_query("")
       local list = query.result()
       local sql_shown = true
@@ -104,11 +107,11 @@ listview_search_meta.direct.repl_list = function(self) return function(view, met
                sqlShown = config.sql_shown and "true" or "false",
       }
 end end
-accept_js_funs(listview_search_meta, {"show_sql", "manual_sql", "do_search"})
+accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search"})
 
 -- Adding entries
-listview_add_meta = copy_table(listview_meta)
-function listview_add_meta.direct.repl_list(self) return function(view, meta)
+listview_metas.add = copy_table(listview_metas.base)
+function listview_metas.add.direct.repl_list(self) return function(view, meta)
       return { addManual=asset("parts/add"),
                stylesheet = asset("style", ".css") or "", 
                js         = asset("js", ".js") or "",
@@ -116,16 +119,25 @@ function listview_add_meta.direct.repl_list(self) return function(view, meta)
       }
 end end
 
-accept_js_funs(listview_add_meta, {"manual_enter"})
+accept_js_funs(listview_metas.add, {"manual_enter"})
 
 -- Both those.
-listview_all_meta = copy_table(listview_meta)
-listview_all_meta.values.to_js = to_js
-function listview_all_meta.direct.repl_list(self) return function(view, meta)
+listview_metas.all = copy_table(listview_metas.base)
+function listview_metas.all.direct.repl_list(self) return function(view, meta)
       -- Combine the two.
-      local ret = listview_search_meta.direct.repl_list(self)(view, meta)
-      for k, v in pairs(listview_add_meta.direct.repl_list(self)(view, meta)) do
+      local ret = listview_metas.search.direct.repl_list(self)(view, meta)
+      local lst = listview_metas.add.direct.repl_list(self)(view, meta)
+      for k, v in pairs(lst) do
          ret[k] = v
       end
       return ret
 end end
+
+listview_metas.all.values.to_js = to_js
+
+local listview_metatables = {}
+for k,v in pairs(listview_metas) do listview_metatables[k] = metatable_of(v) end
+
+function listview_chrome(log, which)
+   return setmetatable({log = log}, listview_metatables[which])
+end
