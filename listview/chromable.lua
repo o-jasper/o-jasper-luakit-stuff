@@ -22,16 +22,16 @@ require "listview.log_html"
 -- .. hmm this is pretty close to what they are?
 --    Perhaps paged_chrome just needs a 'combiner' function?
 
-function final_html_list(list, as_msg)
+local function final_html_list(listview, list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   return as_msg and html_msg_list(list, config) or html_list_keyval(list)
+   return as_msg and html_msg_list(listview, list, config) or html_list_keyval(list)
 end
 
 local search_cnt = 0
 
-local function js_listupdate(list, as_msg)
+local function js_listupdate(listview, list, as_msg)
    search_cnt = search_cnt + 1
-   return { list=final_html_list(list, as_msg),
+   return { list=final_html_list(listview, list, as_msg),
             cnt=#list, search_cnt=search_cnt }
 end
 
@@ -55,11 +55,11 @@ local to_js = {
    manual_sql = function(self) return function(sql, as_msg)
          local list = self.log.db:exec(sql);
          if as_msg then list = map(list, self.log._msg) end
-         return js_listupdate(list, as_msg)
+         return js_listupdate(self, list, as_msg)
    end end,
    
    do_search = function(self) return function(search, as_msg)
-      return js_listupdate(self.total_query(search).result(), as_msg)
+      return js_listupdate(self, self.total_query(search).result(), as_msg)
    end end,
 }
 
@@ -81,6 +81,18 @@ local listview_metas = {
                -- TODO other ones..
                return query
          end end,
+         asset = function(self) return function(what, kind)
+               if type(self.where) == "string" then self.where = {self.where} end
+               local after = "/assets/" .. what .. (kind or ".html")
+               for _, w in pairs(self.where) do
+                  local got = load_asset(w .. after)
+                  if got then return got end
+               end
+               return load_asset("listview" .. after) or "COULDNT FIND ASSET"
+         end end,
+         asset_getter = function(self) return function(what, kind) -- .. yah.
+               return function() return self.asset(what, kind) end
+         end end,
       },
       values = { to_js = {} },
 }}
@@ -97,13 +109,13 @@ listview_metas.search.direct.repl_list = function(self) return function(view, me
       local query = self.total_query("")
       local list = query.result()
       local sql_shown = true
-      return { searchInput=asset("parts/search"),
-               searchInitial=asset("parts/search_initial"),
-               stylesheet = asset("style", ".css"),
-               js         = asset("js", ".js"),
+      return { searchInput   = self.asset("parts/search"),
+               searchInitial = self.asset("parts/search_initial"),
+               stylesheet    = self.asset("style", ".css"),
+               js            = self.asset("js", ".js"),
                title = string.format("%s:%s", self.chrome_name, self.name),
                cnt = #list,
-               list = final_html_list(list, true),
+               list = final_html_list(self, list, true),
                sqlInput = config.sql_show and query.sql_code() or "",
                sqlShown = config.sql_shown and "true" or "false",
       }
@@ -113,9 +125,9 @@ accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search"})
 -- Adding entries
 listview_metas.add = copy_table(listview_metas.base)
 function listview_metas.add.direct.repl_list(self) return function(view, meta)
-      return { addManual=asset("parts/add"),
-               stylesheet = asset("style", ".css") or "", 
-               js         = asset("js", ".js") or "",
+      return { addManual  = self.asset("parts/add"),
+               stylesheet = self.asset("style", ".css") or "", 
+               js         = self.asset("js", ".js") or "",
                title = string.format("%s:%s", self.chrome_name, self.name),
       }
 end end
@@ -139,7 +151,7 @@ listview_metas.all.values.to_js = to_js
 local listview_metatables = {}
 for k,v in pairs(listview_metas) do listview_metatables[k] = metatable_of(v) end
 
-function listview_chrome(log, which)
+function listview_chrome(log, which, where)
    assert(log)
-   return setmetatable({log = log}, listview_metatables[which])
+   return setmetatable({log = log, where=where}, listview_metatables[which])
 end

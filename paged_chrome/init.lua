@@ -38,7 +38,7 @@ end
 require "o_jasper_common"
 
 function asset(what, kind)  -- TODO get rid of listview.. somehow..
-   return load_asset("listview/assets/" .. what .. (kind or ".html"))
+   return load_asset("assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
 end
 
@@ -50,8 +50,9 @@ local templated_page_metatable = {
    __index = function(self, key)
       local vals = {  
          html = function(view, meta)
-            return full_gsub(self.page.repl_pattern or asset(self.page.name, ".html"),
-                             self.page.repl_list(view, meta))
+            local pattern = self.page.repl_pattern or 
+               (self.page.asset or asset)(self.page.name, ".html")
+            return full_gsub(pattern, self.page.repl_list(view, meta))
          end,
          init = function(view, _)
             for name, fun in pairs(self.page.to_js) do

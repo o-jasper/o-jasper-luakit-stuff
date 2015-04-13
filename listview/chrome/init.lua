@@ -8,14 +8,15 @@
 -- Chrome page of all logs. User may do subselection.
 
 require "listview.chromable"
+require "listview.log_html"
+
 require "paged_chrome"
 
 local log = new_log(capi.luakit.data_dir .. "/msgs.db")
 
 paged_chrome("listview", {
    default_name = "search",
-   search = templated_page(listview_chrome(log, "search")),
-   add    = templated_page(listview_chrome(log, "add")),
-   all    = templated_page(listview_chrome(log, "all")),
+   search = templated_page(listview_chrome(log, "search", "listview")),
+   add    = templated_page(listview_chrome(log, "add",    "listview")),
+   all    = templated_page(listview_chrome(log, "all",    "listview")),
 })
-

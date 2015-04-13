@@ -19,7 +19,7 @@ msg_meta.values = {
    taggings = "taggings", tagname ="tag",
    tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
    order_by = "id",
-   time = "id",
+   time = "id", timemul=0.001,
    row_names = {"id", "claimtime", "re_assess_time", "kind", "origin",
                 "data", "data_uri",
                 "uri", "title", "desc"

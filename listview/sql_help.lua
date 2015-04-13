@@ -95,7 +95,7 @@ values = {
       taggings = "taggings", tagname="tag",
       order_by = "id",
       idname = "id", 
-      time = "id",
+      time = "id", timemul = 0.001,
 },
 determine = { input = function(self) return {} end,
               c = function(self) return false end,
