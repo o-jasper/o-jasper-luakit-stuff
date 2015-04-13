@@ -9,16 +9,19 @@ require "o_jasper_common"
 require "listview.sql_help"
 require "listview.sql_entry"
 
+require "listview.log"
+require "listview.log_html"  -- TODO... Want this later.
+
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 -- History stuff.
-history_entry_meta = copy_table(sqlentry_meta)
+history_entry_meta = copy_table(msg_meta)
 
 history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
 --   taggings = "history_implied",
 --   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
-   time = "last_visit",
+   time = "last_visit", timemul = 1000,
    row_names = {"id", "uri", "title", "last_visit", "visits"},
    order_by = "last_visit",
    time_overkill = false,

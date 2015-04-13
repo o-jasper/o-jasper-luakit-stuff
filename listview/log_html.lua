@@ -6,7 +6,6 @@
 --  (at your option) any later version.
 
 require "o_jasper_common"
-local html = load_asset("listview/assets/parts/show_1.html") or ""
 
 local function tags_html(tags) return function(class)
    class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]
@@ -43,14 +42,18 @@ local function delta_t_html(dt, pre, aft)
    end
 end
 
+function msg_meta.direct.ms_t(self)
+   return math.floor(self[self.logger.values.time]*self.logger.values.timemul)
+end
+
 function msg_meta.direct.tagsHTML(self)
    return tags_html(self.tags)(self.html_state.tagsclass) 
 end
-function msg_meta.direct.dateHTML(self, key)
+function msg_meta.direct.dateHTML(self)
    local state = self.html_state
-   local t, ret = math.floor(self.id/1000), ""
+   local t, ret = self.ms_t, ""
    if not state.last_time then
-      ret = os.date(nil, math.floor(t/1000)) 
+      ret = os.date(nil, math.floor(t/1000))
    else
       local datecfg = state.config.date or {}
       ret = delta_t_html(t - state.last_time, datecfg.pre, datecfg.aft)
@@ -60,26 +63,30 @@ function msg_meta.direct.dateHTML(self, key)
 end 
 
 function msg_meta.direct.timemarks(self)
-   local state, t = self.html_state, math.floor(self.id/1000000)
+   local state, t = self.html_state, self.ms_t
    local tm = state.timemarks
    if not tm then
-      state.timemarks = os.date("*t", t)
+      state.timemarks = os.date("*t", math.floor(t/1000))
       return ""
    end
-   local str, d = "", os.date("*t", t)
+   local str, d = "", os.date("*t", math.floor(t/1000))
    local default_care = {{"year", "Y"}, {"month", "M"}, {"yday", "d"},
                          {"hour", "h"}, {"min", "<small>m</small>"}}
-   for _, el in pairs(state.config.timemarks or default_care) do
+   for _, el in pairs(state.config.timemarks or default_care) do -- Things we care to mark.
       local k, v = el[1], el[2]
+      -- If that aspect of the date is no longer the same, increament it.
       if d[k] ~= tm[k] then
-         str = str .. v
+         if v then str = str .. v end  -- If want a string.
+         -- TODO for instance, a horizontal line instead.
          tm[k] = d[k]
       end
    end
    return str
 end
 
-function html_msg(state)
+--local html = load_asset("assets/parts/show_1.html") or ""
+
+function html_msg(listview, state)
    return function (index, msg)
       msg.html_state = state
       msg.index = index
@@ -87,14 +94,14 @@ function html_msg(state)
          msg[k] = msg[k] or ""
       end
       -- TODO put in more stuff.
-      return string.gsub(html, "{%%(%w+)}", msg)
+      return string.gsub(listview.asset("parts/show_1"), "{%%(%w+)}", msg)
    end
 end
 
-function html_msg_list(data, config)
+function html_msg_list(listview, data, config)
    local pass_state = { 
       last_time = cur_time_ms(),
-      config = config or {}
+      config = config or {}  -- TODO config stuff in listview?!
    }
-   return html_list(data, html_msg(pass_state))
+   return html_list(data, html_msg(listview, pass_state))
 end
