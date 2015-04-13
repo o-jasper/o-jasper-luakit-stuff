@@ -76,20 +76,32 @@ function set_continuous(yes, up) {
 }
 
 function touch_sql() {
+    reset_range_values();
     set_sql_locked(true);
     set_by_search(false);
     if(continuous){ search(); }
 }
 function touch_search() {
+    reset_range_values();
     set_by_search(true);
     if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
     if(continuous){ search(); }
 }
 
-// TODO time it and turn off continuous, which then has 'force continuous' option.
 function search() {
+    reset_range_values();
+    _search();
+}
+
+// TODO time it and turn off continuous, which then has 'force continuous' option.
+function _search() {
     if(by_search){ set_ids(do_search(ge('search').value, as_msg)); }
     else{
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
+}
+
+function cycle_results() {
+    cycle_range_values(); //Just change the parameters and search.
+    _search();
 }

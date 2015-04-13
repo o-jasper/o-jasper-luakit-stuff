@@ -61,6 +61,22 @@ local to_js = {
    do_search = function(self) return function(search, as_msg)
       return js_listupdate(self, self.total_query(search).result(), as_msg)
    end end,
+
+   cycle_range_values = function(self) return function()
+         self.set_i = self.set_i + self.set_step
+   end end,
+
+   reset_range_values = function(self) return function()
+         self.set_i   = self.values.set_i
+         self.set_cnt = self.values.set_cnt
+   end end,
+--   get_range = function(self) return function() 
+--         return {self.set_i, self.set_cnt}
+--   end end,
+--   set_range = function(self) return function(set_i, set_cnt)
+--         self.set_i = set_i
+--         self.set_cnt   = set_cnt
+--   end end,
 }
 
 require "paged_chrome"
@@ -69,7 +85,8 @@ require "paged_chrome"
 
 local listview_metas = {
    base = {
-      defaults = { repl_pattern = false, to_js = {} },
+      values = { set_i = 0, set_cnt = 20, set_step = 20 },
+      defaults = { repl_pattern = false, to_js = {}, set_i=0, set_cnt = 20, set_step=20 },
       direct = {
          total_query = function(self) return function(search)
                -- How we end up searching.
@@ -77,7 +94,9 @@ local listview_metas = {
                local query = self.log.new_sql_help()
                if search ~= "" then query.search(search) end
                query.order_by(self.log.values.order_by)
-               query.row_range(0, 20)
+               -- TODO the query itself should be able to override.
+               -- (that'd be less tricky to get not-annoying)
+               query.row_range(self.set_i, self.set_cnt)
                -- TODO other ones..
                return query
          end end,
@@ -114,13 +133,15 @@ listview_metas.search.direct.repl_list = function(self) return function(view, me
                stylesheet    = self.asset("style", ".css"),
                js            = self.asset("js", ".js"),
                title = string.format("%s:%s", self.chrome_name, self.name),
+               cycleCnt = self.set_step,
                cnt = #list,
                list = final_html_list(self, list, true),
                sqlInput = config.sql_show and query.sql_code() or "",
                sqlShown = config.sql_shown and "true" or "false",
       }
 end end
-accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search"})
+accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
+                                       "cycle_range_values", "reset_range_values"})
 
 -- Adding entries
 listview_metas.add = copy_table(listview_metas.base)
