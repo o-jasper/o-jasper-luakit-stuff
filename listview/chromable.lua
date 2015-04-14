@@ -53,9 +53,7 @@ local to_js = {
    end end,
    
    manual_sql = function(self) return function(sql, as_msg)
-         local list = self.log.db:exec(sql);
-         if as_msg then list = map(list, self.log._msg) end
-         return js_listupdate(self, list, as_msg)
+         return js_listupdate(self, self.log.exec(sql), as_msg)
    end end,
    
    do_search = function(self) return function(search, as_msg)

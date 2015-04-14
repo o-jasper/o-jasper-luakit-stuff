@@ -34,6 +34,9 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
 history_meta = copy_table(sql_help_meta)
 history_meta.values = history_entry_meta.values
 
+history_meta.direct._msg = log_meta.direct._msg  -- TODO this is suckage.
+history_meta.direct.exec = log_meta.direct.exec
+
 function history_meta.direct.history_entry(self) return function(history_entry)
       history_entry.logger = self
       return setmetatable(history_entry, metatable_of(history_entry_meta))

@@ -64,6 +64,10 @@ function log_meta.direct._msg(self) return function (msg)
       return msg
 end end
 
+function log_meta.direct.exec(self) return function (sql)
+      return map(self.db:exec(sql), self._msg)
+end end
+
 local function mk_db(path)
    local db = capi.sqlite3{ filename = path }
    db:exec [[
