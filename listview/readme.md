@@ -1,12 +1,12 @@
-
 # List view lib / messages lib
 
-Intention to make a messages/list view lib.
+Intention to make a fairly general messages/list view lib.
 
-Not sure if i can get the generality want to call it a list view lib.
+To be applied to... well whatever might use SQL to store data.
+Particularly thinking of chat clients and history/bookmarks for now.
 
 ## Search
-Search terms `AND`. Explicitly strings `"..."` are taken as whole.
+Search terms are anded. Explicit strings `""` are taken as whole.
 `keyword:...` uses the below keyword. That may also have a space inbetween
 or utilize an explicit strings. Search is not well-tested yet, and intended
 as user-interface. Expect that it may change. Implemented in
@@ -32,6 +32,22 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 ## TODO
 
+* Make it usable separately aswel, like commandline.
+  (as a user-search thing, not for programmatic use you expect to be stable)
+
 * Combine multiple tables? Searching them at the same time?
 
-* Start logging stuff
+* Make more organized, and document better.
+
+* Make the search keywords changable/extendable.
+  (add `domain:` basically `like:`.. but with `http[s]://[www.]` infront.)
+
+* (Optional)continuous scrolling, and other things to make looking at results
+  nicer. (keywords in the search should override? indicate that it is overridden?)
+  Possibly instead of "Next 20", "20 more".
+
+* Put the search term in the address bar, or at least possibly, 
+  so people can link to their searches...
+  
+  However a malicious link can mess with the SQL database. Perhaps alternatively
+  just have the hash of a search stored somewhere, connected to the search.
