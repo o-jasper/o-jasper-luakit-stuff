@@ -13,8 +13,11 @@ Download, make sure the directories are accessible from the configuration
 directory, for instance:
 
     cd  ~/.config/luakit/
-    ln -s ~/path_to_/o-jasper-luakit-stuff/listview
-    ln -s ~/path_to_/o-jasper-luakit-stuff/hist_n_bookmarks
+    ln -s path_to_/o-jasper-luakit-stuff/hist_n_bookmarks
+    ln -s path_to_/o-jasper-luakit-stuff/listview
+    ln -s path_to_/o-jasper-luakit-stuff/o_jasper_common
+    ln -s path_to_/o-jasper-luakit-stuff/paged_chrome
+    # Currently the socket lua lib might be needed.(todo)
 
 And then in `~/.config/luakit/rc.lua`, do `require "hist_n_bookmarks.chrome"`
 
@@ -24,3 +27,5 @@ should look at that.
 
 ## TODO
 * Doesnt have a remove button like the one that is included.
+* Hmm, some of the stuff requires the `socket` lua lib for millisecond times,
+  but this afaik should not require that.
