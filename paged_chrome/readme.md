@@ -1,4 +1,8 @@
 
+*NOTE* it is likely better to try emulate an existing lua server system,
+assuming one of them is well-thought out and has ajax or some such.
+(i'd expect so)
+
 Two ways to define a page, the template-based one is better IMO, the former
 is "closer to what happens".
 

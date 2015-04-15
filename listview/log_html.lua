@@ -7,6 +7,8 @@
 
 require "o_jasper_common"
 
+--- TODO better to add them to the other one?
+
 local function tags_html(tags) return function(class)
    class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]
    local ret = {}
