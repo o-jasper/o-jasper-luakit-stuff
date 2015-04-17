@@ -7,16 +7,8 @@
 
 require "o_jasper_common"
 
-local tt = require "o_jasper_common.timetext"
-
-local function tagsHTML(tags, class)
-   class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]
-   local ret = {}
-   for _, tag in pairs(tags) do
-      table.insert(ret, string.format("<span%s>%s</span>", class, tag))
-   end
-   return table.concat(ret, ", ")
-end
+local ot = require "o_jasper_common.html.other"
+local tt = require "o_jasper_common.html.time"
 
 --- TODO better to add them to the other one?
 
@@ -26,7 +18,7 @@ function msg_meta.direct.ms_t(self)
 end
 
 function msg_meta.direct.tagsHTML(self)
-   return tt.tagsHTML(self.tags, self.html_state.tagsclass) 
+   return ot.tagsHTML(self.tags, self.html_state.tagsclass) 
 end
 
 function msg_meta.direct.dateHTML(self)
