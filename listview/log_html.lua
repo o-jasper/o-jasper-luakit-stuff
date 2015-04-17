@@ -7,92 +7,43 @@
 
 require "o_jasper_common"
 
---- TODO better to add them to the other one?
+local tt = require "o_jasper_common.timetext"
 
-local function tags_html(tags) return function(class)
+local function tagsHTML(tags, class)
    class = class == "" and "" or class and " class=" .. class or [[ class="msg_tag"]]
    local ret = {}
    for _, tag in pairs(tags) do
       table.insert(ret, string.format("<span%s>%s</span>", class, tag))
    end
    return table.concat(ret, ", ")
-end end
-
--- TODO pretty messy..
-local function delta_t_html(dt, pre, aft)
-   pre, aft = pre or "", aft or ""
-   local adt = math.abs(dt)
-   local s, min, h, d = 1000, 60000, 3600000, 24*3600000
-   if adt < s then  -- milliseconds
-      return string.format("%d%sms%s", dt, pre, aft)
-   elseif adt < 10*s then  -- ~ 1s
-      return string.format("%g%ss%s", math.floor(10*dt/s)/10, pre, aft)
-   elseif adt < min then -- seconds
-      return string.format("%d%ss%s", math.floor(dt/s), pre, aft)
-   elseif adt < 10*min then -- ~ 1 min
-      return string.format("%g%s min%s", math.floor(10*dt/min)/10, pre, aft)
-   elseif adt < h then -- minutes
-      return string.format("%d%smin%s", math.floor(dt/min), pre, aft)
-   elseif adt < 10*h then -- ~1 hour
-      return string.format("%g%s hours%s", math.floor(10*dt/h)/10, pre, aft)
-   elseif adt < 3*d then -- hours
-      return string.format("%d%shours%s", math.floor(dt/h), pre, aft)
-   elseif adt < 10*d then -- ~ day
-      return string.format("%g%sdays%s", math.floor(10*dt/d)/10, pre, aft)
-   else
-      return string.format("%g%sdays%s", math.floor(dt/d), pre, aft)
-   end
 end
 
+--- TODO better to add them to the other one?
+
+-- Put it into the metamethod.
 function msg_meta.direct.ms_t(self)
    return math.floor(self[self.logger.values.time]*self.logger.values.timemul)
 end
 
 function msg_meta.direct.tagsHTML(self)
-   return tags_html(self.tags)(self.html_state.tagsclass) 
+   return tt.tagsHTML(self.tags, self.html_state.tagsclass) 
 end
+
 function msg_meta.direct.dateHTML(self)
-   local state = self.html_state
-   local t, ret = self.ms_t, ""
-   if not state.last_time then
-      ret = os.date(nil, math.floor(t/1000))
-   else
-      local datecfg = state.config.date or {}
-      ret = delta_t_html(t - state.last_time, datecfg.pre, datecfg.aft)
-   end
-   state.last_time = t
-   return ret
-end 
+   return tt.dateHTML(self.html_state, self.ms_t)
+end
 
 function msg_meta.direct.timemarks(self)
-   local state, t = self.html_state, self.ms_t
-   local tm = state.timemarks
-   if not tm then
-      state.timemarks = os.date("*t", math.floor(t/1000))
-      return ""
-   end
-   local str, d = "", os.date("*t", math.floor(t/1000))
-   local default_care = {{"year", "Y"}, {"month", "M"}, {"yday", "d"},
-                         {"hour", "h"}, {"min", "<small>m</small>"}}
-   for _, el in pairs(state.config.timemarks or default_care) do -- Things we care to mark.
-      local k, v = el[1], el[2]
-      -- If that aspect of the date is no longer the same, increament it.
-      if d[k] ~= tm[k] then
-         if v then str = str .. v end  -- If want a string.
-         -- TODO for instance, a horizontal line instead.
-         tm[k] = d[k]
-      end
-   end
-   return str
+   return tt.timemarks(self.html_state, self.ms_t)
 end
 
---local html = load_asset("assets/parts/show_1.html") or ""
-
+-- Single entry.
 function html_msg(listview, state)
    return function (index, msg)
       msg.html_state = state
       msg.index = index
-      for _, k in pairs({"title", "desc", "uri", "origin"}) do 
+      -- TODO..shouldnt be needed.
+      for _, k in pairs({"title", "desc", "uri", "origin"}) do
          msg[k] = msg[k] or ""
       end
       -- TODO put in more stuff.
