@@ -1,4 +1,4 @@
---  Copyright (C) 14-03-2015 Jasper den Ouden.
+--  Copyright (C) 18-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -6,7 +6,7 @@
 --  (at your option) any later version.
 
 -- Makes a metatable for entries, to get functions handy.
-sqlentry_meta = {
+local sql_entry_meta = {
    defaults = {},
    values={
       taggings="taggings",
@@ -53,5 +53,7 @@ sqlentry_meta = {
       return "N/A" -- Less control, but allows the html to request stuff we dont have.
    end,
 }
-sqlentry_meta.direct.rt_tags = sqlentry_meta.direct.realtime_tags
-sqlentry_meta.determine.tags = function(self) return self.realtime_tags() end
+sql_entry_meta.direct.rt_tags = sql_entry_meta.direct.realtime_tags
+sql_entry_meta.determine.tags = function(self) return self.realtime_tags() end
+
+return sql_entry_meta

@@ -6,8 +6,8 @@
 --  (at your option) any later version.
 
 require "o_jasper_common"
-local sql_help_meta = require("sql_help").sql_help_meta
-require "listview.sql_entry"
+local sql_help = require("sql_help")
+local sql_help_meta, sql_entry_meta = sql_help.sql_help_meta, sql_help.sql_entry_meta
 
 require "listview.log"
 require "listview.log_html"  -- TODO... Want this later.
