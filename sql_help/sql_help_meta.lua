@@ -1,4 +1,4 @@
---  Copyright (C) 14-03-2015 Jasper den Ouden.
+--  Copyright (C) 18-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -9,77 +9,20 @@
 --  Likely good to rename the concept, and have ability to use the concept
 --   multiple times, the same way.
 
-require "o_jasper_common"
+-- TODO make it only _compose_ it.
+
+local Public = {}
+
+require "o_jasper_common" -- TODO make this properly namespaced too.
+--local common = require "o_jasper_common"
+--local map = common.map  
+
+local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
+local searchlike = require("o_jasper_common.fromtext.searchlike").searchlike
 
 local string_split = lousy.util.string.split
 
-local function time_interpret(str, from_t)
-   local i, j = string.find(str, "[%-]?[%d]+[.]?[%d]*")
-   if j == 0 then
-      i, j = string.find(str, "[%-]?[%d]*[.]?[%d]+")
-   end
-   if not i or i > 2 then return nil end
-   if i == 2 then
-      if string.sub(str, 1, 1) == "a" then from_t = 0 else return nil end
-   end
-
-   -- TODO next to time-differences could also do 'day before'
-   local num = tonumber(string.sub(str, i or 1, j ~= 0 and j or #str))
-   if j == #str then return 1000*((from_t or cur_time_ms()) + 1000*num) end
-
-   local min = 60000
-   local h = 60*min
-   local d = 24*h
-   local f = ({ms=1, s=1000, ks=1000000, min=min, h=h, d=d, D=d,
-               week=7*d, wk=7*d, w=7*d, M=31*d, Y=365.25*d})[string.sub(str, j + 1)]
-   
-   return f and 1000*((from_t or cur_time_ms()) + num*f)
-end
-
--- Splits things up by whitespace and quotes.
-local function portions(str)
-   local list = {}
-   for i, el in pairs(string_split(str, "\"")) do
-      if i%2 == 1 then
-         for _, sel in pairs(string_split(el, " ")) do table.insert(list, sel) end
-      else
-         table.insert(list, el)
-      end
-   end
-   return list
-end
-
--- Finds commands in the search (TODO name is confusing)
-function tagged(portions, matchable)
-   local ret, dibs = {}, false
-   for _, el in pairs(portions) do
-      local done = false
-      for _, m in pairs(matchable) do
-         if string.sub(el, 1, #m) == m then -- Match.
-            if #el == #m then
-               dibs = m  -- All of them, keep.
-               done = true
-               break
-            else
-               table.insert(ret, {m=m, v=string.sub(el, #m + 1)})
-               done = true
-               break
-            end
-         end
-      end
-      if not done then
-         if dibs then -- Previous matched, get it.
-            table.insert(ret, {m=m, v=el})
-            dibs = nil
-         else 
-            table.insert(ret, {v=el})
-         end
-      end
-   end
-   return ret
-end
-
-function qmarks(n)
+local function qmarks(n)  -- Makes a string with a number of question marks in it.
    if n == 0 then return "" end
    local str = "?"
    while n > 1 do
@@ -89,8 +32,8 @@ function qmarks(n)
    return str
 end
 
-sql_help_meta = {
-values = {
+local sql_help_meta = {
+values = {  -- TODO these are the thing.. should instead just get an object with them.
       textlike = {"title", "uri", "desc"},
       taggings = "taggings", tagname="tag",
       order_by = "id",
@@ -107,69 +50,11 @@ direct = {
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
    new_sql_help = function(self) return function(initial, fun)
+         -- TODO multiple table names?
          initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
-         return setmetatable({db = self.db, cmd={initial},
+         return setmetatable({db=self.db, cmd={initial},
                               first=first or  "WHERE", fun=fun},
                              getmetatable(self))
-   end end,
-
-   -- Enter a message.
-   db_enter = function(self) return function(add)
-         assert(self.values.table_name and self.values.row_names)
-         
-         local ret = {}
-         if add.keep then  -- Only bother getting it if it is keepworthy.
-            local sql = string.format("INSERT INTO %s VALUES (%s)",
-                                      self.values.table_name, qmarks(#self.values.row_names))
-            ret.add = self.db:exec(sql, self.args_in_order(add))
-            -- And all the tags, if we do those.
-            if add.tags and #add.tags > 0 and self.values.taggings then
-               self.tags_last = cur_time()  -- Note time last changed.
-               local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
-                                                 self.value.taggings)
-               ret.tags = {}
-               for _, tag in pairs(add.tags) do
-                  table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
-               end
-            end
-         end
-         return ret
-   end end,
-
-   db_delete = function(self) return function (id)
-         local cmd = string.format([[DELETE FROM ? WHERE %s == ?;
-DELETE FROM ? WHERE to_%s == ?;]],
-                                   self.values.idname, self.values.idname)
-         return self.db:exec(cmd, self.values.table_name, id, self.values.taggings, id)
-   end end,
-   
-   db_update = function(self) return function(msg)
-         local sql = string.format("UPDATE %s SET\n", self.values.table_name)
-         for i, name in pairs(self.values.row_names) do
-            if i ~= 0 then 
-               sql = sql .. name
-               if i ~= #self.values.row_names then
-                  sql = sql .. "=?,\n"
-               else
-                  sql = sql .. "=?\n"
-               end
-            end
-         end
-         local args = self.args_in_order(add)
-         table.insert(args, args[1])
-         table.remove(args)
-         sql = sql .. string.format("WHERE %s = ?", self.values.idname)
-         local ret = {
-            change  = self.db:exec(sql, args),
-            -- Delete old ones, enter new ones.
-            deltags = self.db:exec(string.format("DELETE FROM ? WHERE to_%s == ?", idname))
-         }
-         for _, tag in pairs(msg.tags) do
-            table.insert(ret.tags, self.db:exec("INSERT INTO ? VALUES (?, ?)",
-                                                self.values.taggings, msg.id, tag))
-         end
-         -- TODO tags?
-         return ret
    end end,
 
    -- Stuff to help me construct queries based on searches.
@@ -182,7 +67,7 @@ DELETE FROM ? WHERE to_%s == ?;]],
          self.c = ""
          table.insert(self.cmd, string.format(str, ...))
    end end,
-
+   -- A piece of input.
    inp = function(self) return function(what)
          if type(what) == "table" then
             for k,v in pairs(what) do print(k, v) end
@@ -193,11 +78,12 @@ DELETE FROM ? WHERE to_%s == ?;]],
                 string.format("E(BUG): Not a string %s", what))
          table.insert(self.input, what)
    end end,
-   
+   -- Manually add string.
    addstr = function(self) return function(str, ...)
          self.cmd[#self.cmd] = self.cmd[#self.cmd] .. string.format(str, ...)
    end end,
-
+   
+   -- Combines the things.
    comb = function(self) return function(how, down)
          self.c = self.first or how or self.how
    end end,
@@ -221,22 +107,24 @@ DELETE FROM ? WHERE to_%s == ?;]],
          self.inp(input)
    end end,
 
+   -- Value less/greater then ..
    lt  = function (self) return function(which, value)  -- TODO
          self.extcmd([[%s < ?]], which)
          self.inp(value)
-   end end,
+   end end,   
    gt  = function (self) return function(which, value)  -- TODO
          self.extcmd([[%s > ?]], which)
          self.inp(value)
    end end,
-
+   -- Time is after/before ..
    after = function(self) return function(time)
          self.gt(self.values.time, time)
    end end,
    before = function(self) return function(time)
          self.gt(self.values.time, time)
    end end,
-
+   
+   -- Add a like command.
    like = function(self) return function(value, what, n)
          self.extcmd([[%s LIKE ?]], n and what .." NOT" or what)
          self.inp(value)
@@ -245,6 +133,7 @@ DELETE FROM ? WHERE to_%s == ?;]],
          self.like(value, what, true)
    end end,
 
+   -- a LIKE command on all textlike parts.
    text_like = function(self) return function(search, n)
          if self.first then 
             if n then
@@ -260,17 +149,14 @@ DELETE FROM ? WHERE to_%s == ?;]],
          self.addstr(")")
    end end,
 
+   -- Search wordm any textlike. (does that LIKE command with '%' around)
    text_sw = function(self) return function(search, n)
          if #search > 0 then
             self.text_like('%' .. search .. '%', n)
          end
    end end,
-   like_sw = function(self) return function(search, what, n)
-         if search > 0 then
-            self.like('%' .. search .. '%', what, n)
-         end
-   end end,
 
+   -- Any exact tag.
    tags = function (self) return function(tags, taggingsname, tagname, w)
          if #tags == 0 then return end
 --         self.addstr("\nJOIN %s t ON t.to_id == m.id AND %s (",
@@ -302,7 +188,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
                             "uri:", "desc:", "title:",
                             "urilike:", "desclike:", "titlelike:",
                             "before:", "after:"}
-         local tagged_list = tagged(portions(str), matchable)
+         local tagged_list = searchlike(portions(str), matchable)
 
          local n, tags, not_tags, before_t, after_t = false, {}, {}, nil, nil
          for i, el in pairs(tagged_list) do
@@ -328,7 +214,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
                   reset = true
                end
             elseif m == "uri:" or m == "desc:" or m == "title:" then
-               self.like_sw(v, string.sub(m, 1, #m - 1), n)
+               self.like(v, '%' .. string.sub(m, 1, #m - 1) .. '%', n)
             elseif m == "urilike:" or m == "desclike:" or m == "titlelike:" then
                self.like(v, string.sub(m, 1, #m-5), n)
             elseif m == "after:" and time_interpret(v) then
@@ -353,6 +239,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          if after_t then self.comb() self.after(after_t) end
    end end,
 
+   -- Sorting it.
    order_by = function(self) return function(what, way)
          if type(what) == "table" then what = table.concat(what, ", ") end
          assert(what)
@@ -360,6 +247,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          self.extcmd("ORDER BY %s %s", what, way or "DESC")
    end end,
    
+   -- Limiting the number of results.
    row_range = function(self) return function(fr, cnt) 
          self.c = ""
          self.extcmd("LIMIT ?, ?")
@@ -367,12 +255,13 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          self.inp(cnt)
    end end,
 
+   -- Patterns with all the questionmarks to be filled with `self.input`.
    sql_pattern = function(self) return function()
          return table.concat(self.cmd, "\n") 
    end end,
    
-   -- Note: not what is used for the actual query.
-   -- TODO.. if it is a string at all, add the quotes? When quotes?
+   -- Manually fill those in. USE THE SQL VERSION.
+   -- TODO SQL exposes it?
    sql_code = function(self) return function()
          local pat = string_split(self.sql_pattern(), "?")
          local str = pat[1]
@@ -385,9 +274,10 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          return str
    end end,
    
+   -- Get the result of the current query on a DB.
    result = function(self) return function(db)
          -- TODO check number of questionmarks?
-         local list = (db or self.db):exec(self.sql_pattern(), self.input)
+         local list = (self.db or db):exec(self.sql_pattern(), self.input)
          return self.fun and map(list, self.fun) or list
    end end,
 
@@ -398,16 +288,19 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    -- Stuff that can be used later on.
 
    -- Time-based IDs.
-   new_time_id = function(self) return function()
+   new_time_id = function(self) return function(db)
          local time = cur_time_ms()*1000
          if time == self.last_id_time then time = time + 1 end
          -- Search for matching.
          while self.values.time_overkill and
-               #db:exec([[SELECT id FROM ? WHERE id == ?]], 
-                        {self.values.table_name, time}) > 0 do
+            (self.db or db):exec([[SELECT ? FROM ? WHERE ? == ?]], 
+                                 {self.values.idname, self.values.table_name,
+                                  self.values.idname, time}) > 0 do
             time = time + 1
          end
          last_time = time
          return time
    end end,
 }}
+
+return sql_help_meta
