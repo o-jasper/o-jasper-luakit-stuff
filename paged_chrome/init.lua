@@ -1,17 +1,18 @@
--- Makes chrome paged-ier.
+-- Makes chrome paged-ier. TODO/NOTE: wanna basically imitate a library for
+--  servers.
+
+local Public ={ paged_chrome_dict = {} }
 
 local chrome = require("chrome")
 local lousy = require("lousy")
 
-paged_chrome_dict = {}
-
 -- Each page has an `init(view, meta)` and `html(view,meta)`
-function paged_chrome(chrome_name, pages)
-   paged_chrome_dict[chrome_name] = pages
+function Public.paged_chrome(chrome_name, pages)
+   Public.paged_chrome_dict[chrome_name] = pages
    chrome.add(chrome_name,
               function (view, meta)
                  local use_name = lousy.util.string.split(meta.path, "/")[1]
-                 local pages = paged_chrome_dict[chrome_name]
+                 local pages = Public.paged_chrome_dict[chrome_name]
                  local page = pages[use_name]
                  if not page then
                     use_name = pages.default_name
@@ -37,7 +38,7 @@ end
 
 require "o_jasper_common"
 
-function asset(what, kind)  -- TODO get rid of listview.. somehow..
+function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
    return load_asset("assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
 end
@@ -67,7 +68,9 @@ local templated_page_metatable = {
    end,
 }
 
-function templated_page(page)
+function Public.templated_page(page)
    assert(page)
    return setmetatable({page = page}, templated_page_metatable)
 end
+
+return Public

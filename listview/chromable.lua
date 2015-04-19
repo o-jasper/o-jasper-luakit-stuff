@@ -77,7 +77,7 @@ local to_js = {
 --   end end,
 }
 
-require "paged_chrome"
+--pagedChrome = require "paged_chrome"
 
 -- Making the objects that do the pages.
 

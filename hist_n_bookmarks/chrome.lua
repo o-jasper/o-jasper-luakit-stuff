@@ -10,6 +10,8 @@
 require "listview.chromable"
 require "hist_n_bookmarks"
 
+local paged_chrome = require("paged_chrome")
+
 -- TODO.. better ways to get features across..
 for _,k in pairs({"dateHTML", "timemarks"}) do
    history_entry_meta.direct[k] = msg_meta.direct[k]
@@ -21,13 +23,14 @@ local config = globals.hist_n_bookmarks
 local function chrome_describe(default_name, log)
    assert(log)
    return { default_name = default_name,
-            search = templated_page(listview_chrome(log, "search", "hist_n_bookmarks")),
+            search = paged_chrome.templated_page(listview_chrome(log, "search", 
+                                                                 "hist_n_bookmarks")),
    }
 end
 
 -- Turned on defaultly.
 if true or config.take_history then
-   paged_chrome("hnb", chrome_describe("search", history))
+   paged_chrome.paged_chrome("hnb", chrome_describe("search", history))
 end
 
 -- paged_chrome("hist_n_bookmarks", chrome_describe("history", history))
