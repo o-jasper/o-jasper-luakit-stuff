@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+require "o_jasper_common.meta"
+
 -- Makes a metatable for entries, to get functions handy.
 local SqlEntry = {
    taggings="taggings",
@@ -59,4 +61,4 @@ local SqlEntry = {
 SqlEntry.rt_tags = SqlEntry.realtime_tags
 SqlEntry.determine.tags = function(self) return self:realtime_tags() end
 
-return SqlEntry
+return metatable_of(SqlEntry)

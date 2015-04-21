@@ -11,6 +11,8 @@
 
 -- TODO make it only _compose_ it.
 
+require "o_jasper_common.meta"
+
 local Public = {}
 
 require "o_jasper_common" -- TODO make this properly namespaced too.
@@ -316,4 +318,4 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    end,
 }
 
-return SqlHelp
+return metatable_of(SqlHelp)
