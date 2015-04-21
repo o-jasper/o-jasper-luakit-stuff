@@ -33,12 +33,12 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
 history_meta = copy_table(sql_help_meta)
 history_meta.values = history_entry_meta.values
 
-function history_meta.direct.produce_entry(notself) return function(entry)
+function history_meta.direct.history_entry(notself) return function(entry)
       entry.origin = notself
       return setmetatable(history_entry, metatable_of(history_entry_meta))
 end end
 
---history_meta.direct.produce_entry = history_meta.direct.history_entry
+history_meta.direct.produce_entry = history_meta.direct.history_entry
 
 history_meta.values = history_entry_meta.values
 

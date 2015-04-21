@@ -282,13 +282,15 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
             local ret = {}
             for _, entry in pairs(list) do
                assert(type(getmetatable(self).__index.produce_entry) == "function")
-               assert(type(getmetatable(self).direct.produce_entry) == "function")
+               assert(type(getmetatable(self).direct.produce_entry(self)) == "function")
                
+               print(getmetatable(self).direct.produce_entry(self)(entry))
+
                assert(type(self) == "table")
                assert(type(entry) == "table")
                --table.insert(ret, getmetatable(self).__index.produce_entry(self, entry))
                table.insert(ret, getmetatable(self).direct.produce_entry(self)(entry))
-               -- table.insert(ret, self:produce_entry(entry))
+               --table.insert(ret, self:produce_entry(entry))
             end
             return ret
             --return map(list, function(entry) return self:produce_entry(entry) end)
