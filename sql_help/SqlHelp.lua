@@ -11,7 +11,7 @@
 
 -- TODO make it only _compose_ it.
 
-require "o_jasper_common.meta"
+local metatable_of = require "o_jasper_common.meta"
 
 local Public = {}
 
