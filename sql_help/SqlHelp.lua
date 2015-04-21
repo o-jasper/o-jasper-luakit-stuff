@@ -36,27 +36,27 @@ local function qmarks(n)  -- Makes a string with a number of question marks in i
 end
 
 local SqlHelp = {
-values = {  -- TODO these are the thing.. should instead just get an object with them.
+   values = {
       textlike = {"title", "uri", "desc"},
       taggings = "taggings", tagname="tag",
       order_by = "id",
       idname = "id", 
       time = "id", timemul = 0.001,
-},
-defaults = { input = {}, c = false, tags_last = 0, last_id_time = 0 },
-direct = {
-   -- Note: use this is you want to "build" a search.
-   -- Otherwise the state is hanging around. (you can use it just the same)
-   new_SqlHelp = function(self) return function(initial, fun)
-         -- TODO multiple table names?
-         initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
-         return setmetatable({db=self.db, cmd={initial},
-                              first=first or  "WHERE", produce_entry=fun},
-                             getmetatable(self))
-   end end,
+   },
+   input = {}, c = false, tags_last = 0, last_id_time = 0,
+   
+-- Note: use this is you want to "build" a search.
+-- Otherwise the state is hanging around. (you can use it just the same)
+    new_SqlHelp = function(self, initial, fun)
+      -- TODO multiple table names?
+      initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
+      return setmetatable({db=self.db, cmd={initial},
+                           first=first or  "WHERE", produce_entry=fun},
+                          getmetatable(self))
+   end,
 
    -- Stuff to help me construct queries based on searches.
-   extcmd = function(self) return function(str, ...)
+   extcmd = function(self, str, ...)
          if self.c then
             str = self.c .. " " .. str
             self.c = false
@@ -64,28 +64,28 @@ direct = {
          self.first = false
          self.c = ""
          table.insert(self.cmd, string.format(str, ...))
-   end end,
+   end,
    -- A piece of input.
-   inp = function(self) return function(what)
+   inp = function(self, what)
          if type(what) ~= "table" then
             what = tostring(what)
          end
          assert(type(what) == "string",
                 string.format("E(BUG): Not a string %s", what))
          table.insert(self.input, what)
-   end end,
+   end,
    -- Manually add string.
-   addstr = function(self) return function(str, ...)
+   addstr = function(self, str, ...)
          self.cmd[#self.cmd] = self.cmd[#self.cmd] .. string.format(str, ...)
-   end end,
+   end,
    
    -- Combines the things.
-   comb = function(self) return function(how, down)
+   comb = function(self, how, down)
          self.c = self.first or how or self.how
-   end end,
+   end,
 
    -- Lots of stuff to build searches from.
-   equal_one_or_list = function (self) return function(which, input)
+   equal_one_or_list = function(self, which, input)
          if type(input) == "table" then
             if #input > 1 then
                local str = {string.format("%s IN (?", which)}
@@ -101,36 +101,36 @@ direct = {
          assert(type(input) == "string")
          self:extcmd("%s == ?", which)
          self:inp(input)
-   end end,
+   end,
 
    -- Value less/greater then ..
-   lt  = function (self) return function(which, value)  -- TODO
+   lt  = function (self, which, value)  -- TODO
          self:extcmd([[%s < ?]], which)
          self:inp(value)
-   end end,   
-   gt  = function (self) return function(which, value)  -- TODO
+   end,   
+   gt  = function (self, which, value)  -- TODO
          self:extcmd([[%s > ?]], which)
          self:inp(value)
-   end end,
+   end,
    -- Time is after/before ..
-   after = function(self) return function(time)
+   after = function(self, time)
          self:gt(self.values.time, time)
-   end end,
-   before = function(self) return function(time)
+   end,
+   before = function(self, time)
          self:gt(self.values.time, time)
-   end end,
+   end,
    
    -- Add a like command.
-   like = function(self) return function(value, what, n)
+   like = function(self, value, what, n)
          self:extcmd([[%s LIKE ?]], n and what .." NOT" or what)
          self:inp(value)
-   end end,
-   not_like = function(self) return function(value, what)
+   end,
+   not_like = function(self, value, what)
          self:like(value, what, true)
-   end end,
+   end,
 
    -- a LIKE command on all textlike parts.
-   text_like = function(self) return function(search, n)
+   text_like = function(self, search, n)
          if self.first then 
             if n then
                self.first = self.first .. "NOT ("
@@ -143,17 +143,17 @@ direct = {
             self:like(search, what)
          end
          self:addstr(")")
-   end end,
+   end,
 
    -- Search wordm any textlike. (does that LIKE command with '%' around)
-   text_sw = function(self) return function(search, n)
+   text_sw = function(self, search, n)
          if #search > 0 then
             self:text_like('%' .. search .. '%', n)
          end
-   end end,
+   end,
 
    -- Any exact tag.
-   tags = function (self) return function(tags, taggingsname, tagname, w)
+   tags = function (self, tags, taggingsname, tagname, w)
          if #tags == 0 then return end
 --         self:addstr("\nJOIN %s t ON t.to_id == m.id AND %s (",
 --                     taggingsname or self.values.taggings, w or "")
@@ -170,16 +170,16 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          self:comb("AND")
          self:equal_one_or_list(tagname or self.values.tagname, tags)
          self:addstr(")")
-   end end,
-   not_tags = function(self) return function(tags, taggingsname, tagname)
+   end,
+   not_tags = function(self, tags, taggingsname, tagname)
          self:tags(tags, taggingsname, tagname, "NOT ")
-   end end,
+   end,
 
    -- The actual search build from it.
    -- TODO thing is.. kindah becomes a myriad of things it has do..
    --  To keep things organized, separate this off into a file
    ---  particularly for this purpose.
-   search = function(self) return function(str)
+   search = function(self, str)
          local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
                             "uri:", "desc:", "title:",
                             "urilike:", "desclike:", "titlelike:",
@@ -233,31 +233,31 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          self:not_tags(not_tags)
          if before_t then self:comb() self:before(before_t) end
          if after_t then self:comb() self:after(after_t) end
-   end end,
+   end,
 
    -- Sorting it.
-   order_by = function(self) return function(what, way)
+   order_by = function(self, what, way)
          if type(what) == "table" then what = table.concat(what, ", ") end
          self.c = ""
          self:extcmd("ORDER BY %s %s", what, way or "DESC")
-   end end,
+   end,
    
    -- Limiting the number of results.
-   row_range = function(self) return function(fr, cnt) 
+   row_range = function(self, fr, cnt) 
          self.c = ""
          self:extcmd("LIMIT ?, ?")
          self:inp(fr)
          self:inp(cnt)
-   end end,
+   end,
 
    -- Patterns with all the questionmarks to be filled with `self.input`.
-   sql_pattern = function(self) return function()
+   sql_pattern = function(self)
          return table.concat(self.cmd, "\n") 
-   end end,
+   end,
    
    -- Manually fill those in. USE THE SQL VERSION.
    -- TODO SQL exposes it?
-   sql_code = function(self) return function()
+   sql_code = function(self)
          local pat = string_split(self:sql_pattern(), "?")
          local str = pat[1]
          for i, el in pairs(self.input) do
@@ -267,10 +267,10 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
             str = str .. el .. pat[i + 1]
          end
          return str
-   end end,
+   end,
    
    -- Get the result of the current query on a DB.
-   result = function(self) return function(db)
+   result = function(self, db)
          -- TODO check number of questionmarks?
          local list = (self.db or db):exec(self:sql_pattern(), self.input)
          if self.produce_entry then
@@ -292,17 +292,17 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          else
             return list
          end
-   end end,
+   end,
 
-   args_in_order = function(self) return function(entry)
+   args_in_order = function(self, entry)
          assert(type(self.values.row_names) == "table")
          return map(self.values.row_names, function(name) return entry[name] end)
-   end end,
+   end,
 
    -- Stuff that can be used later on.
 
    -- Time-based IDs.
-   new_time_id = function(self) return function(db)
+   new_time_id = function(self, db)
          local time = cur_time_ms()*1000
          if time == self.last_id_time then time = time + 1 end
          -- Search for matching.
@@ -314,8 +314,8 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          end
          last_time = time
          return time
-   end end,
-}}
+   end,
+}
 
 function SqlHelp:produce_entry(data)
    assert(type(data) == "table")

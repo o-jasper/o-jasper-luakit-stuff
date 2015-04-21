@@ -12,21 +12,21 @@ local tt = require "o_jasper_common.html.time"
 
 SqlEntry = require("sql_help").SqlEntry
 
-function SqlEntry.direct.html_repl(self) return function(state)
-   assert(self)
+function html_repl(entry, state)
+   assert(entry)
    local pass = {}
-   for _,name in pairs(self.values.row_names) do  -- Grab the data.
-      pass[name] = self[name]
+   for _,name in pairs(entry.values.row_names) do  -- Grab the data.
+      pass[name] = entry[name]
    end
-   local calculators = self.html_calc
+   local calculators = entry.html_calc
    local function calc(_, key)
-      local fun = self.html_calc[key]
+      local fun = entry.html_calc[key]
       if fun then
-         return fun(self, state)
+         return fun(entry, state)
       end
    end
    return setmetatable(pass, {__index=calc})
-end end
+end
 
 --- TODO better to add them to the other one?
 
@@ -56,7 +56,8 @@ function html_msg(listview, state)
          msg[k] = msg[k] or ""
       end
       -- TODO put in more stuff.
-      return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}", msg:html_repl(state))
+      return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}",
+                         html_repl(msg, state))
    end
 end
 
