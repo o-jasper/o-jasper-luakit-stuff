@@ -21,7 +21,7 @@ local SqlEntry = require "sql_help.SqlEntry"
 assert(type(SqlEntry) == "table")
 
 local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
-local searchlike = require("o_jasper_common.fromtext.searchlike").searchlike
+local searchlike = require("o_jasper_common.fromtext.searchlike")
 
 local string_split = lousy.util.string.split
 
@@ -43,14 +43,16 @@ local SqlHelp = {
       idname = "id", 
       time = "id", timemul = 0.001,
    },
-   input = {}, c = false, tags_last = 0, last_id_time = 0,
+   c = false, tags_last = 0, last_id_time = 0,
    
+   -- Important: gotta be a _new_ one!
 -- Note: use this is you want to "build" a search.
 -- Otherwise the state is hanging around. (you can use it just the same)
     new_SqlHelp = function(self, initial, fun)
       -- TODO multiple table names?
       initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
-      return setmetatable({db=self.db, cmd={initial},
+      return setmetatable({db=self.db, 
+                           input = {}, cmd={initial}, 
                            first=first or  "WHERE", produce_entry=fun},
                           getmetatable(self))
    end,
@@ -184,7 +186,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
                             "uri:", "desc:", "title:",
                             "urilike:", "desclike:", "titlelike:",
                             "before:", "after:"}
-         local tagged_list = searchlike(portions(str), matchable)
+         local tagged_list = searchlike.searchlike(searchlike.portions(str), matchable)
 
          local n, tags, not_tags, before_t, after_t = false, {}, {}, nil, nil
          for i, el in pairs(tagged_list) do
@@ -239,7 +241,8 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    order_by = function(self, what, way)
          if type(what) == "table" then what = table.concat(what, ", ") end
          self.c = ""
-         self:extcmd("ORDER BY %s %s", what, way or "DESC")
+         self:inp(what)
+         self:extcmd("ORDER BY ? %s", way or "DESC")
    end,
    
    -- Limiting the number of results.
@@ -259,35 +262,26 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    -- TODO SQL exposes it?
    sql_code = function(self)
          local pat = string_split(self:sql_pattern(), "?")
-         local str = pat[1]
+         local str = pat[1] or "{NOPE1}"
          for i, el in pairs(self.input) do
             if string.find(el, "[%%]") then
                el = "'" .. el .. "'"
             end
-            str = str .. el .. pat[i + 1]
+            str = str .. el .. (pat[i + 1] or string.format("{NOPE%d}", i + 1))
          end
          return str
    end,
    
    -- Get the result of the current query on a DB.
    result = function(self, db)
+         print("***", #self.input, #self.cmd)
+         print(self:sql_pattern())
+         for _,v in pairs(self.input) do print(v) end
+         print("----")
+
          -- TODO check number of questionmarks?
          local list = (self.db or db):exec(self:sql_pattern(), self.input)
          if self.produce_entry then
-            --local ret = {}
-            --for _, entry in pairs(list) do
-            --assert(type(getmetatable(self).__index.produce_entry) == "function")
-            --assert(type(getmetatable(self).direct.produce_entry(self)) == "function")
-            --
-            --print(getmetatable(self).direct.produce_entry(self)(entry))
-            --
-            --assert(type(self) == "table")
-            --assert(type(entry) == "table")
-            ----table.insert(ret, getmetatable(self).__index.produce_entry(self, entry))
-            --table.insert(ret, getmetatable(self).direct.produce_entry(self)(entry))
-            ----table.insert(ret, self:produce_entry(entry))
-         --end
-            --return ret
             return map(list, function(entry) return self:produce_entry(entry) end)
          else
             return list

@@ -92,15 +92,11 @@ local listview_metas = {
          total_query = function(self) return function(search)
                -- How we end up searching.
                assert(type(search) == "string", "Search not string; " .. tostring(search))
-               assert(type(self.log) == "table", 
-                      "(bug, possibly by you)Need a thing to search in.")
-               assert(getmetatable(self.log).__index.new_SqlHelp)
                local query = self.log:new_SqlHelp()
                if search ~= "" then query:search(search) end
                query:order_by(self.log.values.order_by)
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
-               assert(self.set_i)
                query:row_range(self.set_i, self.set_cnt)
                -- TODO other ones..
                return query
