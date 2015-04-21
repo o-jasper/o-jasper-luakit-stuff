@@ -29,8 +29,6 @@ function html_repl(entry, state)
    return setmetatable(pass, {__index=calc})
 end
 
---- TODO better to add them to the other one?
-
 function default_html_calc.tagsHTML(self, state)
    return ot.tagsHTML(self.tags, state.tagsclass)
 end
@@ -42,10 +40,6 @@ end
 function default_html_calc.timemarks(self, state)
    return tt.timemarks(state, self:ms_t())
 end
-
-SqlEntry = metatable_of(SqlEntry)
-
--- TODO ... review below.
 
 -- Single entry.
 -- Requires a msg:repl_list
