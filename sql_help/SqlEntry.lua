@@ -6,6 +6,7 @@
 --  (at your option) any later version.
 
 local metatable_of = require "o_jasper_common.meta"
+local cur_time_raw = require("o_jasper_common.cur_time").raw
 
 -- Makes a metatable for entries, to get functions handy.
 local SqlEntry = {
@@ -21,7 +22,7 @@ local SqlEntry = {
          return rawget(self, "tags")
             end
       -- Get the tags.
-      self.tags_last = cur_time()
+      self.tags_last = cur_time_raw()
       self.tags = {}
       local got = origin.db:exec(self.values.tagfinder, {self.id})
       for _, el in pairs(got) do

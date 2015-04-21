@@ -57,7 +57,7 @@ function html_msg(listview, state)
 end
 
 function html_msg_list(listview, data, state)
-   state = state or { last_time = cur_time_ms() }
+   state = state or { last_time = cur_time.ms() }
    state.config = state.config or {}
    state.html_calc = state.html_calc or default_html_calc
    return html_list(data, html_msg(listview, state))

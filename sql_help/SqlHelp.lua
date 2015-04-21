@@ -12,6 +12,7 @@
 -- TODO make it only _compose_ it.
 
 local metatable_of = require "o_jasper_common.meta"
+local cur_time_ms = require("o_jasper_common.cur_time").ms
 
 local Public = {}
 

@@ -1,4 +1,4 @@
-require "o_jasper_common.time"
+cur_time = require "o_jasper_common.cur_time"
 metatable_of = require "o_jasper_common.meta"
 require "o_jasper_common.other"
 

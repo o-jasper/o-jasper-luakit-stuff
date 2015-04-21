@@ -41,8 +41,8 @@ end
 
 local to_js = {
    manual_enter = function(self) return function(inp)
-         local v= self.log:db_enter({ claimtime=cur_time_s(),
-                                   re_assess_time = cur_time_s() + 120,
+         local v= self.log:db_enter({ claimtime=cur_time.s(),
+                                   re_assess_time = cur_time.s() + 120,
                                    origin = "manual",
                                    kind = "manual test",
                                    data = "", data_uri = "",
