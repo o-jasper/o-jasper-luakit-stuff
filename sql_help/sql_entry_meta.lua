@@ -29,6 +29,11 @@ local sql_entry_meta = {
             end
             return self.tags
       end end,
+
+      ms_t = function(self) return function()
+            return math.floor(self[self.values.time]*self.values.timemul)
+      end end,
+
       -- Delete in DB.
       --db_delete = function(self) return function()
       --   self.origin:delete(self.id)
@@ -55,5 +60,7 @@ local sql_entry_meta = {
 }
 sql_entry_meta.direct.rt_tags = sql_entry_meta.direct.realtime_tags
 sql_entry_meta.determine.tags = function(self) return self:realtime_tags() end
+
+sql_entry_meta.html_calc = {}
 
 return sql_entry_meta

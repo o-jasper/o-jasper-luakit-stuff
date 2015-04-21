@@ -33,12 +33,11 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
 history_meta = copy_table(sql_help_meta)
 history_meta.values = history_entry_meta.values
 
-function history_meta.direct.history_entry(notself) return function(entry)
-      entry.origin = notself
-      return setmetatable(history_entry, metatable_of(history_entry_meta))
-end end
-
-history_meta.direct.produce_entry = history_meta.direct.history_entry
+function history_meta:history_entry(entry)
+   entry.origin = notself
+   return setmetatable(history_entry, metatable_of(history_entry_meta))
+end
+--history_meta.produce_entry = history_meta.history_entry
 
 history_meta.values = history_entry_meta.values
 
@@ -46,6 +45,8 @@ local existing_history = require("history")
 local db = existing_history.db
 
 history = setmetatable({ db = db }, metatable_of(history_meta))
+
+sql_entry_meta.__index.values = history_entry_meta.values
 
 assert(history_meta.__index.new_sql_help)
 assert(history_meta.__index.produce_entry)

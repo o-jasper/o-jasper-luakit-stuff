@@ -10,6 +10,8 @@
 -- TODO instead of a full chrome.. make it something that can easily be 
 --  put into one.
 
+local config = globals.listview or {}
+
 local lousy = require("lousy")
 
 require "o_jasper_common"

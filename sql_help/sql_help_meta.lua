@@ -45,11 +45,6 @@ values = {  -- TODO these are the thing.. should instead just get an object with
 },
 defaults = { input = {}, c = false, tags_last = 0, last_id_time = 0 },
 direct = {
-   produce_entry = function(_) return function(data)
-         assert(type(data) == "table")
-         return setmetatable(data, sql_entry_meta)
-   end end,
-
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
    new_sql_help = function(self) return function(initial, fun)
@@ -279,21 +274,21 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          -- TODO check number of questionmarks?
          local list = (self.db or db):exec(self:sql_pattern(), self.input)
          if self.produce_entry then
-            local ret = {}
-            for _, entry in pairs(list) do
-               assert(type(getmetatable(self).__index.produce_entry) == "function")
-               assert(type(getmetatable(self).direct.produce_entry(self)) == "function")
-               
-               print(getmetatable(self).direct.produce_entry(self)(entry))
-
-               assert(type(self) == "table")
-               assert(type(entry) == "table")
-               --table.insert(ret, getmetatable(self).__index.produce_entry(self, entry))
-               table.insert(ret, getmetatable(self).direct.produce_entry(self)(entry))
-               --table.insert(ret, self:produce_entry(entry))
-            end
-            return ret
-            --return map(list, function(entry) return self:produce_entry(entry) end)
+            --local ret = {}
+            --for _, entry in pairs(list) do
+            --assert(type(getmetatable(self).__index.produce_entry) == "function")
+            --assert(type(getmetatable(self).direct.produce_entry(self)) == "function")
+            --
+            --print(getmetatable(self).direct.produce_entry(self)(entry))
+            --
+            --assert(type(self) == "table")
+            --assert(type(entry) == "table")
+            ----table.insert(ret, getmetatable(self).__index.produce_entry(self, entry))
+            --table.insert(ret, getmetatable(self).direct.produce_entry(self)(entry))
+            ----table.insert(ret, self:produce_entry(entry))
+         --end
+            --return ret
+            return map(list, function(entry) return self:produce_entry(entry) end)
          else
             return list
          end
@@ -321,5 +316,10 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          return time
    end end,
 }}
+
+function sql_help_meta:produce_entry(data)
+   assert(type(data) == "table")
+         return setmetatable(data, sql_entry_meta)
+end
 
 return sql_help_meta

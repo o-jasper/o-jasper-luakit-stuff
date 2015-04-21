@@ -12,9 +12,8 @@ local tt = require "o_jasper_common.html.time"
 
 sql_entry_meta = require("sql_help").sql_entry_meta
 
-sql_entry_meta.html_calc = {}
-
-function sql_entry_meta.direct.html_repl(self, state)
+function sql_entry_meta.direct.html_repl(self) return function(state)
+   assert(self)
    local pass = {}
    for _,name in pairs(self.values.row_names) do  -- Grab the data.
       pass[name] = self[name]
@@ -26,26 +25,21 @@ function sql_entry_meta.direct.html_repl(self, state)
          return fun(self, state)
       end
    end
-
    return setmetatable(pass, {__index=calc})
-end
+end end
 
 --- TODO better to add them to the other one?
-
-function sql_entry_meta.html_calc.ms_t(self)
-   return math.floor(self[self.origin.values.time]*self.origin.values.timemul)
-end
 
 function sql_entry_meta.html_calc.tagsHTML(self, state)
    return ot.tagsHTML(self.tags, state.tagsclass)
 end
 
 function sql_entry_meta.html_calc.dateHTML(self, state)
-   return tt.dateHTML(state, self.ms_t)
+   return tt.dateHTML(state, self:ms_t())
 end
 
-function sql_entry_meta.html_calc.timemarks(self)
-   return tt.timemarks(self.html_state, self.ms_t)
+function sql_entry_meta.html_calc.timemarks(self, state)
+   return tt.timemarks(state, self:ms_t())
 end
 
 sql_entry_meta = metatable_of(sql_entry_meta)
@@ -67,5 +61,5 @@ function html_msg(listview, state)
 end
 
 function html_msg_list(listview, data)
-   return html_list(data, html_msg(listview, { last_time = cur_time_ms() }))
+   return html_list(data, html_msg(listview, { last_time = cur_time_ms(), config={} }))
 end
