@@ -283,12 +283,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          print("----")
 
          -- TODO check number of questionmarks?
-         local list = (self.db or db):exec(self:sql_pattern(), self.input)
-         if self.produce_entry then
-            return map(list, function(entry) return self:produce_entry(entry) end)
-         else
-            return list
-         end
+         return self:listfun((self.db or db):exec(self:sql_pattern(), self.input))
    end,
 
    args_in_order = function(self, entry)
@@ -313,9 +308,12 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          return time
    end,
 
-   produce_entry = function(_, data)
-      assert(type(data) == "table")
-      return setmetatable(data, SqlEntry)
+   listfun = function(_, list)
+      for _, data in pairs(list) do
+         assert(type(data) == "table")
+         setmetatable(data, SqlEntry)
+      end
+      return list
    end,
 }
 
