@@ -10,14 +10,7 @@
 require "listview.chromable"
 require "hist_n_bookmarks"
 
-local sql_entry_meta = require("sql_help").sql_entry_meta
-
 local paged_chrome = require("paged_chrome")
-
--- TODO.. better ways to get features across..
---for _,k in pairs({"dateHTML", "timemarks"}) do
---   history_entry_meta.direct[k] = msg_meta.direct[k]
---end
 
 local config = globals.hist_n_bookmarks
 

@@ -14,9 +14,9 @@ require "listview.entry_html"  -- TODO... Want this later.
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 -- History stuff.
-history_entry_meta = copy_table(SqlEntry)
+HistoryEntry = copy_table(SqlEntry)
 
-history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
+HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
 --   taggings = "history_implied",
 --   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
@@ -30,23 +30,21 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
    int_els = values_now_set({"id", "last_visit", "visits"}),
 }
 
-history_meta = copy_table(SqlHelp)
-history_meta.values = history_entry_meta.values
+History = copy_table(SqlHelp)
+History.values = HistoryEntry.values
 
-function history_meta:history_entry(entry)
-   entry.origin = notself
-   return setmetatable(history_entry, metatable_of(history_entry_meta))
+function History:history_entry(entry)
+   entry.origin = self
+   return setmetatable(history_entry, metatable_of(HistoryEntry))
 end
---history_meta.produce_entry = history_meta.history_entry
+--History.produce_entry = History.history_entry
+History.values = HistoryEntry.values
 
-history_meta.values = history_entry_meta.values
+local db = require("history").db
+history = setmetatable({ db = db }, metatable_of(History))
 
-local existing_history = require("history")
-local db = existing_history.db
+SqlEntry.__index.values = HistoryEntry.values
+SqlEntry.values = HistoryEntry.values
 
-history = setmetatable({ db = db }, metatable_of(history_meta))
-
-SqlEntry.__index.values = history_entry_meta.values
-
-assert(history_meta.__index.new_SqlHelp)
-assert(history_meta.__index.produce_entry)
+assert(History.__index.new_SqlHelp)
+assert(History.__index.produce_entry)
