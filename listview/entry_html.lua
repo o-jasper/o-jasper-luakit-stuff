@@ -10,9 +10,9 @@ require "o_jasper_common"
 local ot = require "o_jasper_common.html.other"
 local tt = require "o_jasper_common.html.time"
 
-sql_entry_meta = require("sql_help").sql_entry_meta
+SqlEntry = require("sql_help").SqlEntry
 
-function sql_entry_meta.direct.html_repl(self) return function(state)
+function SqlEntry.direct.html_repl(self) return function(state)
    assert(self)
    local pass = {}
    for _,name in pairs(self.values.row_names) do  -- Grab the data.
@@ -30,19 +30,19 @@ end end
 
 --- TODO better to add them to the other one?
 
-function sql_entry_meta.html_calc.tagsHTML(self, state)
+function SqlEntry.html_calc.tagsHTML(self, state)
    return ot.tagsHTML(self.tags, state.tagsclass)
 end
 
-function sql_entry_meta.html_calc.dateHTML(self, state)
+function SqlEntry.html_calc.dateHTML(self, state)
    return tt.dateHTML(state, self:ms_t())
 end
 
-function sql_entry_meta.html_calc.timemarks(self, state)
+function SqlEntry.html_calc.timemarks(self, state)
    return tt.timemarks(state, self:ms_t())
 end
 
-sql_entry_meta = metatable_of(sql_entry_meta)
+SqlEntry = metatable_of(SqlEntry)
 
 -- TODO ... review below.
 

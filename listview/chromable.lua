@@ -94,9 +94,8 @@ local listview_metas = {
                assert(type(search) == "string", "Search not string; " .. tostring(search))
                assert(type(self.log) == "table", 
                       "(bug, possibly by you)Need a thing to search in.")
-               assert(getmetatable(self.log).__index.new_sql_help)
-               --local query = getmetatable(self.log).__index.new_sql_help(self.log)
-               local query = self.log:new_sql_help()
+               assert(getmetatable(self.log).__index.new_SqlHelp)
+               local query = self.log:new_SqlHelp()
                if search ~= "" then query:search(search) end
                query:order_by(self.log.values.order_by)
                -- TODO the query itself should be able to override.

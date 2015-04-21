@@ -1,7 +1,5 @@
 
-local Public = {
-   sql_help_meta = require "sql_help.sql_help_meta",
-   sql_entry_meta = require "sql_help.sql_entry_meta",
+return {
+   SqlHelp = require "sql_help.SqlHelp",
+   SqlEntry = require "sql_help.SqlEntry",
 }
-
-return Public

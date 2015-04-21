@@ -6,7 +6,7 @@
 --  (at your option) any later version.
 
 -- Makes a metatable for entries, to get functions handy.
-local sql_entry_meta = {
+local SqlEntry = {
    defaults = {},
    values={
       taggings="taggings",
@@ -58,9 +58,9 @@ local sql_entry_meta = {
       return "N/A" -- Less control, but allows the html to request stuff we dont have.
    end,
 }
-sql_entry_meta.direct.rt_tags = sql_entry_meta.direct.realtime_tags
-sql_entry_meta.determine.tags = function(self) return self:realtime_tags() end
+SqlEntry.direct.rt_tags = SqlEntry.direct.realtime_tags
+SqlEntry.determine.tags = function(self) return self:realtime_tags() end
 
-sql_entry_meta.html_calc = {}
+SqlEntry.html_calc = {}
 
-return sql_entry_meta
+return SqlEntry

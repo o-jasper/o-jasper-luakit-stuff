@@ -8,13 +8,13 @@
 require "o_jasper_common"
 
 local sql_help = require("sql_help")
-local sql_help_meta, sql_entry_meta = sql_help.sql_help_meta, sql_help.sql_entry_meta
+local SqlHelp, SqlEntry = sql_help.SqlHelp, sql_help.SqlEntry
 require "listview.entry_html"  -- TODO... Want this later.
 
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 -- History stuff.
-history_entry_meta = copy_table(sql_entry_meta)
+history_entry_meta = copy_table(SqlEntry)
 
 history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
@@ -30,7 +30,7 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
    int_els = values_now_set({"id", "last_visit", "visits"}),
 }
 
-history_meta = copy_table(sql_help_meta)
+history_meta = copy_table(SqlHelp)
 history_meta.values = history_entry_meta.values
 
 function history_meta:history_entry(entry)
@@ -46,7 +46,7 @@ local db = existing_history.db
 
 history = setmetatable({ db = db }, metatable_of(history_meta))
 
-sql_entry_meta.__index.values = history_entry_meta.values
+SqlEntry.__index.values = history_entry_meta.values
 
-assert(history_meta.__index.new_sql_help)
+assert(history_meta.__index.new_SqlHelp)
 assert(history_meta.__index.produce_entry)

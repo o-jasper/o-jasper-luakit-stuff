@@ -17,8 +17,8 @@ require "o_jasper_common" -- TODO make this properly namespaced too.
 --local common = require "o_jasper_common"
 --local map = common.map  
 
-local sql_entry_meta = require "sql_help.sql_entry_meta"
-assert(type(sql_entry_meta) == "table")
+local SqlEntry = require "sql_help.SqlEntry"
+assert(type(SqlEntry) == "table")
 
 local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
 local searchlike = require("o_jasper_common.fromtext.searchlike").searchlike
@@ -35,7 +35,7 @@ local function qmarks(n)  -- Makes a string with a number of question marks in i
    return str
 end
 
-local sql_help_meta = {
+local SqlHelp = {
 values = {  -- TODO these are the thing.. should instead just get an object with them.
       textlike = {"title", "uri", "desc"},
       taggings = "taggings", tagname="tag",
@@ -47,7 +47,7 @@ defaults = { input = {}, c = false, tags_last = 0, last_id_time = 0 },
 direct = {
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
-   new_sql_help = function(self) return function(initial, fun)
+   new_SqlHelp = function(self) return function(initial, fun)
          -- TODO multiple table names?
          initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
          return setmetatable({db=self.db, cmd={initial},
@@ -317,9 +317,9 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    end end,
 }}
 
-function sql_help_meta:produce_entry(data)
+function SqlHelp:produce_entry(data)
    assert(type(data) == "table")
-         return setmetatable(data, sql_entry_meta)
+         return setmetatable(data, SqlEntry)
 end
 
-return sql_help_meta
+return SqlHelp
