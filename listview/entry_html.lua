@@ -12,15 +12,16 @@ local tt = require "o_jasper_common.html.time"
 
 SqlEntry = require("sql_help").SqlEntry
 
+local default_html_calc = {}
+
 function html_repl(entry, state)
    assert(entry)
    local pass = {}
    for _,name in pairs(entry.values.row_names) do  -- Grab the data.
       pass[name] = entry[name]
    end
-   local calculators = entry.html_calc
    local function calc(_, key)
-      local fun = entry.html_calc[key]
+      local fun = state.html_calc[key]
       if fun then
          return fun(entry, state)
       end
@@ -30,15 +31,15 @@ end
 
 --- TODO better to add them to the other one?
 
-function SqlEntry.html_calc.tagsHTML(self, state)
+function default_html_calc.tagsHTML(self, state)
    return ot.tagsHTML(self.tags, state.tagsclass)
 end
 
-function SqlEntry.html_calc.dateHTML(self, state)
+function default_html_calc.dateHTML(self, state)
    return tt.dateHTML(state, self:ms_t())
 end
 
-function SqlEntry.html_calc.timemarks(self, state)
+function default_html_calc.timemarks(self, state)
    return tt.timemarks(state, self:ms_t())
 end
 
@@ -61,6 +62,9 @@ function html_msg(listview, state)
    end
 end
 
-function html_msg_list(listview, data)
-   return html_list(data, html_msg(listview, { last_time = cur_time_ms(), config={} }))
+function html_msg_list(listview, data, state)
+   state = state or { last_time = cur_time_ms() }
+   state.config = state.config or {}
+   state.html_calc = state.html_calc or default_html_calc
+   return html_list(data, html_msg(listview, state))
 end

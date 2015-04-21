@@ -59,6 +59,4 @@ local SqlEntry = {
 SqlEntry.rt_tags = SqlEntry.realtime_tags
 SqlEntry.determine.tags = function(self) return self:realtime_tags() end
 
-SqlEntry.html_calc = {}
-
 return SqlEntry
