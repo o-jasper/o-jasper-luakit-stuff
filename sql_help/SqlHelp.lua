@@ -309,11 +309,11 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
          last_time = time
          return time
    end,
-}
 
-function SqlHelp:produce_entry(data)
-   assert(type(data) == "table")
-         return setmetatable(data, SqlEntry)
-end
+   produce_entry = function(_, data)
+      assert(type(data) == "table")
+      return setmetatable(data, SqlEntry)
+   end,
+}
 
 return SqlHelp
