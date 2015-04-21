@@ -30,13 +30,13 @@ local sql_entry_meta = {
             return self.tags
       end end,
       -- Delete in DB.
-      db_delete = function(self) return function()
-            self.logger.delete(self.id)
-      end end,
+      --db_delete = function(self) return function()
+      --   self.logger:delete(self.id)
+      --end end,
       -- Pass any changes to object to the database.
-      db_update = function(self) return function()
-            self.logger.update_entirely_by(self)
-      end end,
+      --db_update = function(self) return function()
+            --self.logger:update_entirely_by(self)
+      --end end,
    },
    otherwise=function(self, key)
       local meta = getmetatable(self).meta
@@ -54,6 +54,6 @@ local sql_entry_meta = {
    end,
 }
 sql_entry_meta.direct.rt_tags = sql_entry_meta.direct.realtime_tags
-sql_entry_meta.determine.tags = function(self) return self.realtime_tags() end
+sql_entry_meta.determine.tags = function(self) return self:realtime_tags() end
 
 return sql_entry_meta

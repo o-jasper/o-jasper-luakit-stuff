@@ -22,9 +22,9 @@ local config = globals.hist_n_bookmarks
 -- TODO.. config the listview metas..
 local function chrome_describe(default_name, log)
    assert(log)
+   local page = listview_chrome(log, "search", "hist_n_bookmarks")
    return { default_name = default_name,
-            search = paged_chrome.templated_page(listview_chrome(log, "search", 
-                                                                 "hist_n_bookmarks")),
+            search = paged_chrome.templated_page(page),
    }
 end
 

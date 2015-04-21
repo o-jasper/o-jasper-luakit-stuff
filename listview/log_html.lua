@@ -12,22 +12,26 @@ local tt = require "o_jasper_common.html.time"
 
 --- TODO better to add them to the other one?
 
+msg_meta.calculate = {}
+
 -- Put it into the metamethod.
-function msg_meta.direct.ms_t(self)
+function msg_meta.calculate.ms_t(self)
    return math.floor(self[self.logger.values.time]*self.logger.values.timemul)
 end
 
-function msg_meta.direct.tagsHTML(self)
+function msg_meta.calculate.tagsHTML(self)
    return ot.tagsHTML(self.tags, self.html_state.tagsclass) 
 end
 
-function msg_meta.direct.dateHTML(self)
+function msg_meta.calculate.dateHTML(self)
    return tt.dateHTML(self.html_state, self.ms_t)
 end
 
-function msg_meta.direct.timemarks(self)
+function msg_meta.calculate.timemarks(self)
    return tt.timemarks(self.html_state, self.ms_t)
 end
+
+-- TODO ... review below.
 
 -- Single entry.
 function html_msg(listview, state)
@@ -39,7 +43,7 @@ function html_msg(listview, state)
          msg[k] = msg[k] or ""
       end
       -- TODO put in more stuff.
-      return string.gsub(listview.asset("parts/show_1"), "{%%(%w+)}", msg)
+      return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}", msg)
    end
 end
 

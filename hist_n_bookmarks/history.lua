@@ -37,17 +37,16 @@ history_meta.values = history_entry_meta.values
 history_meta.direct._msg = log_meta.direct._msg  -- TODO this is suckage.
 history_meta.direct.exec = log_meta.direct.exec
 
-function history_meta.direct.history_entry(self) return function(history_entry)
-      history_entry.logger = self
+function history_meta.direct.history_entry(self) return function(entry)
+      entry.logger = self
       return setmetatable(history_entry, metatable_of(history_entry_meta))
 end end
 
 history_meta.direct.fun = history_meta.direct.history_entry
+
 history_meta.values = history_entry_meta.values
 
 local existing_history = require("history")
 local db = existing_history.db
-print("****", existing_history, db)
-for k,v in pairs(existing_history._M) do print(k,v) end
 
 history = setmetatable({ db = db }, metatable_of(history_meta))

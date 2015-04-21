@@ -41,32 +41,32 @@ log_meta.values = msg_meta.values
 -- Enter a message.
 function log_meta.direct.db_enter(self) return function(msg)
       if msg.id then return "you dont get to set `id`(time), only `claimtime`" end
-      msg.id = self.new_time_id()
+      msg.id = self:new_time_id()
       local sanity = log_input_sanity(msg)
       if sanity ~= "good" then return sanity end
       
-      --if self.msg_re_assess then self.msg_re_assess(msg) end
+      --if self.msg_re_assess then self:msg_re_assess(msg) end
       
       return sql_help_meta.direct.db_enter(self)(msg)
 end end
 
 function log_meta.direct.msg(self) return function (msg)
       if isinteger(msg) then
-         return self._msg(self.db:exec([[SELECT * WHERE id == ?]], msg))
+         return self:_msg(self.db:exec([[SELECT * WHERE id == ?]], msg))
       end
-      return self._msg(msg)
+      return self:_msg(msg)
 end end
 
-log_meta.direct.fun = log_meta.direct.msg
-   
 function log_meta.direct._msg(self) return function (msg)
       msg.logger = self
       setmetatable(msg, metatable_of(msg_meta))
       return msg
 end end
 
+msg_meta.direct.fun = msg_meta.direct._msg
+
 function log_meta.direct.exec(self) return function (sql)
-      return map(self.db:exec(sql), self._msg)
+      return map(self.db:exec(sql), function(msg) self:fun(msg) end)
 end end
 
 local function mk_db(path)

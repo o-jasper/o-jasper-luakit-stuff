@@ -7,6 +7,9 @@
 
 -- Chrome page of all logs. User may do subselection.
 
+-- TODO instead of a full chrome.. make it something that can easily be 
+--  put into one.
+
 config = (globals.listview or {})
 
 local lousy = require("lousy")
@@ -37,7 +40,7 @@ end
 
 local to_js = {
    manual_enter = function(self) return function(inp)
-         local v= self.log.db_enter({ claimtime=cur_time_s(),
+         local v= self.log:db_enter({ claimtime=cur_time_s(),
                                    re_assess_time = cur_time_s() + 120,
                                    origin = "manual",
                                    kind = "manual test",
@@ -49,15 +52,15 @@ local to_js = {
    end end,
    
    show_sql = function(self) return function(sql)
-         return { sql_input = self.total_query(sql).sql_code() }
+         return { sql_input = self:total_query(sql):sql_code() }
    end end,
    
    manual_sql = function(self) return function(sql, as_msg)
-         return js_listupdate(self, self.log.exec(sql), as_msg)
+         return js_listupdate(self, self.log:exec(sql), as_msg)
    end end,
    
    do_search = function(self) return function(search, as_msg)
-      return js_listupdate(self, self.total_query(search).result(), as_msg)
+      return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
    cycle_range_values = function(self) return function()
@@ -65,8 +68,8 @@ local to_js = {
    end end,
 
    reset_range_values = function(self) return function()
-         self.set_i   = self.values.set_i
-         self.set_cnt = self.values.set_cnt
+         self.set_i   = nil -- self.values.set_i
+         self.set_cnt = nil --self.values.set_cnt
    end end,
 --   get_range = function(self) return function() 
 --         return {self.set_i, self.set_cnt}
@@ -83,22 +86,23 @@ local to_js = {
 
 local listview_metas = {
    base = {
-      values = { set_i = 0, set_cnt = 20, set_step = 20 },
       defaults = { repl_pattern = false, to_js = {}, set_i=0, set_cnt = 20, set_step=20 },
       direct = {
          total_query = function(self) return function(search)
                -- How we end up searching.
                assert(type(search) == "string", "Search not string; " .. tostring(search))
-               local query = self.log.new_sql_help()
-               if search ~= "" then query.search(search) end
-               query.order_by(self.log.values.order_by)
+               local query = self.log:new_sql_help()
+               if search ~= "" then query:search(search) end
+               query:order_by(self.log.values.order_by)
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
-               query.row_range(self.set_i, self.set_cnt)
+               assert(self.set_i)
+               query:row_range(self.set_i, self.set_cnt)
                -- TODO other ones..
                return query
          end end,
          asset = function(self) return function(what, kind)
+               assert(type(self) == "table")
                if type(self.where) == "string" then self.where = {self.where} end
                local after = "/assets/" .. what .. (kind or ".html")
                for _, w in pairs(self.where) do
@@ -108,7 +112,7 @@ local listview_metas = {
                return load_asset("listview" .. after) or "COULDNT FIND ASSET"
          end end,
          asset_getter = function(self) return function(what, kind) -- .. yah.
-               return function() return self.asset(what, kind) end
+               return function() return self:asset(what, kind) end
          end end,
       },
       values = { to_js = {} },
@@ -123,18 +127,18 @@ end
 -- Listview.
 listview_metas.search = copy_table(listview_metas.base)
 listview_metas.search.direct.repl_list = function(self) return function(view, meta)
-      local query = self.total_query("")
-      local list = query.result()
+      local query = self:total_query("")
+      local list = query:result()
       local sql_shown = true
-      return { searchInput   = self.asset("parts/search"),
-               searchInitial = self.asset("parts/search_initial"),
-               stylesheet    = self.asset("style", ".css"),
-               js            = self.asset("js", ".js"),
+      return { searchInput   = self:asset("parts/search"),
+               searchInitial = self:asset("parts/search_initial"),
+               stylesheet    = self:asset("style", ".css"),
+               js            = self:asset("js", ".js"),
                title = string.format("%s:%s", self.chrome_name, self.name),
                cycleCnt = self.set_step,
                cnt = #list,
                list = final_html_list(self, list, true),
-               sqlInput = config.sql_show and query.sql_code() or "",
+               sqlInput = config.sql_show and query:sql_code() or "",
                sqlShown = config.sql_shown and "true" or "false",
       }
 end end
@@ -144,9 +148,9 @@ accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
 -- Adding entries
 listview_metas.add = copy_table(listview_metas.base)
 function listview_metas.add.direct.repl_list(self) return function(view, meta)
-      return { addManual  = self.asset("parts/add"),
-               stylesheet = self.asset("style", ".css") or "", 
-               js         = self.asset("js", ".js") or "",
+      return { addManual  = self:asset("parts/add"),
+               stylesheet = self:asset("style", ".css") or "", 
+               js         = self:asset("js", ".js") or "",
                title = string.format("%s:%s", self.chrome_name, self.name),
       }
 end end
@@ -171,6 +175,6 @@ local listview_metatables = {}
 for k,v in pairs(listview_metas) do listview_metatables[k] = metatable_of(v) end
 
 function listview_chrome(log, which, where)
-   assert(log)
+   assert(log and where)
    return setmetatable({log = log, where=where}, listview_metatables[which])
 end

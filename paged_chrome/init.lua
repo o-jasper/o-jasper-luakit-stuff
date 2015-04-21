@@ -44,16 +44,22 @@ function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
 end
 
 -- Makes the above page-object based on templates instead. Requires a:
--- `repl_pattern` template in which replacements take place.
--- `repl_list`,   replacement rules table.(may be in meta)
--- `to_js`        lua functions accessible to javascript.
+-- `repl_pattern`             template in which replacements take place.
+-- `repl_list(view, meta)`,   method returning replacement rules.
+-- `to_js`                    lua functions accessible to javascript.
 local templated_page_metatable = {
    __index = function(self, key)
       local vals = {  
          html = function(view, meta)
-            local pattern = self.page.repl_pattern or 
-               (self.page.asset or asset)(self.page.name, ".html")
-            return full_gsub(pattern, self.page.repl_list(view, meta))
+            local pattern = self.page.repl_pattern
+            if not pattern then
+               if self.page.asset then
+                  pattern = self.page:asset(self.page.name, ".html")
+               else
+                  pattern = Public.asset(self.page.name, ".html")
+               end
+            end
+            return full_gsub(pattern, self.page:repl_list(view, meta))
          end,
          init = function(view, _)
             for name, fun in pairs(self.page.to_js) do
