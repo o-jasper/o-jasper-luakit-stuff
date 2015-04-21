@@ -17,6 +17,9 @@ require "o_jasper_common" -- TODO make this properly namespaced too.
 --local common = require "o_jasper_common"
 --local map = common.map  
 
+local sql_entry_meta = require "sql_help.sql_entry_meta"
+assert(type(sql_entry_meta) == "table")
+
 local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
 local searchlike = require("o_jasper_common.fromtext.searchlike").searchlike
 
@@ -42,13 +45,18 @@ values = {  -- TODO these are the thing.. should instead just get an object with
 },
 defaults = { input = {}, c = false, tags_last = 0, last_id_time = 0 },
 direct = {
+   produce_entry = function(_) return function(data)
+         assert(type(data) == "table")
+         return setmetatable(data, sql_entry_meta)
+   end end,
+
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
    new_sql_help = function(self) return function(initial, fun)
          -- TODO multiple table names?
          initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
          return setmetatable({db=self.db, cmd={initial},
-                              first=first or  "WHERE", fun=fun},
+                              first=first or  "WHERE", produce_entry=fun},
                              getmetatable(self))
    end end,
 
@@ -269,10 +277,28 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    -- Get the result of the current query on a DB.
    result = function(self) return function(db)
          -- TODO check number of questionmarks?
-         return (self.db or db):exec(self:sql_pattern(), self.input)
+         local list = (self.db or db):exec(self:sql_pattern(), self.input)
+         if self.produce_entry then
+            local ret = {}
+            for _, entry in pairs(list) do
+               assert(type(getmetatable(self).__index.produce_entry) == "function")
+               assert(type(getmetatable(self).direct.produce_entry) == "function")
+               
+               assert(type(self) == "table")
+               assert(type(entry) == "table")
+               --table.insert(ret, getmetatable(self).__index.produce_entry(self, entry))
+               table.insert(ret, getmetatable(self).direct.produce_entry(self)(entry))
+               -- table.insert(ret, self:produce_entry(entry))
+            end
+            return ret
+            --return map(list, function(entry) return self:produce_entry(entry) end)
+         else
+            return list
+         end
    end end,
 
    args_in_order = function(self) return function(entry)
+         assert(type(self.values.row_names) == "table")
          return map(self.values.row_names, function(name) return entry[name] end)
    end end,
 

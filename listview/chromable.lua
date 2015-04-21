@@ -10,14 +10,11 @@
 -- TODO instead of a full chrome.. make it something that can easily be 
 --  put into one.
 
-config = (globals.listview or {})
-
 local lousy = require("lousy")
 
 require "o_jasper_common"
 require "listview.html_list"
-require "listview.log"
-require "listview.log_html"
+require "listview.entry_html"
 
 -- TODO this not really usable as lib,
 -- Function depending on a 'db', returns object for both the adding, and
@@ -26,8 +23,10 @@ require "listview.log_html"
 --    Perhaps paged_chrome just needs a 'combiner' function?
 
 local function final_html_list(listview, list, as_msg)
+   --print(
+      --list = map(list, function(msg) return listview:fun(msg) end)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   return as_msg and html_msg_list(listview, list, config) or html_list_keyval(list)
+   return as_msg and html_msg_list(listview, list) or html_list_keyval(list)
 end
 
 local search_cnt = 0
@@ -91,6 +90,10 @@ local listview_metas = {
          total_query = function(self) return function(search)
                -- How we end up searching.
                assert(type(search) == "string", "Search not string; " .. tostring(search))
+               assert(type(self.log) == "table", 
+                      "(bug, possibly by you)Need a thing to search in.")
+               assert(getmetatable(self.log).__index.new_sql_help)
+               --local query = getmetatable(self.log).__index.new_sql_help(self.log)
                local query = self.log:new_sql_help()
                if search ~= "" then query:search(search) end
                query:order_by(self.log.values.order_by)

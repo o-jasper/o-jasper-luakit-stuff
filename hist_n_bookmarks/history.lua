@@ -6,16 +6,15 @@
 --  (at your option) any later version.
 
 require "o_jasper_common"
+
 local sql_help = require("sql_help")
 local sql_help_meta, sql_entry_meta = sql_help.sql_help_meta, sql_help.sql_entry_meta
-
-require "listview.log"
-require "listview.log_html"  -- TODO... Want this later.
+require "listview.entry_html"  -- TODO... Want this later.
 
 local capi = { luakit = luakit, sqlite3 = sqlite3 }
 
 -- History stuff.
-history_entry_meta = copy_table(msg_meta)
+history_entry_meta = copy_table(sql_entry_meta)
 
 history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
@@ -34,15 +33,12 @@ history_entry_meta.values = {  -- Note: it is overkill, shared with history_meta
 history_meta = copy_table(sql_help_meta)
 history_meta.values = history_entry_meta.values
 
-history_meta.direct._msg = log_meta.direct._msg  -- TODO this is suckage.
-history_meta.direct.exec = log_meta.direct.exec
-
-function history_meta.direct.history_entry(self) return function(entry)
-      entry.logger = self
+function history_meta.direct.produce_entry(notself) return function(entry)
+      entry.origin = notself
       return setmetatable(history_entry, metatable_of(history_entry_meta))
 end end
 
-history_meta.direct.fun = history_meta.direct.history_entry
+--history_meta.direct.produce_entry = history_meta.direct.history_entry
 
 history_meta.values = history_entry_meta.values
 
@@ -50,3 +46,6 @@ local existing_history = require("history")
 local db = existing_history.db
 
 history = setmetatable({ db = db }, metatable_of(history_meta))
+
+assert(history_meta.__index.new_sql_help)
+assert(history_meta.__index.produce_entry)

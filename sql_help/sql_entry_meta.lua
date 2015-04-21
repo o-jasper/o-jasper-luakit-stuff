@@ -16,14 +16,14 @@ local sql_entry_meta = {
    determine = { tags_last = function(self) return 0 end },
    direct = {
       realtime_tags = function(self) return function()
-            local logger = self.logger
-            if self.tags_last > logger.tags_last and rawget(self, "tags") then
+            local origin = self.origin
+            if self.tags_last > origin.tags_last and rawget(self, "tags") then
                return rawget(self, "tags")
             end
             -- Get the tags.
             self.tags_last = cur_time()
             self.tags = {}
-            local got = logger.db:exec(self.values.tagfinder, {self.id})
+            local got = origin.db:exec(self.values.tagfinder, {self.id})
             for _, el in pairs(got) do
                table.insert(self.tags, el.tag)
             end
@@ -31,11 +31,11 @@ local sql_entry_meta = {
       end end,
       -- Delete in DB.
       --db_delete = function(self) return function()
-      --   self.logger:delete(self.id)
+      --   self.origin:delete(self.id)
       --end end,
       -- Pass any changes to object to the database.
       --db_update = function(self) return function()
-            --self.logger:update_entirely_by(self)
+            --self.origin:update_entirely_by(self)
       --end end,
    },
    otherwise=function(self, key)
