@@ -1,11 +1,11 @@
 -- Get luakit environment
-local package = require("package")
-local lousy = require("lousy")
+local package_path = require("package").path
+local string_split = require("lousy").util.string.split
 local capi = { luakit = luakit }
 
 local search_dirs = {} -- Directories where assets may be.
 
-for _, el in pairs(lousy.util.string.split(package.path, ";")) do
+for _, el in pairs(string_split(package_path, ";")) do
    if string.sub(el, -6) == "/?.lua" then
       table.insert(search_dirs, string.sub(el, 1,-6))
    end
@@ -14,7 +14,7 @@ end
 local memorize_data = {}  -- Keeps track of what we already got.
 
 -- Search all the assets, and load it if exists.
-function load_asset(path, dont_memorize)
+local function load_asset(path, dont_memorize)
    if not dont_memorize and memorize_data[path] then
       return memorize_data[path]
    end
@@ -31,3 +31,5 @@ function load_asset(path, dont_memorize)
    end
    return nil
 end
+
+return load_asset
