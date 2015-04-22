@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "o_jasper_common"
+local cur_time = require "o_jasper_common.cur_time"
 
 local ot = require "o_jasper_common.html.other"
 local tt = require "o_jasper_common.html.time"

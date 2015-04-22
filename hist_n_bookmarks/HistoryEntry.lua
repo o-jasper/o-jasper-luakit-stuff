@@ -1,7 +1,9 @@
 
 local SqlEntry = require("sql_help").SqlEntry
 
-local HistoryEntry = copy_table(SqlEntry)
+local c = require "o_jasper_common"
+
+local HistoryEntry = c.copy_table(SqlEntry)
 
 HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
@@ -13,8 +15,8 @@ HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaue
    time_overkill = false,
 
    textlike = {"uri", "title"},
-   string_els = values_now_set({"uri", "title"}),
-   int_els = values_now_set({"id", "last_visit", "visits"}),
+   string_els = c.values_now_set({"uri", "title"}),
+   int_els = c.values_now_set({"id", "last_visit", "visits"}),
 }
 
-return metatable_of(HistoryEntry)
+return c.metatable_of(HistoryEntry)

@@ -1,36 +1,38 @@
 -- Jasper den Ouden, placed in public domain.
 
-function isinteger(x) return type(x) == "number" and math.floor(x) == x end
+local Public = {}
 
-function map(list, fun)
+function Public.isinteger(x) return type(x) == "number" and math.floor(x) == x end
+
+function Public.map(list, fun)
    local ret = {}
    for _, v in pairs(list) do table.insert(ret, fun(v)) end
    return ret
 end
 
-function map_kv(list, fun)
+function Public.map_kv(list, fun)
    local ret = {}
    for k, v in pairs(list) do ret[k] = fun(k,v) end
    return ret
 end
 
-function map_l_kv(list, fun)
+function Public.map_l_kv(list, fun)
    local ret = {}
    for k, v in pairs(list) do table.insert(ret, fun(k,v)) end
    return ret
 end
 
-function copy_table_1(tab)  -- One-deep copy of table.
+function Public.copy_table_1(tab)  -- One-deep copy of table.
    local ret = {}
    for k,v in pairs(tab) do ret[k] = v end
    return ret
 end
 
-function copy_table(tab)  -- One-deep copy of table.
+function Public.copy_table(tab)  -- One-deep copy of table.
    local ret = {}
    for k,v in pairs(tab) do
       if type(v) == "table" then
-         ret[k] = copy_table(v)
+         ret[k] = Public.copy_table(v)
       else
          ret[k] = v
       end
@@ -38,13 +40,13 @@ function copy_table(tab)  -- One-deep copy of table.
    return ret
 end
 
-function values_now_set(tab)
+function Public.values_now_set(tab)
    local ret = {}
    for _,v in pairs(tab) do ret[v] = true end
    return ret
 end
 
-function full_gsub(str, subst)  -- Perhaps something for lousy.util.string
+function Public.full_gsub(str, subst)  -- Perhaps something for lousy.util.string
    local n, k = 1, 0
    while n > 0 and k < 64 do
       str, n = string.gsub(str, "{%%(%w+)}", subst)
@@ -59,3 +61,5 @@ function full_gsub(str, subst)  -- Perhaps something for lousy.util.string
    end
    return str
 end
+
+return Public

@@ -36,7 +36,7 @@ function Public.paged_chrome(chrome_name, pages)
               end)
 end
 
-require "o_jasper_common"
+local c = require "o_jasper_common"
 
 function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
    return load_asset("assets/" .. what .. (kind or ".html"))
@@ -59,7 +59,7 @@ local templated_page_metatable = {
                   pattern = Public.asset(self.page.name, ".html")
                end
             end
-            return full_gsub(pattern, self.page:repl_list(view, meta))
+            return c.full_gsub(pattern, self.page:repl_list(view, meta))
          end,
          init = function(view, _)
             for name, fun in pairs(self.page.to_js) do

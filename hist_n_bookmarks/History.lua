@@ -1,8 +1,10 @@
 
+local c = require "o_jasper_common"
+
 local SqlHelp = require("sql_help").SqlHelp
 local HistoryEntry = require "hist_n_bookmarks/HistoryEntry"
 
-History = copy_table(SqlHelp)
+History = c.copy_table(SqlHelp)
 History.values = HistoryEntry.values
 
 function History:history_entry(entry)
@@ -19,4 +21,4 @@ function History.listfun(self, list)
    return list
 end
 
-return metatable_of(History)
+return c.metatable_of(History)

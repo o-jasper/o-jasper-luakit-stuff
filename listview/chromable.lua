@@ -14,7 +14,8 @@ local config = globals.listview or {}
 
 local lousy = require("lousy")
 
-require "o_jasper_common"
+local c = require("o_jasper_common")
+
 require "listview.html_list"
 require "listview.entry_html"
 
@@ -106,10 +107,10 @@ local listview_metas = {
                if type(self.where) == "string" then self.where = {self.where} end
                local after = "/assets/" .. what .. (kind or ".html")
                for _, w in pairs(self.where) do
-                  local got = load_asset(w .. after)
+                  local got = c.load_asset(w .. after)
                   if got then return got end
                end
-               return load_asset("listview" .. after) or "COULDNT FIND ASSET"
+               return c.load_asset("listview" .. after) or "COULDNT FIND ASSET"
          end end,
          asset_getter = function(self) return function(what, kind) -- .. yah.
                return function() return self:asset(what, kind) end
@@ -125,7 +126,7 @@ local function accept_js_funs(into_page_meta, names)
 end
 
 -- Listview.
-listview_metas.search = copy_table(listview_metas.base)
+listview_metas.search = c.copy_table(listview_metas.base)
 listview_metas.search.direct.repl_list = function(self) return function(view, meta)
       local query = self:total_query("")
       local list = query:result()
@@ -146,7 +147,7 @@ accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
                                        "cycle_range_values", "reset_range_values"})
 
 -- Adding entries
-listview_metas.add = copy_table(listview_metas.base)
+listview_metas.add = c.copy_table(listview_metas.base)
 function listview_metas.add.direct.repl_list(self) return function(view, meta)
       return { addManual  = self:asset("parts/add"),
                stylesheet = self:asset("style", ".css") or "", 
@@ -158,7 +159,7 @@ end end
 accept_js_funs(listview_metas.add, {"manual_enter"})
 
 -- Both those.
-listview_metas.all = copy_table(listview_metas.base)
+listview_metas.all = c.copy_table(listview_metas.base)
 function listview_metas.all.direct.repl_list(self) return function(view, meta)
       -- Combine the two.
       local ret = listview_metas.search.direct.repl_list(self)(view, meta)
@@ -172,7 +173,7 @@ end end
 listview_metas.all.values.to_js = to_js
 
 local listview_metatables = {}
-for k,v in pairs(listview_metas) do listview_metatables[k] = metatable_of(v) end
+for k,v in pairs(listview_metas) do listview_metatables[k] = c.metatable_of(v) end
 
 function listview_chrome(log, which, where)
    assert(log and where)

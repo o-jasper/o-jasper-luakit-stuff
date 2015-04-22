@@ -16,9 +16,7 @@ local cur_time_ms = require("o_jasper_common.cur_time").ms
 
 local Public = {}
 
-require "o_jasper_common" -- TODO make this properly namespaced too.
---local common = require "o_jasper_common"
---local map = common.map  
+local map = require("o_jasper_common.other").map
 
 local SqlEntry = require "sql_help.SqlEntry"
 assert(type(SqlEntry) == "table")
