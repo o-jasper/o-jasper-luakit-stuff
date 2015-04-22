@@ -1,5 +1,5 @@
--- Makes chrome paged-ier. TODO/NOTE: wanna basically imitate a library for
---  servers.
+-- Makes chrome paged-ier.
+-- TODO/NOTE: wanna basically imitate a library for servers.
 
 local Public ={ paged_chrome_dict = {} }
 
@@ -17,7 +17,6 @@ function Public.paged_chrome(chrome_name, pages)
                  if not page then
                     use_name = pages.default_name
                     page = pages[use_name]
-                    --assert(page, string.format("MIAUW %s %s %s", use_name, meta.path, lousy.util.string.split(meta.path, "/")[1]))
                  end
                  -- TODO.. just use meta.path as the path!?
                  local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
