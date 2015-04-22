@@ -49,7 +49,7 @@ local SqlHelp = {
    -- Important: gotta be a _new_ one!
 -- Note: use this is you want to "build" a search.
 -- Otherwise the state is hanging around. (you can use it just the same)
-    new_SqlHelp = function(self, initial, fun)
+   new_SqlHelp = function(self, initial, fun)
       -- TODO multiple table names?
       initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
       return setmetatable({db=self.db, 
@@ -57,7 +57,9 @@ local SqlHelp = {
                            first=first or  "WHERE", produce_entry=fun},
                           getmetatable(self))
    end,
-
+   
+   exec = function(self, ...) return self:listfun(self.db:exec(...)) end,
+   
    -- Stuff to help me construct queries based on searches.
    extcmd = function(self, str, ...)
          if self.c then
