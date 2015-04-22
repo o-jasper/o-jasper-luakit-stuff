@@ -1,4 +1,4 @@
---  Copyright (C) 18-04-2015 Jasper den Ouden.
+--  Copyright (C) 22-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -244,8 +244,7 @@ WHERE to_id == m.id]], w or "", self.values.taggings)
    order_by = function(self, what, way)
          if type(what) == "table" then what = table.concat(what, ", ") end
          self.c = ""
-         self:inp(what)
-         self:extcmd("ORDER BY ? %s", way or "DESC")
+         self:extcmd("ORDER BY %s %s", what, way or "DESC")
    end,
    
    -- Limiting the number of results.

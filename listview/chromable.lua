@@ -1,4 +1,4 @@
---  Copyright (C) 27-02-2015 Jasper den Ouden.
+--  Copyright (C) 22-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -41,6 +41,8 @@ local function js_listupdate(listview, list, as_msg)
 end
 
 local to_js = {
+--Note these arent done (self, args..)-style because they are fed in
+-- `view:register_function` in paged_chrome
    manual_enter = function(self) return function(inp)
          local v= self.log:db_enter({ claimtime=cur_time.s(),
                                    re_assess_time = cur_time.s() + 120,
@@ -85,12 +87,12 @@ local to_js = {
 --pagedChrome = require "paged_chrome"
 
 -- Making the objects that do the pages.
-
 local listview_metas = {
    base = {
-      defaults = { repl_pattern = false, to_js = {}, set_i=0, set_cnt = 20, set_step=20 },
-      direct = {
-         total_query = function(self) return function(search)
+      repl_pattern = false, to_js = {}, set_i=0, set_cnt = 20, set_step=20,
+      values = { to_js = {} },
+
+      total_query = function(self, search)
                -- How we end up searching.
                assert(type(search) == "string", "Search not string; " .. tostring(search))
                local query = self.log:new_SqlHelp()
@@ -101,74 +103,73 @@ local listview_metas = {
                query:row_range(self.set_i, self.set_cnt)
                -- TODO other ones..
                return query
-         end end,
-         asset = function(self) return function(what, kind)
-               assert(type(self) == "table")
-               if type(self.where) == "string" then self.where = {self.where} end
-               local after = "/assets/" .. what .. (kind or ".html")
-               for _, w in pairs(self.where) do
-                  local got = c.load_asset(w .. after)
-                  if got then return got end
-               end
-               return c.load_asset("listview" .. after) or "COULDNT FIND ASSET"
-         end end,
-         asset_getter = function(self) return function(what, kind) -- .. yah.
-               return function() return self:asset(what, kind) end
-         end end,
+      end,
+      asset = function(self, what, kind)
+         assert(type(self) == "table")
+         if type(self.where) == "string" then self.where = {self.where} end
+         local after = "/assets/" .. what .. (kind or ".html")
+         for _, w in pairs(self.where) do
+            local got = c.load_asset(w .. after)
+            if got then return got end
+         end
+         return c.load_asset("listview" .. after) or "COULDNT FIND ASSET"
+      end,
+      asset_getter = function(self, what, kind) -- .. yah.
+         return function() return self:asset(what, kind) end
+      end,
       },
-      values = { to_js = {} },
-}}
+}
 
 local function accept_js_funs(into_page_meta, names)
    for _, name in pairs(names) do
-      into_page_meta.defaults.to_js[name] = to_js[name]
+      into_page_meta.to_js[name] = to_js[name]
    end
 end
 
 -- Listview.
 listview_metas.search = c.copy_table(listview_metas.base)
-listview_metas.search.direct.repl_list = function(self) return function(view, meta)
-      local query = self:total_query("")
-      local list = query:result()
-      local sql_shown = true
-      return { searchInput   = self:asset("parts/search"),
-               searchInitial = self:asset("parts/search_initial"),
-               stylesheet    = self:asset("style", ".css"),
-               js            = self:asset("js", ".js"),
-               title = string.format("%s:%s", self.chrome_name, self.name),
-               cycleCnt = self.set_step,
-               cnt = #list,
-               list = final_html_list(self, list, true),
-               sqlInput = config.sql_show and query:sql_code() or "",
-               sqlShown = config.sql_shown and "true" or "false",
-      }
-end end
+function listview_metas.search:repl_list(view, meta)
+   local query = self:total_query("")
+   local list = query:result()
+   local sql_shown = true
+   return { searchInput   = self:asset("parts/search"),
+            searchInitial = self:asset("parts/search_initial"),
+            stylesheet    = self:asset("style", ".css"),
+            js            = self:asset("js", ".js"),
+            title = string.format("%s:%s", self.chrome_name, self.name),
+            cycleCnt = self.set_step,
+            cnt = #list,
+            list = final_html_list(self, list, true),
+            sqlInput = config.sql_show and query:sql_code() or "",
+            sqlShown = config.sql_shown and "true" or "false",
+   }
+end
 accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
                                        "cycle_range_values", "reset_range_values"})
 
 -- Adding entries
 listview_metas.add = c.copy_table(listview_metas.base)
-function listview_metas.add.direct.repl_list(self) return function(view, meta)
-      return { addManual  = self:asset("parts/add"),
-               stylesheet = self:asset("style", ".css") or "", 
-               js         = self:asset("js", ".js") or "",
-               title = string.format("%s:%s", self.chrome_name, self.name),
-      }
-end end
+function listview_metas.add:repl_list(self, view, meta)
+   return { addManual  = self:asset("parts/add"),
+            stylesheet = self:asset("style", ".css") or "", 
+            js         = self:asset("js", ".js") or "",
+            title = string.format("%s:%s", self.chrome_name, self.name),
+   }
+end
 
 accept_js_funs(listview_metas.add, {"manual_enter"})
 
 -- Both those.
 listview_metas.all = c.copy_table(listview_metas.base)
-function listview_metas.all.direct.repl_list(self) return function(view, meta)
-      -- Combine the two.
-      local ret = listview_metas.search.direct.repl_list(self)(view, meta)
-      local lst = listview_metas.add.direct.repl_list(self)(view, meta)
-      for k, v in pairs(lst) do
-         ret[k] = v
-      end
-      return ret
-end end
+function listview_metas.all:repl_list(self, view, meta)
+   -- Combine the two.
+   local ret = listview_metas.search.direct.repl_list(self)(view, meta)
+   local lst = listview_metas.add.direct.repl_list(self)(view, meta)
+   for k, v in pairs(lst) do
+      ret[k] = v
+   end
+   return ret
+end
 
 listview_metas.all.values.to_js = to_js
 

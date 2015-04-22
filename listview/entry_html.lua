@@ -1,4 +1,4 @@
---  Copyright (C) 27-02-2015 Jasper den Ouden.
+--  Copyright (C) 22-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -42,15 +42,9 @@ function default_html_calc.timemarks(self, state)
 end
 
 -- Single entry.
--- Requires a msg:repl_list
 function html_msg(listview, state)
    return function (index, msg)
       state.index = index
-      -- TODO..shouldnt be needed.
-      for _, k in pairs({"title", "desc", "uri", "origin"}) do
-         msg[k] = msg[k] or ""
-      end
-      -- TODO put in more stuff.
       return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}",
                          html_repl(msg, state))
    end
