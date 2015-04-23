@@ -68,8 +68,20 @@ local to_js = {
       return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
-   cycle_limit_values = function(self) return function()
-         self.set_i = self.set_i + self.set_step
+   set_i    = function(self) return self.set_i end,
+   set_cnt  = function(self) return self.set_cnt end,
+   set_step = function(self) return self.set_step end,
+
+   set_set_i    = function(self) return function(to) self.set_i = to end end,
+   set_set_cnt  = function(self) return function(to) self.set_cnt = to end end,
+   set_set_step = function(self) return function(to) self.set_step = to end end,
+   
+   change_cnt = function(self) return function(by)
+         self.set_cnt = math.max(1, self.set_cnt + by)
+   end end,
+
+   cycle_limit_values = function(self) return function(n)
+         self.set_i = self.set_i + self.set_step*(n or 1)
    end end,
 
    reset_limit_values = function(self) return function()
@@ -149,7 +161,8 @@ function listview_metas.search:repl_list(view, meta)
    }
 end
 accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
-                                       "cycle_limit_values", "reset_limit_values"})
+                                       "cycle_limit_values", "change_cnt",
+                                       "reset_limit_values"})
 
 -- Adding entries
 listview_metas.add = c.copy_table(listview_metas.base)

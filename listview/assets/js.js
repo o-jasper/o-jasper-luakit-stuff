@@ -84,8 +84,12 @@ function touch_sql() {
 function touch_search() {
     reset_limit_values();
     set_by_search(true);
-    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
+    update_sql_shown();
     if(continuous){ search(); }
+}
+
+function update_sql_shown() {
+    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
 }
 
 function search() {
@@ -101,7 +105,14 @@ function _search() {
     }
 }
 
-function cycle_results() {
-    cycle_limit_values(); //Just change the parameters and search.
+function cycle_results(n) {
+    cycle_limit_values(n); //Just change the parameters and search.
     _search();
+    update_sql_shown();
+}
+
+function more_results(more) {
+    change_cnt(more);
+    _search();
+    update_sql_shown();
 }
