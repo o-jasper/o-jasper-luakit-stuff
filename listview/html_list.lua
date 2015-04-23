@@ -46,8 +46,10 @@ function Public.table(data, fun, toprow, row_class, table_class, usefun)
                        tableClass=maybeclass(table_class or html.table)})
 end
 
+local isinteger = require("o_jasper_common.other").isinteger
+
 -- TODO sort it.
-function Public.list_keyval(data, fun, toprow, row_class, table_class, el)
+function Public.keyval(data, fun, toprow, row_class, table_class, el)
    return Public.table(data,
                        function(k, v)
                           if isinteger(v) and v > 1e15 then
