@@ -10,6 +10,8 @@ local cur_time = require "o_jasper_common.cur_time"
 local ot = require "o_jasper_common.html.other"
 local tt = require "o_jasper_common.html.time"
 
+local html_list = require "listview.html_list"
+
 SqlEntry = require("sql_help").SqlEntry
 
 local default_html_calc = {}
@@ -54,5 +56,5 @@ function html_msg_list(listview, data, state)
    state = state or { last_time = cur_time.ms() }
    state.config = state.config or {}
    state.html_calc = state.html_calc or default_html_calc
-   return html_list(data, html_msg(listview, state))
+   return html_list.list(data, html_msg(listview, state))
 end

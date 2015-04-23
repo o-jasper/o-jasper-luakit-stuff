@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+local Public = {}
+
 -- If a class provided, makes it addable to tag data.
 local function maybeclass(class) return class and " class=\"".. class .. "\"" or "" end
 
@@ -16,7 +18,7 @@ local html= {
    table = [[<table{%tableClass}>{%topRow}{%tableContent}</table>]]
 }
 
-function html_row(data, fun, row, row_class)
+function Public.row(data, fun, row, row_class)
    fun = fun or function(_,v) return tostring(v) end
    local str = ""
    for k, v in pairs(data) do
@@ -27,30 +29,33 @@ function html_row(data, fun, row, row_class)
    return str
 end
 
-function html_list(data, fun, row_class, table_class)
+function Public.list(data, fun, row_class, table_class)
    return string.gsub(html.table, "{%%(%w+)}",
                       {topRow="",
-                       tableContent=html_row(data, fun, html.row, row_class),
+                       tableContent=Public.row(data, fun, html.row, row_class),
                        tableClass=maybeclass(table_class or html.table)})
 end
 
-function html_table(data, fun, toprow, row_class, table_class, usefun)
+function Public.table(data, fun, toprow, row_class, table_class, usefun)
    local usefun = usefun or function(k, v)
-      return html_row(v, fun, html.el, row_class)
+      return Public.row(v, fun, html.el, row_class)
    end
    return string.gsub(html.table, "{%%(%w+)}",
                       {topRow=toprow or "",
-                       tableContent=html_row(data, usefun, html.row, row_class),
+                       tableContent=Public.row(data, usefun, html.row, row_class),
                        tableClass=maybeclass(table_class or html.table)})
 end
 
 -- TODO sort it.
-function html_list_keyval(data, fun, toprow, row_class, table_class, el)
-   return html_table(data, function(k, v)
-                               if isinteger(v) and v > 1e15 then
-                                  v = string.format("%d%d", math.floor(v/10e14), v%1e15)
-                               end
-                               return string.gsub(el or "{%k}: {%v}", "{%%(%w+)}",
-                                                  {k=tostring(k), v=tostring(v)})
-                           end, toprow, row_class, table_class)
+function Public.list_keyval(data, fun, toprow, row_class, table_class, el)
+   return Public.table(data,
+                       function(k, v)
+                          if isinteger(v) and v > 1e15 then
+                             v = string.format("%d%d", math.floor(v/10e14), v%1e15)
+                          end
+                          return string.gsub(el or "{%k}: {%v}", "{%%(%w+)}",
+                                             {k=tostring(k), v=tostring(v)})
+                       end, toprow, row_class, table_class)
 end
+
+return Public

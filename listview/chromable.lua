@@ -16,7 +16,8 @@ local lousy = require("lousy")
 
 local c = require("o_jasper_common")
 
-require "listview.html_list"
+local html_list = require("listview.html_list")
+assert(html_list)
 require "listview.entry_html"
 
 -- TODO this not really usable as lib,
@@ -29,7 +30,7 @@ local function final_html_list(listview, list, as_msg)
    --print(
       --list = map(list, function(msg) return listview:fun(msg) end)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   return as_msg and html_msg_list(listview, list) or html_list_keyval(list)
+   return as_msg and html_msg_list(listview, list) or html_list.keyval(list)
 end
 
 local search_cnt = 0
