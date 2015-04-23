@@ -12,7 +12,7 @@ local tt = require "o_jasper_common.html.time"
 
 local html_list = require "listview.html_list"
 
-SqlEntry = require("sql_help").SqlEntry
+local SqlEntry = require("sql_help").SqlEntry
 
 local default_html_calc = {}
 
