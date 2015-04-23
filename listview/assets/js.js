@@ -103,6 +103,12 @@ function _search() {
     else{
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
+    var gl = got_limit();
+    ge("less_results").disabled = gl;
+    ge("more_results").disabled = gl;
+    ge("cycle_forw").disabled = gl;
+    ge("cycle_forw2").disabled = gl;
+    ge("cycle_back").disabled = gl;
 }
 
 function cycle_results(n) {

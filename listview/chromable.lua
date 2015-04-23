@@ -76,6 +76,8 @@ local to_js = {
    set_set_cnt  = function(self) return function(to) self.set_cnt = to end end,
    set_set_step = function(self) return function(to) self.set_step = to end end,
    
+   got_limit = function(self) return function() return self.got_limit end end,
+
    change_cnt = function(self) return function(by)
          self.set_cnt = math.max(1, self.set_cnt + by)
    end end,
@@ -114,6 +116,7 @@ local listview_metas = {
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
 
+               self.got_limit = not not query.got_limit
                if not query.got_limit then  -- Add a limit if dont have one yet.
                   query:limit(self.set_i, self.set_cnt)
                end
@@ -162,7 +165,7 @@ function listview_metas.search:repl_list(view, meta)
 end
 accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
                                        "cycle_limit_values", "change_cnt",
-                                       "reset_limit_values"})
+                                       "reset_limit_values", "got_limit"})
 
 -- Adding entries
 listview_metas.add = c.copy_table(listview_metas.base)
