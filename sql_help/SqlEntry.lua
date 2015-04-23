@@ -35,14 +35,14 @@ local SqlEntry = {
       return math.floor(self[self.values.time]*self.values.timemul)
    end,
 
-      -- Delete in DB.
-      --db_delete = function(self, )
-      --   self.origin:delete(self.id)
-      --end,
-      -- Pass any changes to object to the database.
-      --db_update = function(self, )
-            --self.origin:update_entirely_by(self)
-      --end,
+  -- Delete in DB.
+   delete = function(self)
+      self.origin:delete_id(self.id)
+   end,
+   -- Pass any changes to object to the database.
+--   db_update = function(self)
+--      self.origin:update_id(self)
+--   end,
 
    otherwise = function(self, key)
       local meta = getmetatable(self).meta

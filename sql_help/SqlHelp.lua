@@ -12,7 +12,7 @@
 -- TODO make it only _compose_ it.
 
 local metatable_of = require "o_jasper_common.meta"
-local cur_time_ms = require("o_jasper_common.cur_time").ms
+local cur_time = require("o_jasper_common.cur_time")
 
 local Public = {}
 
@@ -45,7 +45,17 @@ local SqlHelp = {
       time = "id", timemul = 0.001,
    },
    c = false, tags_last = 0, last_id_time = 0,
-   
+
+   -- Intended as replacable ("virtual")
+   listfun = function(_, list)
+      for _, data in pairs(list) do
+         assert(type(data) == "table")
+         data.origin = self
+         setmetatable(data, SqlEntry)
+      end
+      return list
+   end,
+  
    -- Important: gotta be a _new_ one!
 -- Note: use this is you want to "build" a search.
 -- Otherwise the state is hanging around. (you can use it just the same)
@@ -89,9 +99,17 @@ local SqlHelp = {
          self.c = self.first or how or self.how
    end,
 
-   from_table = function(self, table_name)
-      table.insert(self.cmd, string.format([[SELECT * FROM %s m]], self.values.table_name))
+   -- Selecting.
+   select_from_table = function(self, table_name)
+      table.insert(self.cmd, string.format([[SELECT * FROM %s m]],
+                                           table_name or self.values.table_name))
    end,
+
+   -- Deleting. -- TODO problem is.. then you want to get all the tags too.
+--   delete = function(self, table_name)
+--      table.insert(self.cmd, string.format([[DELETE FROM %s m]],
+--                                           table_name or self.values.table_name))
+--   end,
 
    -- Lots of stuff to build searches from.
    equal_one_or_list = function(self, which, input)
@@ -278,46 +296,69 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
          return str
    end,
    
-   -- Get the result of the current query on a DB.
-   result = function(self, db)
-         print("***", #self.input, #self.cmd)
-         print(self:sql_pattern())
-         for _,v in pairs(self.input) do print(v) end
-         print("----")
-
-         -- TODO check number of questionmarks?
-         return self:listfun((self.db or db):exec(self:sql_pattern(), self.input))
+   raw_result = function(self, db)
+      return (db or self.db):exec(self:sql_pattern(), self.input)
    end,
+   
+   -- Get the result of the current query on a DB.
+   result = function(self, db) return self:listfun(self:raw_result(db)) end,
 
+   -- Represents the entry as list in the order of the names.
    args_in_order = function(self, entry)
          assert(type(self.values.row_names) == "table")
          return map(self.values.row_names, function(name) return entry[name] end)
    end,
 
-   -- Stuff that can be used later on.
+-- Adding/removing
 
-   -- Time-based IDs.
-   new_time_id = function(self, db)
-         local time = cur_time_ms()*1000
-         if time == self.last_id_time then time = time + 1 end
-         -- Search for matching.
-         while self.values.time_overkill and
-            (self.db or db):exec([[SELECT ? FROM ? WHERE ? == ?]], 
-                                 {self.values.idname, self.values.table_name,
-                                  self.values.idname, time}) > 0 do
-            time = time + 1
-         end
-         last_time = time
-         return time
-   end,
-
-   listfun = function(_, list)
-      for _, data in pairs(list) do
-         assert(type(data) == "table")
-         setmetatable(data, SqlEntry)
+   -- Remove all positive results.
+   delete_result = function(self, table_name, db)
+      db = db or self.db
+      local list = self:raw_result(self, db)
+      for _, entry in pairs(list) do -- Then delete all of them.
+         self:delete_id(self, entry[self.values.idname], table_name)
       end
       return list
+   end,   
+
+   -- Add an entry.
+   enter = function(self, add)
+         assert(self.values.table_name and self.values.row_names)
+         
+         local ret = {}
+         if add.keep then  -- Only bother getting it if it is keepworthy.
+            local sql = string.format("INSERT INTO %s VALUES (%s)",
+                                      self.values.table_name, qmarks(#self.values.row_names))
+            ret.add = self.db:exec(sql, self.args_in_order(add))
+            -- And all the tags, if we do those.
+            if add.tags and #add.tags > 0 and self.values.taggings then
+               self.tags_last = cur_time.raw()  -- Note time last changed.
+               local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
+                                                 self.value.taggings)
+               ret.tags = {}
+               for _, tag in pairs(add.tags) do
+                  table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
+               end
+            end
+         end
+         return ret
    end,
+
+   -- Delete an entry.
+   delete_id = function(self, id, table_name)
+      table_name = table_name or self.values.table_name
+      self.db:exec(string.format("DELETE FROM ? WHERE %s == ?", self.values.idname),
+                   { table_name, id })
+      
+      if taggings then
+         self.db.exec(string.format("DELETE FROM ? WHERE to_%s == ?",self.values.idname),
+                      { self.values.taggings, id })
+      end
+   end,
+
+   -- Change an entry.
+   -- TODO use update and stuff.
+   -- update_id
 }
 
 return metatable_of(SqlHelp)
