@@ -10,14 +10,19 @@
 require "listview.chromable"
 require "hist_n_bookmarks"
 
+local table_copy = require("o_jasper_common.other").table_copy
+
 local paged_chrome = require("paged_chrome")
 
-local config = globals.hist_n_bookmarks
+local config = globals.hist_n_bookmarks or {}
+config.page = config.page or {}
 
 -- TODO.. config the listview metas..
 local function chrome_describe(default_name, log)
    assert(log)
    local page = listview_chrome(log, "search", "hist_n_bookmarks")
+   page.set_cnt = config.page.cnt or 20
+   page.set_step = config.page.step or page.step_cnt
    return { default_name = default_name,
             search = paged_chrome.templated_page(page),
    }
