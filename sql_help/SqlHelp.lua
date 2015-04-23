@@ -210,7 +210,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
                          "uri:", "desc:", "title:",
                          "urilike:", "desclike:", "titlelike:",
-                         "before:", "after:", "range:"}
+                         "before:", "after:", "limit:"}
       local tagged_list = searchlike.searchlike(searchlike.portions(str), matchable)
       
       local n, tags, not_tags, before_t, after_t = false, {}, {}, nil, nil
@@ -248,15 +248,15 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
             else
                before_t = time_interpret(v)
             end
-         elseif m == "range:" then
+         elseif m == "limit:" then
             local list = string_split(v, ",")
             -- TODO  collect more nicely.(might be bad user-input)
             assert(#list == 1 or #list == 2)
-            assert(not self.got_range)
-            self.got_range = {}
+            assert(not self.got_limit)
+            self.got_limit = {}
             for _, el in pairs(list) do
                assert(string.match(el, "[%d]+"))
-               table.insert(self.got_range, tonumber(el))
+               table.insert(self.got_limit, tonumber(el))
             end
          else
             self:text_sw(v, n)
@@ -280,7 +280,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    -- Limiting the number of results.
-   row_range = function(self, fr, cnt) 
+   limit = function(self, fr, cnt) 
       self.c = ""
       self:extcmd("LIMIT ?, ?")
       self:inp(fr)
@@ -288,13 +288,13 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    finish = function(self)  -- Add requested searches.
-      if self.got_range then
-         if #self.got_range == 2 then
-            self:row_range(self.got_range[1], self.got_range[2])
+      if self.got_limit then
+         if #self.got_limit == 2 then
+            self:limit(self.got_limit[1], self.got_limit[2])
          else
-            self:row_range(0, self.got_range[1])
+            self:limit(0, self.got_limit[1])
          end
-         self.got_range = nil
+         self.got_limit = nil
       end
    end,
 

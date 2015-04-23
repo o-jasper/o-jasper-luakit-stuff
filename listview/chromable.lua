@@ -68,18 +68,18 @@ local to_js = {
       return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
-   cycle_range_values = function(self) return function()
+   cycle_limit_values = function(self) return function()
          self.set_i = self.set_i + self.set_step
    end end,
 
-   reset_range_values = function(self) return function()
+   reset_limit_values = function(self) return function()
          self.set_i   = nil -- self.values.set_i
          self.set_cnt = nil --self.values.set_cnt
    end end,
---   get_range = function(self) return function() 
+--   get_limit = function(self) return function() 
 --         return {self.set_i, self.set_cnt}
 --   end end,
---   set_range = function(self) return function(set_i, set_cnt)
+--   set_limit = function(self) return function(set_i, set_cnt)
 --         self.set_i = set_i
 --         self.set_cnt   = set_cnt
 --   end end,
@@ -102,8 +102,8 @@ local listview_metas = {
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
 
-               if not query.got_range then  -- Add a range if dont have one yet.
-                  query:row_range(self.set_i, self.set_cnt)
+               if not query.got_limit then  -- Add a limit if dont have one yet.
+                  query:limit(self.set_i, self.set_cnt)
                end
                -- TODO other ones..
                return query
@@ -149,7 +149,7 @@ function listview_metas.search:repl_list(view, meta)
    }
 end
 accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
-                                       "cycle_range_values", "reset_range_values"})
+                                       "cycle_limit_values", "reset_limit_values"})
 
 -- Adding entries
 listview_metas.add = c.copy_table(listview_metas.base)

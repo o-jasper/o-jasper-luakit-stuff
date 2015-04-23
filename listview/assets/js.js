@@ -76,20 +76,20 @@ function set_continuous(yes, up) {
 }
 
 function touch_sql() {
-    reset_range_values();
+    reset_limit_values();
     set_sql_locked(true);
     set_by_search(false);
     if(continuous){ search(); }
 }
 function touch_search() {
-    reset_range_values();
+    reset_limit_values();
     set_by_search(true);
     if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
     if(continuous){ search(); }
 }
 
 function search() {
-    reset_range_values();
+    reset_limit_values();
     _search();
 }
 
@@ -102,6 +102,6 @@ function _search() {
 }
 
 function cycle_results() {
-    cycle_range_values(); //Just change the parameters and search.
+    cycle_limit_values(); //Just change the parameters and search.
     _search();
 }
