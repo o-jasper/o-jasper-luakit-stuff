@@ -51,9 +51,9 @@ local SqlHelp = {
 -- Otherwise the state is hanging around. (you can use it just the same)
    new_SqlHelp = function(self, initial, fun)
       -- TODO multiple table names?
-      initial = initial or string.format([[SELECT * FROM %s m]], self.values.table_name)
+      initial = initial or {string.format([[SELECT * FROM %s m]], self.values.table_name)}
       return setmetatable({db=self.db, 
-                           input = {}, cmd={initial}, 
+                           input = {}, cmd=initial,
                            first=first or  "WHERE", produce_entry=fun},
                           getmetatable(self))
    end,
@@ -87,6 +87,10 @@ local SqlHelp = {
    -- Combines the things.
    comb = function(self, how, down)
          self.c = self.first or how or self.how
+   end,
+
+   from_table = function(self, table_name)
+      table.insert(self.cmd, string.format([[SELECT * FROM %s m]], self.values.table_name))
    end,
 
    -- Lots of stuff to build searches from.
