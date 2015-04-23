@@ -1,4 +1,4 @@
---  Copyright (C) 22-04-2015 Jasper den Ouden.
+--  Copyright (C) 24-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -175,7 +175,7 @@ local SqlHelp = {
 
          self:extcmd([[%sEXISTS (
 SELECT * FROM %s
-WHERE to_id == m.id]], w or "", self.values.taggings)
+WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
          self:comb("AND")
          self:equal_one_or_list(tagname or self.values.tagname, tags)
          self:addstr(")")
