@@ -334,7 +334,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    
    -- Adding/removing
    
-   -- Remove all positive results.
+   -- Remove all results of the search.
    delete_result = function(self, table_name, db)
       db = db or self.db
       local list = self:raw_result(self, db)
