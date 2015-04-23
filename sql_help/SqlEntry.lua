@@ -13,14 +13,14 @@ local SqlEntry = {
    taggings="taggings",
    string_els={}, int_els={},
    tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
-
+   
    determine = { tags_last = function(self) return 0 end },
-
+   
    realtime_tags = function(self)
       local origin = self.origin
       if self.tags_last > origin.tags_last and rawget(self, "tags") then
          return rawget(self, "tags")
-            end
+      end
       -- Get the tags.
       self.tags_last = cur_time_raw()
       self.tags = {}
@@ -30,20 +30,20 @@ local SqlEntry = {
       end
       return self.tags
    end,
-
+   
    ms_t = function(self)
       return math.floor(self[self.values.time]*self.values.timemul)
    end,
-
-  -- Delete in DB.
+   
+   -- Delete in DB.
    delete = function(self)
       self.origin:delete_id(self.id)
    end,
    -- Pass any changes to object to the database.
---   db_update = function(self)
---      self.origin:update_id(self)
---   end,
-
+   --   db_update = function(self)
+   --      self.origin:update_id(self)
+   --   end,
+   
    otherwise = function(self, key)
       local meta = getmetatable(self).meta
       if meta.values.string_els[key] then
