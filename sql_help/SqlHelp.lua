@@ -210,7 +210,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
                          "uri:", "desc:", "title:",
                          "urilike:", "desclike:", "titlelike:",
-                         "before:", "after:"}
+                         "before:", "after:", "range:"}
       local tagged_list = searchlike.searchlike(searchlike.portions(str), matchable)
       
       local n, tags, not_tags, before_t, after_t = false, {}, {}, nil, nil
@@ -248,6 +248,16 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
             else
                before_t = time_interpret(v)
             end
+         elseif m == "range:" then
+            local list = string_split(v, ",")
+            -- TODO  collect more nicely.(might be bad user-input)
+            assert(#list == 1 or #list == 2)
+            assert(not self.got_range)
+            self.got_range = {}
+            for _, el in pairs(list) do
+               assert(string.match(el, "[%d]+"))
+               table.insert(self.got_range, tonumber(el))
+            end
          else
             self:text_sw(v, n)
          end
@@ -277,14 +287,27 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       self:inp(cnt)
    end,
    
+   finish = function(self)  -- Add requested searches.
+      if self.got_range then
+         if #self.got_range == 2 then
+            self:row_range(self.got_range[1], self.got_range[2])
+         else
+            self:row_range(0, self.got_range[1])
+         end
+         self.got_range = nil
+      end
+   end,
+
    -- Patterns with all the questionmarks to be filled with `self.input`.
    sql_pattern = function(self)
+      self:finish()
       return table.concat(self.cmd, "\n") 
    end,
    
    -- Manually fill those in. USE THE SQL VERSION.
    -- TODO SQL exposes it?
    sql_code = function(self)
+      self:finish()
       local pat = string_split(self:sql_pattern(), "?")
       local str = pat[1] or "{NOPE1}"
       for i, el in pairs(self.input) do
@@ -355,7 +378,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
                       { self.values.taggings, id })
       end
    end,
-   
+
    -- Change an entry.
    -- TODO use update and stuff.
    -- update_id

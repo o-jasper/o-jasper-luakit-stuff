@@ -101,7 +101,10 @@ local listview_metas = {
                query:order_by(self.log.values.order_by)
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
-               query:row_range(self.set_i, self.set_cnt)
+
+               if not query.got_range then  -- Add a range if dont have one yet.
+                  query:row_range(self.set_i, self.set_cnt)
+               end
                -- TODO other ones..
                return query
       end,
