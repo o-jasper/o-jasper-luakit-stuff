@@ -14,7 +14,19 @@ local html_list = require "listview.html_list"
 
 local SqlEntry = require("sql_help").SqlEntry
 
-local default_html_calc = {}
+local default_html_calc = {
+   tagsHTML = function (self, state)
+      return ot.tagsHTML(self.tags, state.tagsclass)
+   end,
+
+   dateHTML = function(self, state)
+      return tt.dateHTML(state, self:ms_t())
+   end,
+   
+   timemarks = function(self, state)
+      return tt.timemarks(state, self:ms_t())
+   end,
+}
 
 function html_repl(entry, state)
    assert(entry)
@@ -29,18 +41,6 @@ function html_repl(entry, state)
       end
    end
    return setmetatable(pass, {__index=calc})
-end
-
-function default_html_calc.tagsHTML(self, state)
-   return ot.tagsHTML(self.tags, state.tagsclass)
-end
-
-function default_html_calc.dateHTML(self, state)
-   return tt.dateHTML(state, self:ms_t())
-end
-
-function default_html_calc.timemarks(self, state)
-   return tt.timemarks(state, self:ms_t())
 end
 
 -- Single entry.
