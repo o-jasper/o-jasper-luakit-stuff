@@ -123,6 +123,10 @@ function more_results(more) {
     update_sql_shown();
 }
 
-function delete_entry(which) {
-    alert(which);
+var selected = {}
+
+function select_toggle(id) {
+    var cursel = !selected[id];
+    selected[id] = cursel
+    ge("id_" + id).className = (cursel ? "selected" : null);
 }

@@ -10,8 +10,6 @@ local cur_time = require "o_jasper_common.cur_time"
 local ot = require "o_jasper_common.html.other"
 local tt = require "o_jasper_common.html.time"
 
-local html_list = require "listview.html_list"
-
 local SqlEntry = require("sql_help").SqlEntry
 
 local default_html_calc = {
@@ -27,12 +25,7 @@ local default_html_calc = {
       return tt.timemarks(state, self:ms_t())
    end,
 
-   deleteButton = function(self, _)
-      return string.format(
-         [[<button class="delete_entry" onclick="delete_entry('%s')">DEL</button>]],
-         self[self.values.idname]
-      )
-   end,
+   identifier = function(self, _) return self[self.values.idname] end,
 }
 
 function html_repl(entry, state)
@@ -59,9 +52,15 @@ function html_msg(listview, state)
    end
 end
 
+local map = require("o_jasper_common.other").map
+
 function html_msg_list(listview, data, state)
    state = state or { last_time = cur_time.ms() }
    state.config = state.config or {}
    state.html_calc = state.html_calc or default_html_calc
-   return html_list.list(data, html_msg(listview, state))
+   local str = "<table>"
+   for i, el in pairs(data) do 
+      str = str .. html_msg(listview, state)(i, el)
+   end
+   return str .. "</table>"
 end
