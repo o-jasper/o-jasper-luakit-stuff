@@ -37,8 +37,23 @@ local search_cnt = 0
 
 local function js_listupdate(listview, list, as_msg)
    search_cnt = search_cnt + 1
+   -- TODO bit fussy.. really getting the return value straight out would be handy..
+   local cnt = "BUG"
+   local gl = listview.got_limit
+   if gl then
+      if #gl == 1 then
+         cnt = string.format("results 0 to %d", gl[1])
+      else
+         cnt = string.format("results %d to %d", gl[1], gl[1] + gl[2])
+      end
+   else
+      cnt = string.format("results %d to %d", listview.set_i,
+                          math.min(listview.set_i + listview.set_cnt, listview.set_i + #list))
+   end
    return { list=final_html_list(listview, list, as_msg),
-            cnt=#list, search_cnt=search_cnt }
+            cnt=cnt,
+            search_cnt=search_cnt
+   }
 end
 
 local to_js = {
@@ -46,13 +61,13 @@ local to_js = {
 -- `view:register_function` in paged_chrome
    manual_enter = function(self) return function(inp)
          local v= self.log:db_enter({ claimtime=cur_time.s(),
-                                   re_assess_time = cur_time.s() + 120,
-                                   origin = "manual",
-                                   kind = "manual test",
-                                   data = "", data_uri = "",
-                                   uri = "", title = inp.title, desc = inp.desc,
-                                   keep = true,
-                                   tags = lousy.util.string.split(inp.tags, "[,; ]+")
+                                      re_assess_time = cur_time.s() + 120,
+                                      origin = "manual",
+                                      kind = "manual test",
+                                      data = "", data_uri = "",
+                                      uri = "", title = inp.title, desc = inp.desc,
+                                      keep = true,
+                                      tags = lousy.util.string.split(inp.tags, "[,; ]+")
                                  })
    end end,
    
@@ -116,7 +131,7 @@ local listview_metas = {
                -- TODO the query itself should be able to override.
                -- (that'd be less tricky to get not-annoying)
 
-               self.got_limit = not not query.got_limit
+               self.got_limit = query.got_limit
                if not query.got_limit then  -- Add a limit if dont have one yet.
                   query:limit(self.set_i, self.set_cnt)
                end
@@ -157,7 +172,7 @@ function listview_metas.search:repl_list(view, meta)
             js            = self:asset("js", ".js"),
             title = string.format("%s:%s", self.chrome_name, self.name),
             cycleCnt = self.set_step,
-            cnt = #list,
+            cnt = string.format("results 0 to %d", #list),
             list = final_html_list(self, list, true),
             sqlInput = config.sql_show and query:sql_code() or "",
             sqlShown = config.sql_shown and "true" or "false",
