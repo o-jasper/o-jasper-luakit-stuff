@@ -122,3 +122,7 @@ function more_results(more) {
     _search();
     update_sql_shown();
 }
+
+function delete_entry(which) {
+    alert(which);
+}

@@ -15,7 +15,7 @@ local html_list = require "listview.html_list"
 local SqlEntry = require("sql_help").SqlEntry
 
 local default_html_calc = {
-   tagsHTML = function (self, state)
+   tagsHTML = function (self, _)
       return ot.tagsHTML(self.tags, state.tagsclass)
    end,
 
@@ -25,6 +25,13 @@ local default_html_calc = {
    
    timemarks = function(self, state)
       return tt.timemarks(state, self:ms_t())
+   end,
+
+   deleteButton = function(self, _)
+      return string.format(
+         [[<button class="delete_entry" onclick="delete_entry('%s')">DEL</button>]],
+         self[self.values.idname]
+      )
    end,
 }
 

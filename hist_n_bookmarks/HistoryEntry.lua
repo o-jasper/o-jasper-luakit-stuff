@@ -9,6 +9,7 @@ HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaue
    table_name = "history",
 --   taggings = "history_implied",
 --   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
+   idname = "id",
    time = "last_visit", timemul = 1000,
    row_names = {"id", "uri", "title", "last_visit", "visits"},
    order_by = "last_visit",
