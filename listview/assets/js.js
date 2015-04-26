@@ -30,7 +30,7 @@ function hide_button(name, yes) {
 var sql_shown, by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
     if( !by_search && !yes ){ return; }
-    ge('sql_input').hidden = !yes;
+    ge('sql_input_area').hidden = !yes;
     ge('toggle_sql_shown').innerText = yes ? "Shown sql" : "Hidden sql";
     hide_button('toggle_by_search', !yes);
     hide_button('toggle_sql_locked', !yes);
@@ -79,7 +79,7 @@ function set_continuous(yes, up) {
 
 function set_actions_panel(yes) {
     actions_panel = yes;
-    ge('toggle_actions_panel').innerText = yes ? "Hide Acts" : "Show Acts";
+    ge('toggle_actions_panel').innerText = yes ? "acts shown" : "acts hidden";
     ge('actions_panel').hidden = !yes;
 }
 

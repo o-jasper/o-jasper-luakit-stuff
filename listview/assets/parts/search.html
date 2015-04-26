@@ -1,8 +1,6 @@
 <input id="search" oninput="touch_search();" onsubmit="search()" class="live">
   <button onclick="search()">Search</button><br>
 <button id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
-<button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button>
-<button id="toggle_sql_locked" onclick="set_sql_locked(!sql_locked);">BUG</button>
 <button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
 <button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button>
 I
@@ -12,10 +10,17 @@ I
 <button class="smaller" id="cycle_back" onclick="cycle_results(+1)">&gt;&gt;</button>
 I
 <button id = "toggle_actions_panel" onclick="set_actions_panel(!actions_panel)">BUG</button>
-<span id="actions_panel"><br>
-<button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
-<button id="verify_button" onclick="verify();">VerifyThis</button>
-<button id="delete_selected" onclick="do_next('delete_selected')">Delete</button>
-</span>
+
 <br>
-<textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();">{%sqlInput}</textarea>
+<span id="sql_input_area">
+  <span style="float:left;">
+    <button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button><br>
+    <button id="toggle_sql_locked" onclick="set_sql_locked(!sql_locked);">BUG</button>
+  </span>
+  <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();">{%sqlInput}</textarea>
+</span>
+<span id="actions_panel"><br>
+  <button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
+  <button id="verify_button" onclick="verify();">VerifyThis</button>
+  <button id="delete_selected" onclick="do_next('delete_selected')">Delete</button>
+</span>
