@@ -37,7 +37,10 @@ local cmd = lousy.bind.cmd
 add_cmds({
             cmd("listviewHistory",
                 function(w, query)
-                   history.latest_query = query;
+                   history.latest_query = query
                    local v = w:new_tab("luakit://listviewHistory/search")
+                   -- if query then  -- This would be without the nasty "global value" thing.
+                   --  v:eval_js(string.format("ge('search').value = %q; search();", query))
+                   -- end
                 end),
          })
