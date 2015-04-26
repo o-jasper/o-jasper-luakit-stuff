@@ -5,10 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
--- Chrome page of all logs. User may do subselection.
-
--- TODO instead of a full chrome.. make it something that can easily be 
---  put into one.
+-- Chrome page of ..a `SqlHelper` provided. User may do subselection.
 
 local config = globals.listview or {}
 
@@ -20,15 +17,7 @@ local html_list = require("listview.html_list")
 assert(html_list)
 require "listview.entry_html"
 
--- TODO this not really usable as lib,
--- Function depending on a 'db', returns object for both the adding, and
--- searching.
--- .. hmm this is pretty close to what they are?
---    Perhaps paged_chrome just needs a 'combiner' function?
-
 local function final_html_list(listview, list, as_msg)
-   --print(
-      --list = map(list, function(msg) return listview:fun(msg) end)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    return as_msg and html_msg_list(listview, list) or html_list.keyval(list)
 end
@@ -136,7 +125,7 @@ local listview_metas = {
                if not query.got_limit then  -- Add a limit if dont have one yet.
                   query:limit(self.limit_i, self.limit_cnt)
                end
-               -- TODO other ones..
+
                return query
       end,
       asset = function(self, what, kind)
@@ -167,7 +156,7 @@ function listview_metas.search:repl_list(view, meta)
    local query = self:total_query("")
    local list = query:result()
    local sql_shown = true
-   -- TODO metatable it.
+   -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
    return { searchInput   = self:asset("parts/search"),
             searchInitial = self:asset("parts/search_initial"),
             stylesheet    = self:asset("style", ".css"),
