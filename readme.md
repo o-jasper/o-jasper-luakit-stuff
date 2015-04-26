@@ -3,7 +3,7 @@
 * [search_login](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/search_login#log-in-using-pass), which uses `pass` and searching the html to login.
 * [urltamer](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/urltamer#taming-the-urls-that-are-accessed), running code based on `uri` being accessed,
   blocking/redirecting/managing view behavior based on them.
-* A [nicer history searcher](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/hist_n_bookmarks/).
+* A [nicer history searcher](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/listview/history/).
 * .. based on [listview](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/listview#list-view-lib--messages-lib)
   searching SQL, however, might end up just doing so over 
   logs, messages, bookmarks, history. (limited extent)
@@ -14,7 +14,7 @@ things in one repo.
 
 ## Principles
 In order to keep things easy for others to use/extend too, need more
-principles.
+principles. This is largely still TODO..
 
 * For extension, never require knowledge about the metatables i am using.
 
@@ -24,8 +24,7 @@ principles.
   The user can then create objects where accessing that way gives the
   correct behavior.(by table directly, or metatable, doesnt matter)
   
-* *TODO*, there is basically no namespacing at the moment, which is
-  *not* nice.
+* Namespace everything. TODO: do this to the listview.
   
 * *TODO* similar for how objects are extended.. Needs to be more robust
   and clear.

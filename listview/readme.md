@@ -3,9 +3,7 @@
 Intention to make a fairly general messages/list view lib.
 
 To be applied to... well whatever might use SQL to store data.
-Particularly thinking of chat clients and
-[history/bookmarks](https://github.com/o-jasper/o-jasper-luakit-stuff/tree/master/hist_n_bookmarks#better-history-browser)
-for now.
+In the sub directories, there are some uses.
 
 ## Search
 Search terms are anded. Explicit strings `""` are taken as whole.

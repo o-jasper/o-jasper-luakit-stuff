@@ -13,7 +13,6 @@ Download, make sure the directories are accessible from the configuration
 directory, for instance:
 
     cd  ~/.config/luakit/
-    ln -s path_to_/o-jasper-luakit-stuff/hist_n_bookmarks
     ln -s path_to_/o-jasper-luakit-stuff/listview
     ln -s path_to_/o-jasper-luakit-stuff/o_jasper_common
     ln -s path_to_/o-jasper-luakit-stuff/paged_chrome
