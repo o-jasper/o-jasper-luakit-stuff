@@ -1,7 +1,7 @@
 
-*NOTE* it is likely better to try emulate an existing lua server system,
-assuming one of them is well-thought out and has ajax or some such.
-(i'd expect so)
+* *NOTE* it is likely better to try emulate an existing lua server system,
+  assuming one of them is well-thought out and has ajax or some such.
+  (i'd expect so)
 
 Two ways to define a page, the template-based one is better IMO, the former
 is "closer to what happens".
@@ -36,3 +36,7 @@ create the file `"assets/{%page_name}.html"`, where a variant looks.
 
 `paged_chrome.asset(what,kind)` uses the `o_jasper_common` `load_asset`, but looks in
 the local `"assets/"` directory and `kind` is defaultly `.html`.
+
+## TODO
+
+* The note above about being equivalent to a server is overriding.

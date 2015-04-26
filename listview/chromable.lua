@@ -60,7 +60,7 @@ local to_js = {
 --Note these arent done (self, args..)-style because they are fed in
 -- `view:register_function` in paged_chrome
 
-   -- TODO adding is more to ask.. I mena, this list here
+   -- TODO adding is too much to ask.. I mean, this list here
    -- does not work for history.
    manual_enter = function(self) return function(inp)
          local v= self.log:enter({ claimtime=cur_time.s(),
@@ -73,10 +73,10 @@ local to_js = {
                                    tags = lousy.util.string.split(inp.tags, "[,; ]+")
                                  })
    end end,
+
    delete_id = function(self) return function(id)
          self.log:delete_id(id)
    end end,
-
    
    show_sql = function(self) return function(sql)
          return { sql_input = self:total_query(sql):sql_code() }
@@ -90,6 +90,7 @@ local to_js = {
          return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
+-- TODO.. can we provide an interface to self directly?
 --   get_limit_i    = function(self) return function() return self.limit_i end end,
 --   get_limit_cnt  = function(self) return function() return self.limit_cnt end end,
 --   get_limit_step = function(self) return function() return self.limit_step end end,
@@ -113,13 +114,6 @@ local to_js = {
          self.limit_i   = nil -- self.values.limit_i
          self.limit_cnt = nil --self.values.limit_cnt
    end end,
---   get_limit = function(self) return function() 
---         return {self.limit_i, self.limit_cnt}
---   end end,
---   set_limit = function(self) return function(limit_i, limit_cnt)
---         self.limit_i = limit_i
---         self.limit_cnt   = limit_cnt
---   end end,
 }
 
 -- Apparently we dont need to know in order to satisfy the interface.
