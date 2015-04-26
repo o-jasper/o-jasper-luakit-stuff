@@ -34,15 +34,9 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 ## TODO
 
-* Make it usable separately aswel, like commandline.
-  (as a user-search thing, not for programmatic use you expect to be stable)
-
 * Combine multiple tables?
 
-* Make more organized, and document better.
-
-* Make the search keywords changable/extendable.
-  (add `domain:` basically `like:`.. but with `http[s]://[www.]` infront.)
+* Document better.
 
 * (Optional)continuous scrolling, and other things to make looking at results
   nicer. (keywords in the search should override? indicate that it is overridden?)
@@ -53,3 +47,11 @@ search. For instance `-tags:hide` to hide things defaultly.
   
   However a malicious link can mess with the SQL database. Perhaps alternatively
   just have the hash of a search stored somewhere, connected to the search.
+
+## Reorganize
+
+SQL searches &rarr; lists &rarr; each item add metatable.
+
+One of the functions is `repl_list`; for producing a list of things that should
+replace.
+
