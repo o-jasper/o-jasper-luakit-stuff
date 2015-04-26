@@ -48,10 +48,8 @@ search. For instance `-tags:hide` to hide things defaultly.
   However a malicious link can mess with the SQL database. Perhaps alternatively
   just have the hash of a search stored somewhere, connected to the search.
 
-## Reorganize
+* Do all page-creation triggered by JS so that none of it
+  "initial-creation-special".
 
-SQL searches &rarr; lists &rarr; each item add metatable.
-
-One of the functions is `repl_list`; for producing a list of things that should
-replace.
-
+* Uhm... in `chromable.lua` could i just "export `self`"? Or that, and then select
+  which are allowed.

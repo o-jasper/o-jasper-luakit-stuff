@@ -47,8 +47,8 @@ local function js_listupdate(listview, list, as_msg)
          cnt = string.format("results %d to %d", gl[1], gl[1] + gl[2])
       end
    else
-      cnt = string.format("results %d to %d", listview.set_i,
-                          math.min(listview.set_i + listview.set_cnt, listview.set_i + #list))
+      cnt = string.format("results %d to %d", listview.limit_i,
+                          math.min(listview.limit_i + listview.limit_cnt, listview.limit_i + #list))
    end
    return { list=final_html_list(listview, list, as_msg),
             cnt=cnt,
@@ -90,35 +90,35 @@ local to_js = {
          return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
---   set_i    = function(self) return self.set_i end,
---   set_cnt  = function(self) return self.set_cnt end,
---   set_step = function(self) return self.set_step end,
+--   get_limit_i    = function(self) return function() return self.limit_i end end,
+--   get_limit_cnt  = function(self) return function() return self.limit_cnt end end,
+--   get_limit_step = function(self) return function() return self.limit_step end end,
 --
---   set_set_i    = function(self) return function(to) self.set_i = to end end,
---   set_set_cnt  = function(self) return function(to) self.set_cnt = to end end,
---   set_set_step = function(self) return function(to) self.set_step = to end end,
+--   set_limit_i    = function(self) return function(to) self.limit_i = to end end,
+--   set_limit_cnt  = function(self) return function(to) self.limit_cnt = to end end,
+--   set_limit_step = function(self) return function(to) self.limit_step = to end end,
    
    got_limit = function(self) return function() return self.got_limit end end,
 
    change_cnt = function(self) return function(by)
-         self.set_cnt = math.max(1, self.set_cnt + by)
-         self.set_step = self.set_cnt
+         self.limit_cnt = math.max(1, self.limit_cnt + by)
+         self.limit_step = self.limit_cnt
    end end,
 
    cycle_limit_values = function(self) return function(n)
-         self.set_i = self.set_i + self.set_step*(n or 1)
+         self.limit_i = self.limit_i + self.limit_step*(n or 1)
    end end,
 
    reset_limit_values = function(self) return function()
-         self.set_i   = nil -- self.values.set_i
-         self.set_cnt = nil --self.values.set_cnt
+         self.limit_i   = nil -- self.values.limit_i
+         self.limit_cnt = nil --self.values.limit_cnt
    end end,
 --   get_limit = function(self) return function() 
---         return {self.set_i, self.set_cnt}
+--         return {self.limit_i, self.limit_cnt}
 --   end end,
---   set_limit = function(self) return function(set_i, set_cnt)
---         self.set_i = set_i
---         self.set_cnt   = set_cnt
+--   set_limit = function(self) return function(limit_i, limit_cnt)
+--         self.limit_i = limit_i
+--         self.limit_cnt   = limit_cnt
 --   end end,
 }
 
@@ -128,7 +128,7 @@ local to_js = {
 -- Making the objects that do the pages.
 local listview_metas = {
    base = {
-      repl_pattern = false, to_js = {}, set_i=0, set_cnt = 20, set_step=20,
+      repl_pattern = false, to_js = {}, limit_i=0, limit_cnt = 20, limit_step=20,
       values = { to_js = {} },
 
       total_query = function(self, search)
@@ -140,7 +140,7 @@ local listview_metas = {
 
                self.got_limit = query.got_limit
                if not query.got_limit then  -- Add a limit if dont have one yet.
-                  query:limit(self.set_i, self.set_cnt)
+                  query:limit(self.limit_i, self.limit_cnt)
                end
                -- TODO other ones..
                return query
@@ -179,7 +179,7 @@ function listview_metas.search:repl_list(view, meta)
             stylesheet    = self:asset("style", ".css"),
             js            = self:asset("js", ".js"),
             title = string.format("%s:%s", self.chrome_name, self.name),
-            cycleCnt = self.set_step,
+            cycleCnt = self.limit_step,
             cnt = string.format("results 0 to %d", #list),
             list = final_html_list(self, list, true),
             sqlInput = config.sql_show and query:sql_code() or "",
