@@ -139,12 +139,19 @@ function more_results(more) {
     update_sql_shown();
 }
 
-var selected = {}
+var selected_cnt = 0;
+function incr_selected_cnt(delta) {
+    selected_cnt += delta;
+    ge('delcnt').innerText = "(" + selected_cnt + ")";
+}
+
+var selected = {};
 
 function select_toggle(id) {
-    var cursel = !selected[id];
-    selected[id] = cursel
-    ge("id_" + id).className = (cursel ? "selected" : null);
+    var cursel = selected[id];
+    selected[id] = !cursel;
+    incr_selected_cnt(cursel ? -1 : +1);
+    ge("id_" + id).className = (cursel ? null : "selected");
 }
 
 var _do_next = null;
