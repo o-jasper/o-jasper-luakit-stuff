@@ -13,7 +13,7 @@ local tt = require "o_jasper_common.html.time"
 local SqlEntry = require("sql_help").SqlEntry
 
 local default_html_calc = {
-   tagsHTML = function (self, _)
+   tagsHTML = function (self, state)
       return ot.tagsHTML(self.tags, state.tagsclass)
    end,
 
@@ -51,8 +51,6 @@ function html_msg(listview, state)
                          html_repl(msg, state))
    end
 end
-
-local map = require("o_jasper_common.other").map
 
 function html_msg_list(listview, data, state)
    state = state or { last_time = cur_time.ms() }

@@ -7,8 +7,8 @@
 
 require "listview.entry_html"  -- TODO... Want this later.
 
-HistoryEntry = require "hist_n_bookmarks/HistoryEntry"
-History = require "hist_n_bookmarks/History"
+HistoryEntry = require "listview.history.HistoryEntry"
+History = require "listview.history.History"
 
 local db = require("history").db
 history = setmetatable({ db = db }, History)
