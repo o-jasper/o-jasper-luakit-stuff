@@ -370,10 +370,11 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    -- Delete an entry.
    delete_id = function(self, id, table_name)
       table_name = table_name or self.values.table_name
-      self.db:exec(string.format("DELETE FROM ? WHERE %s == ?", self.values.idname),
-                   { table_name, id })
+      self.db:exec(string.format("DELETE FROM %s WHERE %s == ?",
+                                 table_name, self.values.idname),
+                   { id })
       
-      if taggings then
+      if self.values.taggings then
          self.db.exec(string.format("DELETE FROM ? WHERE to_%s == ?",self.values.idname),
                       { self.values.taggings, id })
       end

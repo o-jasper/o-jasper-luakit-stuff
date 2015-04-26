@@ -18,6 +18,7 @@ td{padding:0.4em 0.7em ; vertical-align: text-top; align:left}
 
 .it_title{ font-weight:bold }
 
+.greened{ color:green }
 .warn{ color:red }
 .wrong{ color:red }
 .invalid{ color:red }

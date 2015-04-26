@@ -10,5 +10,12 @@ I
 <button class="smaller" id="more_results" onclick="more_results(+1)"><b>+</b></button>
 <button class="smaller" id="cycle_forw" onclick="cycle_results(-1)">&lt;&lt;</button>
 <button class="smaller" id="cycle_back" onclick="cycle_results(+1)">&gt;&gt;</button>
+I
+<button id = "toggle_actions_panel" onclick="set_actions_panel(!actions_panel)">BUG</button>
+<span id="actions_panel"><br>
+<button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
+<button id="verify_button" onclick="verify();">VerifyThis</button>
+<button id="delete_selected" onclick="do_next('delete_selected')">Delete</button>
+</span>
 <br>
 <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();">{%sqlInput}</textarea>

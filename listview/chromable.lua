@@ -1,4 +1,4 @@
---  Copyright (C) 22-04-2015 Jasper den Ouden.
+--  Copyright (C) 24-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -59,17 +59,24 @@ end
 local to_js = {
 --Note these arent done (self, args..)-style because they are fed in
 -- `view:register_function` in paged_chrome
+
+   -- TODO adding is more to ask.. I mena, this list here
+   -- does not work for history.
    manual_enter = function(self) return function(inp)
-         local v= self.log:db_enter({ claimtime=cur_time.s(),
-                                      re_assess_time = cur_time.s() + 120,
-                                      origin = "manual",
-                                      kind = "manual test",
-                                      data = "", data_uri = "",
-                                      uri = "", title = inp.title, desc = inp.desc,
-                                      keep = true,
-                                      tags = lousy.util.string.split(inp.tags, "[,; ]+")
+         local v= self.log:enter({ claimtime=cur_time.s(),
+                                   re_assess_time = cur_time.s() + 120,
+                                   origin = "manual",
+                                   kind = "manual test",
+                                   data = "", data_uri = "",
+                                   uri = "", title = inp.title, desc = inp.desc,
+                                   keep = true,
+                                   tags = lousy.util.string.split(inp.tags, "[,; ]+")
                                  })
    end end,
+   delete_id = function(self) return function(id)
+         self.log:delete_id(id)
+   end end,
+
    
    show_sql = function(self) return function(sql)
          return { sql_input = self:total_query(sql):sql_code() }
@@ -80,16 +87,16 @@ local to_js = {
    end end,
    
    do_search = function(self) return function(search, as_msg)
-      return js_listupdate(self, self:total_query(search):result(), as_msg)
+         return js_listupdate(self, self:total_query(search):result(), as_msg)
    end end,
 
-   set_i    = function(self) return self.set_i end,
-   set_cnt  = function(self) return self.set_cnt end,
-   set_step = function(self) return self.set_step end,
-
-   set_set_i    = function(self) return function(to) self.set_i = to end end,
-   set_set_cnt  = function(self) return function(to) self.set_cnt = to end end,
-   set_set_step = function(self) return function(to) self.set_step = to end end,
+--   set_i    = function(self) return self.set_i end,
+--   set_cnt  = function(self) return self.set_cnt end,
+--   set_step = function(self) return self.set_step end,
+--
+--   set_set_i    = function(self) return function(to) self.set_i = to end end,
+--   set_set_cnt  = function(self) return function(to) self.set_cnt = to end end,
+--   set_set_step = function(self) return function(to) self.set_step = to end end,
    
    got_limit = function(self) return function() return self.got_limit end end,
 
@@ -114,7 +121,8 @@ local to_js = {
 --   end end,
 }
 
---pagedChrome = require "paged_chrome"
+-- Apparently we dont need to know in order to satisfy the interface.
+-- local pagedChrome = require "paged_chrome"
 
 -- Making the objects that do the pages.
 local listview_metas = {
@@ -128,8 +136,6 @@ local listview_metas = {
                local query = self.log:new_SqlHelp()
                if search ~= "" then query:search(search) end
                query:order_by(self.log.values.order_by)
-               -- TODO the query itself should be able to override.
-               -- (that'd be less tricky to get not-annoying)
 
                self.got_limit = query.got_limit
                if not query.got_limit then  -- Add a limit if dont have one yet.
@@ -166,6 +172,7 @@ function listview_metas.search:repl_list(view, meta)
    local query = self:total_query("")
    local list = query:result()
    local sql_shown = true
+   -- TODO metatable it.
    return { searchInput   = self:asset("parts/search"),
             searchInitial = self:asset("parts/search_initial"),
             stylesheet    = self:asset("style", ".css"),
@@ -180,7 +187,8 @@ function listview_metas.search:repl_list(view, meta)
 end
 accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
                                        "cycle_limit_values", "change_cnt",
-                                       "reset_limit_values", "got_limit"})
+                                       "reset_limit_values", "got_limit",
+                                      "delete_id"})
 
 -- Adding entries
 listview_metas.add = c.copy_table(listview_metas.base)
