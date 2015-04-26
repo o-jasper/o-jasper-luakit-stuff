@@ -46,6 +46,78 @@ local SqlHelp = {
    },
    c = false, tags_last = 0, last_id_time = 0,
    
+   searchinfo = {
+      matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
+                   "uri:", "desc:", "title:",
+                   "urilike:", "desclike:", "titlelike:",
+                   "before:", "after:", "limit:"
+      },
+      match_funs = {
+         ["like:"]  = function(self, state, m, v)
+            self:text_like(v, nil, string.sub(m, 1, 2) == "-")
+         end,
+         ["tags:"] = function(self, state, m, v)
+            for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.tags, t) end
+         end,
+         ["-tags:"] = function(self, state, m, v)
+            for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.not_tags, t) end
+         end,
+
+         ["not:"] = function(self, state, m, v)
+            state.n = state.n or (m == "not:")
+            self:text_sw(v, true)
+         end,
+         ["\\-"] = function(self, state, m, v)  -- Should escape it.
+            self:text_sw("-" .. v, state.n)
+         end,
+
+         ["or:"] = function(self, state, m, v)  -- NOTE `or:` takes precidence here!!
+            self.how = "OR"
+            if v then 
+               self:text_sw(w, state.n)
+            else -- Wait a sec.
+               state.reset = true
+            end
+         end,
+         ["uri:"] = function(self, state, m, v)
+            self:like(string.sub(m, 1, #m - 1), '%' .. v .. '%', state.n)
+         end,
+         
+         ["urilike:"] = function(self, state, m, v)
+            self:like(string.sub(m, 1, #m-5), v, state.n)
+         end,
+
+         ["after:"] = function(self, state, m, v)
+            if time_interpret(v) then
+               after_t = math.max(state.after_t or 0, time_interpret(v))
+            end
+         end,
+         ["before:"] = function(self, state, m, v)
+            if time_interpret(v) then  -- TODO why different from after?
+               if state.before_t then
+                  state.before_t = math.min(state.before_t, time_interpret(v))
+               else
+                  state.before_t = time_interpret(v)
+               end
+            end
+         end,
+         ["limit:"] = function(self, state, m, v)
+            local list = string_split(v, ",")
+            -- TODO  collect more nicely.(might be bad user-input)
+            assert(#list == 1 or #list == 2)
+            assert(not self.got_limit)
+            self.got_limit = {}
+            for _, el in pairs(list) do
+               assert(string.match(el, "[%d]+"))
+               table.insert(self.got_limit, tonumber(el))
+            end
+         end,
+         default = function(self, state, m, v)
+            self:text_sw(v, state.n)
+         end
+      }
+   },
+   
    -- Intended as replacable ("virtual")
    listfun = function(_, list)
       for _, data in pairs(list) do
@@ -207,69 +279,27 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    --  To keep things organized, separate this off into a file
    ---  particularly for this purpose.
    search = function(self, str)
-      local matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
-                         "uri:", "desc:", "title:",
-                         "urilike:", "desclike:", "titlelike:",
-                         "before:", "after:", "limit:"}
-      local tagged_list = searchlike.searchlike(searchlike.portions(str), matchable)
+      local tagged_list = searchlike.searchlike(searchlike.portions(str),
+                                                self.searchinfo.matchable)
       
-      local n, tags, not_tags, before_t, after_t = false, {}, {}, nil, nil
+      local state = {n=false, tags={}, not_tags={}, before_t=nil, after_t=nil, reset=true}
+      local match_funs = self.searchinfo.match_funs
+
       for i, el in pairs(tagged_list) do
          local m, v = el.m, el.v
          self:comb()
-         local reset = true
-         if m == "-like:" or m == "-lk:" or m == "like:" or m == "lk:" then
-            self:text_like(v, try, string.sub(m, 1, 2) == "-")
-         elseif m == "tags:" or m == "tag:" then
-            for _, t in pairs(string_split(v, "[,;]")) do table.insert(tags, t) end
-         elseif m == "-tags:" or m == "-tag:" then
-            for _, t in pairs(string_split(v, "[,;]")) do table.insert(not_tags, t) end
-         elseif m == "not:" or m == "-" then
-            n = n or (m == "not:")
-            self:text_sw(v, true)
-         elseif m == "\\-" then
-            self:text_sw("-" .. v, n)
-         elseif m == "or:" then  -- NOTE `or:` takes precidence here!!
-            self.how = "OR"
-            if v then 
-               self:text_sw(w, n)
-            else -- Wait a sec.
-               reset = true
-            end
-         elseif m == "uri:" or m == "desc:" or m == "title:" then
-            self:like(v, '%' .. string.sub(m, 1, #m - 1) .. '%', n)
-         elseif m == "urilike:" or m == "desclike:" or m == "titlelike:" then
-            self:like(v, string.sub(m, 1, #m-5), n)
-         elseif m == "after:" and time_interpret(v) then
-            after_t = math.max(after_t or 0, time_interpret(v))
-         elseif m == "before:" and time_interpret(v) then
-            if before_t then
-               before_t = math.min(before_t, time_interpret(v))
-            else
-               before_t = time_interpret(v)
-            end
-         elseif m == "limit:" then
-            local list = string_split(v, ",")
-            -- TODO  collect more nicely.(might be bad user-input)
-            assert(#list == 1 or #list == 2)
-            assert(not self.got_limit)
-            self.got_limit = {}
-            for _, el in pairs(list) do
-               assert(string.match(el, "[%d]+"))
-               table.insert(self.got_limit, tonumber(el))
-            end
-         else
-            self:text_sw(v, n)
-         end
-         if reset then self.how = "AND" end
+         local fun = (match_funs[m] or match_funs.default)
+         fun(self, state, m, v)
+
+         if state.reset then self.how = "AND" end
       end
       self.how = "AND"
       self:comb()
-      self:tags(tags)
+      self:tags(state.tags)
       self:comb()
-      self:not_tags(not_tags)
-      if before_t then self:comb() self:before(before_t) end
-      if after_t then self:comb() self:after(after_t) end
+      self:not_tags(state.not_tags)
+      if before_t then self:comb() self:before(state.before_t) end
+      if after_t then self:comb() self:after(state.after_t) end
    end,
    
    -- Sorting it.
@@ -384,5 +414,19 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    -- TODO use update and stuff.
    -- update_id
 }
+
+local function copy_matchfun(fr, to)
+   if type(to) ~= "table" then to = {to} end
+   for _, m in pairs(to) do 
+      SqlHelp.searchinfo.match_funs[m] = SqlHelp.searchinfo.match_funs[fr]
+   end
+end
+
+copy_matchfun("like:", {"-like:", "-lk:", "lk:"})
+copy_matchfun("tags:", "tag")
+copy_matchfun("-tags:", "-tag")
+copy_matchfun("not:", "-")
+copy_matchfun("uri:", {"desc:", "title:" })
+copy_matchfun("urilike:", {"desclike:", "titlelike:"})
 
 return metatable_of(SqlHelp)
