@@ -31,3 +31,13 @@ end
 if true or config.take_history then
    paged_chrome.paged_chrome("listviewHistory", chrome_describe("search", history))
 end
+
+local cmd = lousy.bind.cmd
+
+add_cmds({
+            cmd("listviewHistory",
+                function(w, query)
+                   history.latest_query = query;
+                   local v = w:new_tab("luakit://listviewHistory/search")
+                end),
+         })

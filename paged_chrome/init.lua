@@ -25,11 +25,11 @@ function Public.paged_chrome(chrome_name, pages)
                  view:load_string(page.html(view, meta), use_uri)
                  
                  function on_first_visual(view, status)
-                    -- Wait for new page to be created
-                    if status ~= "first-visual" then return end
-                    page.init(view, meta)
-                    -- Hack to run-once
-                    view:remove_signal("load-status", on_first_visual)
+                    page.init(view, meta, status)
+                    -- Hack to run until first visual.
+                    if status == "first-visual" then
+                       view:remove_signal("load-status", on_first_visual)
+                    end
                  end
                  view:add_signal("load-status", on_first_visual)
               end)
@@ -60,9 +60,12 @@ local templated_page_metatable = {
             end
             return c.full_gsub(pattern, self.page:repl_list(view, meta))
          end,
-         init = function(view, _)
-            for name, fun in pairs(self.page.to_js) do
-               view:register_function(name, fun(self.page, name))
+         init = function(view, _, _)
+            if not self.done then  -- Just attach javascript as soon as possible.
+               for name, fun in pairs(self.page.to_js) do
+                  view:register_function(name, fun(self.page, name))
+               end
+               self.done = true
             end
          end,
       }

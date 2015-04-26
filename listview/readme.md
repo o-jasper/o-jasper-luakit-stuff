@@ -39,9 +39,6 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 * Document better.
 
-* Do all page-creation triggered by JS so that none of it
-  "initial-creation-special".
-
 * Put the search term in the address bar, or at least possibly, 
   so people can link to their searches...
   

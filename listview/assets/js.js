@@ -92,16 +92,13 @@ function set_safe_mode(yes) {
 }
 
 function touch_sql() {
-    reset_limit_values();
     set_sql_locked(true);
     set_by_search(false);
     if(continuous){ search(); }
 }
 function touch_search() {
-    reset_limit_values();
     set_by_search(true);
-    update_sql_shown();
-    if(continuous){ search(); }
+    if(continuous){ search(); update_sql_shown(); }
 }
 
 function update_sql_shown() {
@@ -109,7 +106,6 @@ function update_sql_shown() {
 }
 
 function search() {
-    reset_limit_values();
     _search();
 }
 

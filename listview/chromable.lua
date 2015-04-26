@@ -154,18 +154,15 @@ end
 listview_metas.search = c.copy_table(listview_metas.base)
 function listview_metas.search:repl_list(view, meta)
    local query = self:total_query("")
-   local list = query:result()
-   local sql_shown = true
+   local sql_shown, latest_query = true, self.log.latest_query or ""
    -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
-   return { searchInput   = self:asset("parts/search"),
+   return { latestQuery  = latest_query,
+            searchInput   = self:asset("parts/search"),
             searchInitial = self:asset("parts/search_initial"),
             stylesheet    = self:asset("style", ".css"),
             js            = self:asset("js", ".js"),
             title = string.format("%s:%s", self.chrome_name, self.name),
             cycleCnt = self.limit_step,
-            cnt = string.format("results 0 to %d", #list),
-            list = final_html_list(self, list, true),
-            sqlInput = config.sql_show and query:sql_code() or "",
             sqlShown = config.sql_shown and "true" or "false",
    }
 end
