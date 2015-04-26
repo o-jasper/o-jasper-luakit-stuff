@@ -11,8 +11,7 @@ for now.
 Search terms are anded. Explicit strings `""` are taken as whole.
 `keyword:...` uses the below keyword. That may also have a space inbetween
 or utilize an explicit strings. Search is not well-tested yet, and intended
-as user-interface. Expect that it may change. Implemented in
-[sql_help.lua#L183](https://github.com/o-jasper/o-jasper-luakit-stuff/blob/master/listview/sql_help.lua#L183).
+as user-interface.
 
 Currently the following keywords. `-` means not-that.
 Note that except for `or:`, tags dont apply to other tags.
@@ -29,6 +28,8 @@ Note that except for `or:`, tags dont apply to other tags.
   `min`, `h`, `d`(=`D`), `week`(=`wk`), `M`, `Y`.
 * Non-tag are just search-terms (`LIKE '%search%'`)
 
+These are entirely redefinable.
+
 In the future there might be a second input with default additions to the
 search. For instance `-tags:hide` to hide things defaultly.
 
@@ -38,18 +39,25 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 * Document better.
 
-* (Optional)continuous scrolling, and other things to make looking at results
-  nicer. (keywords in the search should override? indicate that it is overridden?)
-  Possibly instead of "Next 20", "20 more".
+* Do all page-creation triggered by JS so that none of it
+  "initial-creation-special".
 
 * Put the search term in the address bar, or at least possibly, 
   so people can link to their searches...
   
   However a malicious link can mess with the SQL database. Perhaps alternatively
   just have the hash of a search stored somewhere, connected to the search.
+  Or perhaps possible to only allow it manually.
+  
+  Add a command to search in the history.
 
-* Do all page-creation triggered by JS so that none of it
-  "initial-creation-special".
+* (Optional)continuous scrolling, and other things to make looking at results
+  nicer. (keywords in the search should override? indicate that it is overridden?)
+  Possibly instead of "Next 20", "20 more".
 
 * Uhm... in `chromable.lua` could i just "export `self`"? Or that, and then select
   which are allowed.
+
+* Selecting multiple in one click with shift.
+
+* Using keys to navigate gui.
