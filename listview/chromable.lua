@@ -200,7 +200,11 @@ listview_metas.all.values.to_js = to_js
 local listview_metatables = {}
 for k,v in pairs(listview_metas) do listview_metatables[k] = c.metatable_of(v) end
 
-function listview_chrome(log, which, where)
+local Public = {pages = listview_metas}
+
+function Public.listview_chrome(log, which, where)
    assert(log and where)
    return setmetatable({log = log, where=where}, listview_metatables[which])
 end
+
+return Public

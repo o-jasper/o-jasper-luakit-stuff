@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "listview.chromable"
+local listview_chrome = require("listview.chromable").listview_chrome
 require "listview.history"
 
 local table_copy = require("o_jasper_common.other").table_copy

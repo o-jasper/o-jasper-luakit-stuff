@@ -55,4 +55,6 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 * Selecting multiple in one click with shift.
 
+* Get sensible location of cursor immediately. At end of the search text i guess.
+
 * Using keys to navigate gui.
