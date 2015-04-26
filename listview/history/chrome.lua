@@ -19,7 +19,7 @@ config.page = config.page or {}
 
 local function chrome_describe(default_name, log)
    assert(log)
-   local page = listview_chrome(log, "search", "hist_n_bookmarks")
+   local page = listview_chrome(log, "search", "listview/history")
    page.set_cnt = config.page.cnt or 20
    page.set_step = config.page.step or page.step_cnt
    return { default_name = default_name,
@@ -31,6 +31,3 @@ end
 if true or config.take_history then
    paged_chrome.paged_chrome("listviewHistory", chrome_describe("search", history))
 end
-
--- paged_chrome("hist_n_bookmarks", chrome_describe("history", history))
-   

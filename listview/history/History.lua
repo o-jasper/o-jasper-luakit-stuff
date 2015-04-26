@@ -19,7 +19,6 @@ function History:history_entry(entry)
 end
 
 function History.listfun(self, list)
-   print(self.values.table_name)
    for _, data in pairs(list) do
       data.origin = self
       setmetatable(data, HistoryEntry)
