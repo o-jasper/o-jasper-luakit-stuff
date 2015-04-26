@@ -102,6 +102,7 @@ local to_js = {
 
    change_cnt = function(self) return function(by)
          self.set_cnt = math.max(1, self.set_cnt + by)
+         self.set_step = self.set_cnt
    end end,
 
    cycle_limit_values = function(self) return function(n)
