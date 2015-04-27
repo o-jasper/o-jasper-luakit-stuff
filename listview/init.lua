@@ -48,20 +48,6 @@ local to_js = {
 --Note these arent done (self, args..)-style because they are fed in
 -- `view:register_function` in paged_chrome
 
-   -- TODO adding is too much to ask.. I mean, this list here
-   -- does not work for history.
-   manual_enter = function(self) return function(inp)
-         local v= self.log:enter({ claimtime=cur_time.s(),
-                                   re_assess_time = cur_time.s() + 120,
-                                   origin = "manual",
-                                   kind = "manual test",
-                                   data = "", data_uri = "",
-                                   uri = "", title = inp.title, desc = inp.desc,
-                                   keep = true,
-                                   tags = lousy.util.string.split(inp.tags, "[,; ]+")
-                                 })
-   end end,
-
    delete_id = function(self) return function(id)
          self.log:delete_id(id)
    end end,
@@ -169,32 +155,6 @@ accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
                                        "cycle_limit_values", "change_cnt",
                                        "reset_limit_values", "got_limit",
                                       "delete_id"})
-
--- Adding entries
-listview_metas.add = c.copy_table(listview_metas.base)
-function listview_metas.add:repl_list(self, view, meta)
-   return { addManual  = self:asset("parts/add"),
-            stylesheet = self:asset("style", ".css") or "", 
-            js         = self:asset("js", ".js") or "",
-            title = string.format("%s:%s", self.chrome_name, self.name),
-   }
-end
-
-accept_js_funs(listview_metas.add, {"manual_enter"})
-
--- Both those.
-listview_metas.all = c.copy_table(listview_metas.base)
-function listview_metas.all:repl_list(self, view, meta)
-   -- Combine the two.
-   local ret = listview_metas.search.direct.repl_list(self)(view, meta)
-   local lst = listview_metas.add.direct.repl_list(self)(view, meta)
-   for k, v in pairs(lst) do
-      ret[k] = v
-   end
-   return ret
-end
-
-listview_metas.all.values.to_js = to_js
 
 local listview_metatables = {}
 for k,v in pairs(listview_metas) do listview_metatables[k] = c.metatable_of(v) end
