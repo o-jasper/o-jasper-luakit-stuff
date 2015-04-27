@@ -13,13 +13,12 @@ local lousy = require("lousy")
 
 local c = require("o_jasper_common")
 
-local html_list = require("listview.html_list")
-assert(html_list)
-require "listview.entry_html"
+local html_list = require "listview.html_list"
+local html_entry = require "listview.entry_html"
 
 local function final_html_list(listview, list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   return as_msg and html_msg_list(listview, list) or html_list.keyval(list)
+   return as_msg and html_entry.list(listview, list) or html_list.keyval(list)
 end
 
 local search_cnt = 0

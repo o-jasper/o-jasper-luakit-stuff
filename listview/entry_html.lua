@@ -28,7 +28,10 @@ local default_html_calc = {
    identifier = function(self, _) return self[self.values.idname] end,
 }
 
-function html_repl(entry, state)
+-- TODO proper package.
+local Public = {}
+
+function Public.repl(entry, state)
    assert(entry)
    local pass = {}
    for _,name in pairs(entry.values.row_names) do  -- Grab the data.
@@ -44,21 +47,23 @@ function html_repl(entry, state)
 end
 
 -- Single entry.
-function html_msg(listview, state)
+function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
       return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}",
-                         html_repl(msg, state))
+                         Public.repl(msg, state))
    end
 end
 
-function html_msg_list(listview, data, state)
+function Public.list(listview, data, state)
    state = state or { last_time = cur_time.ms() }
    state.config = state.config or {}
    state.html_calc = state.html_calc or default_html_calc
    local str = "<table>"
    for i, el in pairs(data) do 
-      str = str .. html_msg(listview, state)(i, el)
+      str = str .. Public.msg(listview, state)(i, el)
    end
    return str .. "</table>"
 end
+
+return Public
