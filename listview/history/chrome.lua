@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local listview_chrome = require("listview").listview_chrome
+local listview = require("listview")
 require "listview.history"
 
 local paged_chrome = require("paged_chrome")
@@ -15,7 +15,7 @@ config.page = config.page or {}
 
 local function chrome_describe(default_name, log)
    assert(log)
-   local page = listview_chrome(log, "search", "listview/history")
+   local page = listview.chrome(log, "search", "listview/history")
    page.limit_cnt = config.page.cnt or 20
    page.limit_step = config.page.step or page.step_cnt
    return { default_name = default_name,
