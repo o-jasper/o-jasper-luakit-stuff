@@ -5,8 +5,6 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
--- Chrome page of ..a `SqlHelper` provided. User may do subselection.
-
 local config = globals.listview or {}
 
 local lousy = require("lousy")

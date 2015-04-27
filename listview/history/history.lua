@@ -5,9 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-History = require "listview.history.History"
+local History = require "listview.history.History"
 
 local histpkg = require("history")
-
 histpkg.init() -- History package uses `capi.luakit.idle_add(init)`
 return setmetatable({ db = histpkg.db }, History)
