@@ -135,7 +135,8 @@ local function accept_js_funs(into_page_meta, names)
 end
 
 -- Listview.
-Public.Search = c.copy_table(Public.Base)
+Public.Search = c.copy_meta(Public.Base)
+
 function Public.Search.repl_list(self, view, meta)
    local query = self:total_query("")
    local sql_shown, latest_query = true, self.log.latest_query or ""
@@ -156,7 +157,7 @@ accept_js_funs(Public.Search, {"show_sql", "manual_sql", "do_search",
                                 "reset_limit_values", "got_limit",
                                 "delete_id"})
 
-Public.AboutChrome = c.copy_table(Public.Base)
+Public.AboutChrome = c.copy_meta(Public.Base)
 function Public.AboutChrome.repl_list(self, view, meta)
    return setmetatable({
                           title = string.format("%s:%s", self.chrome_name, self.name),

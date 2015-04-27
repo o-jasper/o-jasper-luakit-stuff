@@ -1,5 +1,5 @@
 local c = require "o_jasper_common"
-local BookmarksEntry = c.copy_table(require("sql_help").SqlEntry)
+local BookmarksEntry = c.copy_meta(require("sql_help").SqlEntry)
 
 BookmarksEntry.values = {
    table_name = "bookmarks",

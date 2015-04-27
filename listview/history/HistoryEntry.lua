@@ -1,6 +1,6 @@
 local c = require "o_jasper_common"
 
-local HistoryEntry = c.copy_table(require("sql_help").SqlEntry)
+local HistoryEntry = c.copy_meta(require("sql_help").SqlEntry)
 
 HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",

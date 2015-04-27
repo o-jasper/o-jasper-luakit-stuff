@@ -2,7 +2,7 @@
 local c = require "o_jasper_common"
 
 local SqlHelp = require("sql_help").SqlHelp
-local Bookmarks = c.copy_table(SqlHelp)
+local Bookmarks = c.copy_meta(SqlHelp)
 
 local BookmarksEntry = require "listview.more.BookmarksEntry"
 Bookmarks.values = BookmarksEntry.values
