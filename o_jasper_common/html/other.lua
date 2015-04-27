@@ -1,6 +1,7 @@
 
 local Public = {}
 
+-- TODO take iterator as argument instead.
 function Public.tagsHTML(tags, class)
    class = (class == "") and "" or class and " class=" .. class or [[ class="msg_tag"]]
    local ret = {}

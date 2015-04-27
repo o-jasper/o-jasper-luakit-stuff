@@ -9,4 +9,6 @@ for k,v in pairs(require("o_jasper_common.other")) do
 end
 Public.load_asset = require "o_jasper_common.load_asset"
 
+Public.tableText = require("o_jasper_common.text").tableText
+
 return Public

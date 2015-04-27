@@ -16,8 +16,6 @@ local cur_time = require("o_jasper_common.cur_time")
 
 local Public = {}
 
-local map = require("o_jasper_common.other").map
-
 local SqlEntry = require "sql_help.SqlEntry"
 assert(type(SqlEntry) == "table")
 
@@ -359,7 +357,11 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    -- Represents the entry as list in the order of the names.
    args_in_order = function(self, entry)
       assert(type(self.values.row_names) == "table")
-      return map(self.values.row_names, function(name) return entry[name] end)
+      local ret = {}
+      for _, name in pairs(self.values.row_names) do
+         table.insert(ret, entry[name])
+      end
+      return ret
    end,
    
    -- Adding/removing

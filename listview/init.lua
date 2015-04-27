@@ -1,4 +1,4 @@
---  Copyright (C) 24-04-2015 Jasper den Ouden.
+--  Copyright (C) 27-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -36,7 +36,8 @@ local function js_listupdate(listview, list, as_msg)
       end
    else
       cnt = string.format("results %d to %d", listview.limit_i,
-                          math.min(listview.limit_i + listview.limit_cnt, listview.limit_i + #list))
+                          math.min(listview.limit_i + listview.limit_cnt,
+                                   listview.limit_i + #list))
    end
    return { list=final_html_list(listview, list, as_msg),
             cnt=cnt,
@@ -142,6 +143,7 @@ function Public.Search.repl_list(self, view, meta)
    local sql_shown, latest_query = true, self.log.latest_query or ""
    -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
    return { latestQuery  = latest_query,
+            table_name    = self.log.values.table_name,
             searchInput   = self:asset("parts/search"),
             searchInitial = self:asset("parts/search_initial"),
             stylesheet    = self:asset("style", ".css"),
@@ -156,12 +158,43 @@ accept_js_funs(Public.Search, {"show_sql", "manual_sql", "do_search",
                                 "reset_limit_values", "got_limit",
                                 "delete_id"})
 
-local listview_metatables = {}
+Public.AboutChrome = c.copy_table(Public.Base)
+function Public.AboutChrome.repl_list(self, view, meta)
+   return setmetatable({
+                          title = string.format("%s:%s", self.chrome_name, self.name),
+                          stylesheet    = self:asset("style", ".css"),
+                          --raw_summary = html_list.keyval({self.log.values})
+                       },
+                       {__index=function(_, key)
+                           if self.log.values[key] then
+                              return self.log.values[key]
+                           elseif key == "raw_summary" then
+                              return c.tableText(self.log.values, "&nbsp;&nbsp;", "","<br>")
+                           end
+                       end
+                       })
+end
+
+local listview_metatables = {}  -- Prep metatables.
 for k,v in pairs(Public) do Public[k] = c.metatable_of(v) end
 
 function Public.new_Search(log, where)
    assert(log and where)
    return setmetatable({log = log, where=where}, Public.Search)
+end
+function Public.new_AboutChrome(log, where)
+   assert(log and where)
+   return setmetatable({log=log, where=where}, Public.AboutChrome)
+end
+
+local paged_chrome = require("paged_chrome")
+
+function Public.new_Chrome(log, where, default_name)
+   assert(log and where)
+   return { default_name = default_name or "search",
+            search = paged_chrome.templated_page(Public.new_Search(log, where)),
+            aboutChrome = paged_chrome.templated_page(Public.new_AboutChrome(log, where)),
+   }
 end
 
 return Public
