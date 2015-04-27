@@ -10,5 +10,7 @@ require "listview.entry_html"  -- TODO... Want this later.
 HistoryEntry = require "listview.history.HistoryEntry"
 History = require "listview.history.History"
 
-local db = require("history").db
-history = setmetatable({ db = db }, History)
+local histpkg = require("history")
+
+histpkg.init() -- History package uses `capi.luakit.idle_add(init)`
+history = setmetatable({ db = histpkg.db }, History)
