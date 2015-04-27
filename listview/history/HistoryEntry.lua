@@ -7,7 +7,7 @@ local HistoryEntry = c.copy_table(SqlEntry)
 
 HistoryEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "history",
---   taggings = "history_implied",
+--   taggings = "history_implied", -- (possibly record what outside stuff is loaded)
 --   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
    idname = "id",
    time = "last_visit", timemul = 1000,

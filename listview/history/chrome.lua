@@ -8,8 +8,6 @@
 local listview_chrome = require("listview.chromable").listview_chrome
 require "listview.history"
 
-local table_copy = require("o_jasper_common.other").table_copy
-
 local paged_chrome = require("paged_chrome")
 
 local config = (globals.listview or {}).history or {}
@@ -25,6 +23,7 @@ local function chrome_describe(default_name, log)
    }
 end
 
+-- Make the chrome page.
 local history_paged = chrome_describe("search", history)
 paged_chrome.paged_chrome("listviewHistory", history_paged)
 
@@ -32,6 +31,7 @@ if config.take_history_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("history", history_paged)
 end
 
+-- Add bindings.
 local cmd = lousy.bind.cmd
 
 local function on_command(w, query)

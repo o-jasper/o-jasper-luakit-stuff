@@ -1,10 +1,8 @@
 
 local c = require "o_jasper_common"
-
-local SqlHelp = require("sql_help").SqlHelp
 local HistoryEntry = require "listview.history.HistoryEntry"
 
-History = c.copy_table(SqlHelp)
+History = c.copy_table(require("sql_help").SqlHelp)
 History.values = HistoryEntry.values
 
 -- Scratch some search matchabled that arent allowed.
@@ -15,7 +13,7 @@ History.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:",
 
 function History:history_entry(entry)
    entry.origin = self
-   return setmetatable(history_entry, HistoryEntry)
+   return setmetatable(entry, HistoryEntry)
 end
 
 function History.listfun(self, list)

@@ -396,6 +396,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       end
       return ret
    end,
+   -- TODO updating.
    
    -- Delete an entry.
    delete_id = function(self, id, table_name)

@@ -172,6 +172,7 @@ function delete_selected() {
         if(selected[id]) {
             delete_id(id);
             ge("id_" + id).hidden = true;  // TODO Fancy fade stuff?
+            ge("id_" + id).innerHTML = "";
         }
     }
 }
