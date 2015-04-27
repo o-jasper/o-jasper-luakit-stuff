@@ -94,8 +94,8 @@ local to_js = {
 -- local pagedChrome = require "paged_chrome"
 
 -- Making the objects that do the pages.
-local listview_metas = {
-   base = {
+local Public = {
+   Base = {
       repl_pattern = false, to_js = {}, limit_i=0, limit_cnt = 20, limit_step=20,
       values = { to_js = {} },
 
@@ -136,8 +136,8 @@ local function accept_js_funs(into_page_meta, names)
 end
 
 -- Listview.
-listview_metas.search = c.copy_table(listview_metas.base)
-function listview_metas.search:repl_list(view, meta)
+Public.Search = c.copy_table(Public.Base)
+function Public.Search.repl_list(self, view, meta)
    local query = self:total_query("")
    local sql_shown, latest_query = true, self.log.latest_query or ""
    -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
@@ -151,19 +151,17 @@ function listview_metas.search:repl_list(view, meta)
             sqlShown = config.sql_shown and "true" or "false",
    }
 end
-accept_js_funs(listview_metas.search, {"show_sql", "manual_sql", "do_search",
-                                       "cycle_limit_values", "change_cnt",
-                                       "reset_limit_values", "got_limit",
-                                      "delete_id"})
+accept_js_funs(Public.Search, {"show_sql", "manual_sql", "do_search",
+                                "cycle_limit_values", "change_cnt",
+                                "reset_limit_values", "got_limit",
+                                "delete_id"})
 
 local listview_metatables = {}
-for k,v in pairs(listview_metas) do listview_metatables[k] = c.metatable_of(v) end
+for k,v in pairs(Public) do Public[k] = c.metatable_of(v) end
 
-local Public = {pages = listview_metas}
-
-function Public.chrome(log, which, where)
+function Public.new_Search(log, where)
    assert(log and where)
-   return setmetatable({log = log, where=where}, listview_metatables[which])
+   return setmetatable({log = log, where=where}, Public.Search)
 end
 
 return Public
