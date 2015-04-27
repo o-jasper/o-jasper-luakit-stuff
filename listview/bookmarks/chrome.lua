@@ -5,13 +5,9 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local listview = require("listview")
-local bookmarks  = require "listview.more.bookmarks"
-
-print("OV", bookmarks.values.table_name)
-print("ODM", getmetatable(bookmarks).values.table_name)
-
 local paged_chrome = require("paged_chrome")
+local listview = require("listview")
+local bookmarks  = require "listview.bookmarks.bookmarks"
 
 local config = (globals.listview or {}).more or {}
 config.page = config.page or {}

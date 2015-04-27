@@ -4,7 +4,7 @@ local c = require "o_jasper_common"
 local SqlHelp = require("sql_help").SqlHelp
 local Bookmarks = c.copy_meta(SqlHelp)
 
-local BookmarksEntry = require "listview.more.BookmarksEntry"
+local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 Bookmarks.values = BookmarksEntry.values
 
 -- Bookmarks.searchinfo.matchable -- All of them.

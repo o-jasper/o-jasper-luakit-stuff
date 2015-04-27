@@ -1,6 +1,6 @@
 
-local Bookmarks = require "listview.more.Bookmarks"
-local db = require "listview.more.acquire_db"
+local Bookmarks = require "listview.bookmarks.Bookmarks"
+local db = require "listview.acquire_db"
 
 -- Add bookmark tables if needed.
 db:exec [[
@@ -21,5 +21,4 @@ db:exec [[
    );
 ]]
 
-print("OM", Bookmarks.values.table_name)
 return setmetatable({db = db}, Bookmarks)
