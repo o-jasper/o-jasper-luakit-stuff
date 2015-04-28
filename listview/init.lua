@@ -113,7 +113,6 @@ local Public = {
       repl_list = function(self, view, meta)
          return {
             stylesheet    = self:asset("style", ".css"),
-            js            = self:asset("js", ".js"),
             title = string.format("%s:%s", self.chrome_name, self.name),
          }
       end,
@@ -143,15 +142,16 @@ local mod_Search = {
    repl_list = function(self, view, meta)
       local query = self:total_query("")
       local sql_shown, latest_query = true, self.log.latest_query or ""
-      -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
-      return { latestQuery  = latest_query,
-               table_name    = self.log.values.table_name,
-               searchInput   = self:asset("parts/search"),
-               searchInitial = self:asset("parts/search_initial"),
-               stylesheet    = self:asset("style", ".css"),
-               js            = self:asset("js", ".js"),
-               cycleCnt = self.limit_step,
-               sqlShown = config.sql_shown and "true" or "false",
+      return {
+         stylesheet    = self:asset("style", ".css"), -- TODO These are from base..
+         js            = self:asset("search", ".js"),
+
+         latestQuery  = latest_query,
+         table_name    = self.log.values.table_name,
+         searchInput   = self:asset("parts/search"),
+         searchInitial = self:asset("parts/search_initial"),
+         cycleCnt = self.limit_step,
+         sqlShown = config.sql_shown and "true" or "false",
       }
    end,
 }
