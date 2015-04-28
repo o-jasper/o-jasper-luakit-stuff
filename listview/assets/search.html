@@ -4,17 +4,18 @@
     <meta charset="utf-8">
     <title>{%title}</title>
     <style type="text/css">{%stylesheet}</style>
-    <script type="text/javascript">{%js}</script>
+    <script type="text/javascript">{%common_js}</script>
+    <script type="text/javascript">{%search_js}</script>
 </head>
 <body>
 
 <!-- TODO "Enter" should submit them -->
 
 <h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
-  <span class="minor" id="cnt">{%cnt}</span></h3>
+  <span class="minor" id="cnt"></span></h3>
 {%searchInput}
 
-<span id="list">{%list}</span>
+<span id="list"></span>
 
 <hr>
 <p class="minor">chrome run count: {%chromeRanCnt},

@@ -112,6 +112,7 @@ local Public = {
 
       repl_list = function(self, view, meta)
          return {
+            common_js     = self:asset("common", "js"),
             stylesheet    = self:asset("style", ".css"),
             title = string.format("%s:%s", self.chrome_name, self.name),
          }
@@ -143,10 +144,11 @@ local mod_Search = {
       local query = self:total_query("")
       local sql_shown, latest_query = true, self.log.latest_query or ""
       return {
+         common_js     = self:asset("common", "js"),
          stylesheet    = self:asset("style", ".css"), -- TODO These are from base..
-         js            = self:asset("search", ".js"),
+         search_js     = self:asset("search", ".js"),
 
-         latestQuery  = latest_query,
+         latestQuery   = latest_query,
          table_name    = self.log.values.table_name,
          searchInput   = self:asset("parts/search"),
          searchInitial = self:asset("parts/search_initial"),
