@@ -44,8 +44,6 @@ local function js_listupdate(listview, list, as_msg)
 end
 
 local to_js = {
---Note these arent done (self, args..)-style because they are fed in
--- `view:register_function` in paged_chrome
 
    delete_id = function(self) return function(id)
          self.log:delete_id(id)
@@ -95,23 +93,9 @@ local to_js = {
 -- Making the objects that do the pages.
 local Public = {
    Base = {
-      repl_pattern = false, to_js = {}, limit_i=0, limit_cnt = 20, limit_step=20,
-      values = { to_js = {} },
+      repl_pattern = false, to_js = {},
 
-      total_query = function(self, search)
-               -- How we end up searching.
-               assert(type(search) == "string", "Search not string; " .. tostring(search))
-               local query = self.log:new_SqlHelp()
-               if search ~= "" then query:search(search) end
-               query:order_by(self.log.values.order_by)
-
-               self.got_limit = query.got_limit
-               if not query.got_limit then  -- Add a limit if dont have one yet.
-                  query:limit(self.limit_i, self.limit_cnt)
-               end
-
-               return query
-      end,
+-- TODO.. seems like something that might belong in `paged_chrome`.
       asset = function(self, what, kind)
          assert(type(self) == "table")
          if type(self.where) == "string" then self.where = {self.where} end
@@ -125,37 +109,53 @@ local Public = {
       asset_getter = function(self, what, kind) -- .. yah.
          return function() return self:asset(what, kind) end
       end,
-      },
-}
 
-local function accept_js_funs(into_page_meta, names)
-   for _, name in pairs(names) do
-      into_page_meta.to_js[name] = to_js[name]
-   end
-end
-
--- Listview.
-Public.Search = c.copy_meta(Public.Base)
-
-function Public.Search.repl_list(self, view, meta)
-   local query = self:total_query("")
-   local sql_shown, latest_query = true, self.log.latest_query or ""
-   -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
-   return { latestQuery  = latest_query,
-            table_name    = self.log.values.table_name,
-            searchInput   = self:asset("parts/search"),
-            searchInitial = self:asset("parts/search_initial"),
+      repl_list = function(self, view, meta)
+         return {
             stylesheet    = self:asset("style", ".css"),
             js            = self:asset("js", ".js"),
             title = string.format("%s:%s", self.chrome_name, self.name),
-            cycleCnt = self.limit_step,
-            sqlShown = config.sql_shown and "true" or "false",
-   }
-end
-accept_js_funs(Public.Search, {"show_sql", "manual_sql", "do_search",
-                                "cycle_limit_values", "change_cnt",
-                                "reset_limit_values", "got_limit",
-                                "delete_id"})
+         }
+      end,
+      },
+}
+
+-- The search part.
+local mod_Search = {
+   limit_i=0, limit_cnt=20,limit_step=20,
+
+   to_js = to_js,
+
+   total_query = function(self, search)
+      -- How we end up searching.
+      assert(type(search) == "string", "Search not string; " .. tostring(search))
+      local query = self.log:new_SqlHelp()
+      if search ~= "" then query:search(search) end
+      query:order_by(self.log.values.order_by)
+      
+      self.got_limit = query.got_limit
+      if not query.got_limit then  -- Add a limit if dont have one yet.
+         query:limit(self.limit_i, self.limit_cnt)
+      end
+      return query
+   end,
+
+   repl_list = function(self, view, meta)
+      local query = self:total_query("")
+      local sql_shown, latest_query = true, self.log.latest_query or ""
+      -- TODO metatable it? Cant iterate it then tho.(unless also metatable that)
+      return { latestQuery  = latest_query,
+               table_name    = self.log.values.table_name,
+               searchInput   = self:asset("parts/search"),
+               searchInitial = self:asset("parts/search_initial"),
+               stylesheet    = self:asset("style", ".css"),
+               js            = self:asset("js", ".js"),
+               cycleCnt = self.limit_step,
+               sqlShown = config.sql_shown and "true" or "false",
+      }
+   end,
+}
+Public.Search = c.copy_meta(Public.Base, mod_Search)
 
 Public.AboutChrome = c.copy_meta(Public.Base)
 function Public.AboutChrome.repl_list(self, view, meta)
