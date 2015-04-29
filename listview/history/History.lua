@@ -1,4 +1,7 @@
 
+local config = globals.listview_history or globals.listview or {}
+config.addsearch = config.addsearch or { default = "" }
+
 local c = require "o_jasper_common"
 local HistoryEntry = require "listview.history.HistoryEntry"
 
@@ -10,6 +13,8 @@ History.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:",
                                 "uri:", "title:",
                                 "urilike:", "titlelike:",
                                 "before:", "after:", "limit:"}
+
+function History:config() return config end
 
 function History:history_entry(entry)
    entry.origin = self

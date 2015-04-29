@@ -1,3 +1,5 @@
+local config = globals.listview_bookmarks or globals.listview or {}
+config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
 
@@ -14,6 +16,8 @@ Bookmarks.values = BookmarksEntry.values
 
 local addfuns = {
    cur_id_add = 0,
+
+   config = function(self) return config end,
 
    bookmark_entry = function(self, entry)
       entry.origin = self

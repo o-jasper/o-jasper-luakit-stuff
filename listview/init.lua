@@ -6,7 +6,7 @@
 --  (at your option) any later version.
 
 local config = globals.listview or {}
-config.addsearch = { default = "" }
+config.addsearch = config.addsearch or { default = "" }
 
 local lousy = require("lousy")
 
