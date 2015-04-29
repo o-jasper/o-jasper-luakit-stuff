@@ -381,19 +381,17 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       assert(self.values.table_name and self.values.row_names)
       
       local ret = {}
-      if add.keep then  -- Only bother getting it if it is keepworthy.
-         local sql = string.format("INSERT INTO %s VALUES (%s)",
-                                   self.values.table_name, qmarks(#self.values.row_names))
-         ret.add = self.db:exec(sql, self.args_in_order(add))
-         -- And all the tags, if we do those.
-         if add.tags and #add.tags > 0 and self.values.taggings then
-            self.tags_last = cur_time.raw()  -- Note time last changed.
-            local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
-                                              self.value.taggings)
-            ret.tags = {}
-            for _, tag in pairs(add.tags) do
-               table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
-            end
+      local sql = string.format("INSERT INTO %s VALUES (%s)",
+                                self.values.table_name, qmarks(#self.values.row_names))
+      ret.add = self.db:exec(sql, self:args_in_order(add))
+      -- And all the tags, if we do those.
+      if add.tags and #add.tags > 0 and self.values.taggings then
+         self.tags_last = cur_time.raw()  -- Note time last changed.
+         local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
+                                           self.values.taggings)
+         ret.tags = {}
+         for _, tag in pairs(add.tags) do
+            table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
          end
       end
       return ret

@@ -5,15 +5,53 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local paged_chrome = require("paged_chrome")
-local listview = require("listview")
+local c = require("o_jasper_common")
+
+local paged_chrome = require "paged_chrome"
+local listview = require "listview"
 local bookmarks  = require "listview.bookmarks.bookmarks"
 
 local config = (globals.listview or {}).more or {}
 config.page = config.page or {}
 
 -- Make the chrome page.
-local bookmarks_paged = listview.new_Chrome(bookmarks, "listview/more")
+local bookmarks_paged = listview.new_Chrome(bookmarks, "listview/bookmarks")
+
+local mod_Enter = {
+   to_js = {
+      manual_enter = function(self)  -- This one go onto the bindings for.
+         return function(inp)
+            add = {
+               created=c.cur_time.s(),
+               to_uri = inp.uri,
+               title = inp.title,
+               desc = inp.desc,
+               data_uri = inp.data_uri,  -- Empty strings are can be auto-reinterpreted.
+               
+               tags = lousy.util.string.split(inp.tags, "[,; ]+") --(these are not done directly)
+            }
+            local ret = self.log:enter(add)
+            for k,v in pairs(ret) do print(k,v) end
+         end
+      end,
+
+      -- TODO show that the default data_uri would be.
+   },
+   repl_list = function(self, view, meta)
+      -- TODO
+      return { title = "Add bookmark",
+               common_js = self:asset("common", ".js"),
+               bookmarks_js = self:asset("bookmarks", ".js"),
+               part_enter = self:asset("parts/enter"),
+      }
+   end,
+}
+
+local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
+
+local enter_page = setmetatable({where="listview/bookmarks", log=bookmarks},
+                          Enter)
+bookmarks_paged.enter = paged_chrome.templated_page(enter_page)
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
 

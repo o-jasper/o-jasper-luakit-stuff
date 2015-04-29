@@ -11,6 +11,8 @@ Bookmarks.values = BookmarksEntry.values
 -- TODO add data_uri: stuff.
 
 local addfuns = {
+   cur_id_add = 0,
+
    bookmark_entry = function(self, entry)
       entry.origin = self
       return setmetatable(entry, BookmarkEntry)
@@ -19,13 +21,22 @@ local addfuns = {
    listfun = function(self, list)
       for _, data in pairs(list) do
          data.orign = self
-         setmetatable(data, BookmarkEntry)
+         setmetatable(data, BookmarksEntry)
       end
       return list
    end,
 
    enter = function(self, add)
-      add.id = "NULL"  -- Then it should generate an id for us.
+      local t_ms = c.cur_time.ms()
+      if t_ms ~= self.last_t_ms then
+         self.cur_id_add = 0
+      else
+         self.cur_id_add = self.cur_id_add + 1
+      end
+      add.id = 1000*t_ms + self.cur_id_add  -- NOTE: obviously not foolproof.
+      self.last_t_ms = t_ms
+
+--      for k,v in pairs(add) do print(k,v) end
       -- Pass on the rest of the responsibility upstream.
       return SqlHelp.enter(self, add)
    end,
