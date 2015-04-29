@@ -43,17 +43,28 @@ local addfuns = {
       return SqlHelp.enter(self, add)
    end,
 
+   -- State for the html writer.
    initial_state = function(self)
       local html_calc = c.copy_table(entry_html.default_html_calc)
-      html_calc.identifier = function(entry, _)
-         local val = entry[entry.values.idname]
-         return string.format("%d%d",  -- Ugly way to show the entire number.
-                              math.floor(val/1000000000),
+      local mod_html_calc = {
+         identifier = function(entry, _)
+            local val = entry[entry.values.idname]
+            return string.format("%d%d",  -- Ugly way to show the entire number.
+               math.floor(val/1000000000),
                               math.floor(val%1000000000))
-      end
---      html_calc.data_uri = function(entry, _)
---         return string.format("DATAURI:%s", entry.data_uri)
---      end
+         end,
+         data_uri = function(entry, _)
+            if not entry.data_uri or entry.data_uri == "" then
+               return [[<span class="minor">(no uri)</span>]]
+            else
+               return entry.data_uri
+            end
+         end,
+         title = function(entry, _)
+            return entry.title or entry.uri or "(no title)"
+         end
+      }
+      for k,v in pairs(mod_html_calc) do html_calc[k] = v end
       return { html_calc=html_calc }
    end,
 }

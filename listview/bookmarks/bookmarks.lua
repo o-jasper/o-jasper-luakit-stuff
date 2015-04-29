@@ -21,4 +21,9 @@ db:exec [[
    );
 ]]
 
-return setmetatable({db = db}, Bookmarks)
+local ret
+if not ret then
+   ret = setmetatable({db = db}, Bookmarks)
+end
+
+return ret
