@@ -12,7 +12,7 @@ db:exec [[
      title TEXT NOT NULL,
      desc TEXT NOT NULL,
   
-     data_uri TEXT
+     data_uri TEXT NOT NULL
    );
 
    CREATE TABLE IF NOT EXISTS bookmark_taggings (

@@ -50,7 +50,7 @@ local mod_Enter = {
 local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
 
 local enter_page = setmetatable({where="listview/bookmarks", log=bookmarks},
-                          Enter)
+                                Enter)
 bookmarks_paged.enter = paged_chrome.templated_page(enter_page)
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)

@@ -12,19 +12,14 @@ local cur_time_raw = require("o_jasper_common.cur_time").raw
 local SqlEntry = {
    taggings="taggings",
    string_els={}, int_els={},
-   tagfinder=[[SELECT tag FROM taggings WHERE to_id == ?]],
+   tagfinder=[[]],
    
-   determine = { tags_last = function(self) return 0 end },
-   
-   realtime_tags = function(self)
+   tags = function(self)
       local origin = self.origin
-      if self.tags_last > origin.tags_last and rawget(self, "tags") then
-         return rawget(self, "tags")
-      end
       -- Get the tags.
-      self.tags_last = cur_time_raw()
       self.tags = {}
-      local got = origin.db:exec(self.values.tagfinder, {self.id})
+      local sql = string.format("SELECT tag FROM %s WHERE to_id == ?", self.values.taggings)
+      local got = origin.db:exec(sql, {self.id})
       for _, el in pairs(got) do
          table.insert(self.tags, el.tag)
       end
@@ -59,7 +54,5 @@ local SqlEntry = {
       return "N/A" -- Less control, but allows the html to request stuff we dont have.
    end,
 }
-SqlEntry.rt_tags = SqlEntry.realtime_tags
-SqlEntry.determine.tags = function(self) return self:realtime_tags() end
 
 return metatable_of(SqlEntry)

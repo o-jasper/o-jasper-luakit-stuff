@@ -16,7 +16,13 @@ local html_entry = require "listview.entry_html"
 
 local function final_html_list(listview, list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   return as_msg and html_entry.list(listview, list) or html_list.keyval(list)
+   if not as_msg then
+      return html_list.keyval(list)
+   elseif listview.log.initial_state then
+      return html_entry.list(listview, list, listview.log:initial_state())
+   else
+      return html_entry.list(listview, list)
+   end
 end
 
 local search_cnt = 0

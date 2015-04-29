@@ -5,16 +5,17 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local cur_time = require "o_jasper_common.cur_time"
-
+local c = require "o_jasper_common"
 local ot = require "o_jasper_common.html.other"
 local tt = require "o_jasper_common.html.time"
 
 local SqlEntry = require("sql_help").SqlEntry
 
-local default_html_calc = {
+local Public = {}
+
+Public.default_html_calc = {
    tagsHTML = function (self, state)
-      return ot.tagsHTML(self.tags, state.tagsclass)
+      return ot.tagsHTML(self:tags(), state.tagsclass)
    end,
 
    dateHTML = function(self, state)
@@ -27,9 +28,6 @@ local default_html_calc = {
 
    identifier = function(self, _) return self[self.values.idname] end,
 }
-
--- TODO proper package.
-local Public = {}
 
 function Public.repl(entry, state)
    assert(entry)
@@ -50,15 +48,16 @@ end
 function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
-      return string.gsub(listview:asset("parts/show_1"), "{%%(%w+)}",
-                         Public.repl(msg, state))
+      return c.full_gsub(listview:asset("parts/show_1"),
+                          Public.repl(msg, state))
    end
 end
 
 function Public.list(listview, data, state)
-   state = state or { last_time = cur_time.ms() }
+   state = state or {}
+   state.last_time = state.last_time or c.cur_time.ms()
    state.config = state.config or {}
-   state.html_calc = state.html_calc or default_html_calc
+   state.html_calc = state.html_calc or Public.default_html_calc
    local str = "<table>"
    for i, el in pairs(data) do 
       str = str .. Public.msg(listview, state)(i, el)

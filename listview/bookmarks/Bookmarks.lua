@@ -4,6 +4,8 @@ local c = require "o_jasper_common"
 local SqlHelp = require("sql_help").SqlHelp
 local Bookmarks = c.copy_meta(SqlHelp)
 
+local entry_html = require("listview.entry_html")
+
 local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 Bookmarks.values = BookmarksEntry.values
 
@@ -20,7 +22,7 @@ local addfuns = {
    
    listfun = function(self, list)
       for _, data in pairs(list) do
-         data.orign = self
+         data.origin = self
          setmetatable(data, BookmarksEntry)
       end
       return list
@@ -39,6 +41,20 @@ local addfuns = {
 --      for k,v in pairs(add) do print(k,v) end
       -- Pass on the rest of the responsibility upstream.
       return SqlHelp.enter(self, add)
+   end,
+
+   initial_state = function(self)
+      local html_calc = c.copy_table(entry_html.default_html_calc)
+      html_calc.identifier = function(entry, _)
+         local val = entry[entry.values.idname]
+         return string.format("%d%d",  -- Ugly way to show the entire number.
+                              math.floor(val/1000000000),
+                              math.floor(val%1000000000))
+      end
+--      html_calc.data_uri = function(entry, _)
+--         return string.format("DATAURI:%s", entry.data_uri)
+--      end
+      return { html_calc=html_calc }
    end,
 }
 
