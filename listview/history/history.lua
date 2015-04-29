@@ -9,4 +9,10 @@ local History = require "listview.history.History"
 
 local histpkg = require("history")
 histpkg.init() -- History package uses `capi.luakit.idle_add(init)`
-return setmetatable({ db = histpkg.db }, History)
+
+local ret
+if not ret then
+   ret = setmetatable({ db = histpkg.db }, History)
+end
+
+return ret
