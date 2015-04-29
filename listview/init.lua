@@ -146,6 +146,7 @@ local mod_Search = {
       return {
          common_js     = self:asset("common", ".js"),
          stylesheet    = self:asset("style", ".css"), -- TODO These are from base..
+         title = string.format("%s:%s", self.chrome_name, self.name),
          search_js     = self:asset("search", ".js"),
 
          latestQuery   = latest_query,
