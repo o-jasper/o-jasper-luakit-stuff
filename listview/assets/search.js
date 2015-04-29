@@ -1,3 +1,8 @@
+
+function full_search_input() {
+    return ge('addsearch_input').value + " " + ge('search_input').value
+}
+
 var sql_shown, addsearch_shown;
 var by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
@@ -9,7 +14,7 @@ function set_sql_shown(yes) {
 
     if( !by_search && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
 
-    if( yes && !sql_locked ) { set_ids(show_sql(ge('search_input').value)); }
+    if( yes && !sql_locked ) { set_ids(show_sql(full_search_input())); }
 
     sql_shown = yes;
 }
@@ -80,7 +85,7 @@ function touch_search() {
 }
 
 function update_sql_shown() {
-    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search_input').value)); }
+    if( sql_shown && !sql_locked ) { set_ids(show_sql(full_search_input())); }
 }
 
 function search() {
@@ -90,7 +95,7 @@ function search() {
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function _search() {
     if(by_search){ 
-        set_ids(do_search(ge('addsearch_input').value + " " + ge('search_input').value, as_msg));
+        set_ids(do_search(full_search_input(), as_msg));
     } else {
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
