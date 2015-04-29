@@ -37,6 +37,8 @@ search. For instance `-tags:hide` to hide things defaultly.
 
 * Document better.
 
+* "Stored search/sql-appends" so that users can create different topics.
+
 * Put the search term in the address bar, or at least possibly, 
   so people can link to their searches...
   
@@ -50,11 +52,8 @@ search. For instance `-tags:hide` to hide things defaultly.
   nicer. (keywords in the search should override? indicate that it is overridden?)
   Possibly instead of "Next 20", "20 more".
 
-* Uhm... in `chromable.lua` could i just "export `self`"? Or that, and then select
-  which are allowed.
-
 * Selecting multiple in one click with shift.
 
-* Get sensible location of cursor immediately. At end of the search text i guess.
+* Get sensible location of selection immediately the main search.
 
 * Using keys to navigate gui.

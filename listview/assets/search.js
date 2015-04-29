@@ -1,4 +1,5 @@
-var sql_shown, by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
+var sql_shown, addsearch_shown;
+var by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
     if( !by_search && !yes ){ return; }
     ge('sql_input_area').hidden = !yes;
@@ -8,9 +9,15 @@ function set_sql_shown(yes) {
 
     if( !by_search && !yes ){ alert("Cant not see the SQL when searching by it?! BUG?"); }
 
-    if( yes && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
+    if( yes && !sql_locked ) { set_ids(show_sql(ge('search_input').value)); }
 
     sql_shown = yes;
+}
+
+function set_addsearch_shown(yes) {
+    addsearch_shown = yes;
+    ge('addsearch_area').hidden = !yes;
+    ge('toggle_addsearch_shown').innerText = yes ? "Show whole" : "Hidden whole";
 }
 
 function sql_input_class(by_search, locked) {
@@ -24,7 +31,7 @@ function set_by_search(yes) {
     ge('toggle_by_search').innerText = yes ? "By search" : "By SQL";
 
     ge('sql_input').className = sql_input_class(yes, sql_locked);
-    ge('search').className    = (yes ? "live" : "dead");
+    ge('search_input').className    = (yes ? "live" : "dead");
 }
 function set_sql_locked(yes) {
     sql_locked = yes
@@ -73,7 +80,7 @@ function touch_search() {
 }
 
 function update_sql_shown() {
-    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search').value)); }
+    if( sql_shown && !sql_locked ) { set_ids(show_sql(ge('search_input').value)); }
 }
 
 function search() {
@@ -82,8 +89,9 @@ function search() {
 
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function _search() {
-    if(by_search){ set_ids(do_search(ge('search').value, as_msg)); }
-    else{
+    if(by_search){ 
+        set_ids(do_search(ge('addsearch_input').value + " " + ge('search_input').value, as_msg));
+    } else {
         set_ids(manual_sql(ge('sql_input').value, as_msg));
     }
     var gl = got_limit(); // TODO .. This is also connected to whether by-sql.
@@ -145,5 +153,13 @@ function delete_selected() {
             ge("id_" + id).hidden = true;  // TODO Fancy fade stuff?
             ge("id_" + id).innerHTML = "";
         }
+    }
+}
+
+function touch_addsearch_name() {
+    var got = addsearch(ge('addsearch_name_input').value);
+    if(got || got == "") {  // Empty strings are false...
+        ge('addsearch_input').value = got;
+        if(continuous){ search(); }
     }
 }

@@ -1,6 +1,7 @@
-<input id="search" oninput="touch_search();" onsubmit="search()" class="live">
+<input id="search_input" oninput="touch_search();" onsubmit="search()" class="live">
   <button onclick="search()">Search</button><br>
 <button id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
+<button id="toggle_addsearch_shown" onclick="set_addsearch_shown(!addsearch_shown);">BUG</button>
 <button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
 <button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button>
 I
@@ -12,6 +13,10 @@ I
 <button id = "toggle_actions_panel" onclick="set_actions_panel(!actions_panel)">BUG</button>
 
 <br>
+<span id="addsearch_area">
+  <input id="addsearch_name_input" value="default" style="width:10%" oninput="touch_addsearch_name()">
+  <input id="addsearch_input" style="width:80%" oninput="touch_search();" onsubmit="search()">
+</span>
 <span id="sql_input_area">
   <span style="float:left;">
     <button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button><br>

@@ -6,6 +6,7 @@
 --  (at your option) any later version.
 
 local config = globals.listview or {}
+config.addsearch = { default = "" }
 
 local lousy = require("lousy")
 
@@ -51,12 +52,16 @@ end
 
 local to_js = {
 
+   addsearch = function(self) return function(name)
+         return self:config().addsearch[name]
+   end end,
+
    delete_id = function(self) return function(id)
          self.log:delete_id(id)
    end end,
    
-   show_sql = function(self) return function(sql)
-         return { sql_input = self:total_query(sql):sql_code() }
+   show_sql = function(self) return function(search)
+         return { sql_input = self:total_query(search):sql_code() }
    end end,
    
    manual_sql = function(self) return function(sql, as_msg)
@@ -100,6 +105,8 @@ local to_js = {
 local Public = {
    Base = {
       repl_pattern = false, to_js = {},
+
+      config = function(self) return config end,
 
 -- TODO.. seems like something that might belong in `paged_chrome`.
       asset = function(self, what, kind)
@@ -158,9 +165,9 @@ local mod_Search = {
          latestQuery   = latest_query,
          table_name    = self.log.values.table_name,
          searchInput   = self:asset("parts/search"),
-         searchInitial = self:asset("parts/search_initial"),
+         search_initial_js = self:asset("parts/search_initial", ".js"),
          cycleCnt = self.limit_step,
-         sqlShown = config.sql_shown and "true" or "false",
+         sqlShown = self:config().sql_shown and "true" or "false",
       }
    end,
 }
