@@ -33,18 +33,18 @@ local addfuns = {
    end,
 
    enter = function(self, add)
-      local t_ms = c.cur_time.ms()
-      if t_ms ~= self.last_t_ms then
-         self.cur_id_add = 0
-      else
-         self.cur_id_add = self.cur_id_add + 1
+      if not add.id then
+         local t_ms = c.cur_time.ms()
+         if t_ms ~= self.last_t_ms then
+            self.cur_id_add = 0
+         else
+            self.cur_id_add = self.cur_id_add + 1
+         end
+         add.id = 1000*t_ms + self.cur_id_add  -- NOTE: obviously not foolproof.
+         self.last_t_ms = t_ms
+         -- Pass on the rest of the responsibility upstream.
+         return SqlHelp.enter(self, add)
       end
-      add.id = 1000*t_ms + self.cur_id_add  -- NOTE: obviously not foolproof.
-      self.last_t_ms = t_ms
-
---      for k,v in pairs(add) do print(k,v) end
-      -- Pass on the rest of the responsibility upstream.
-      return SqlHelp.enter(self, add)
    end,
 
    -- State for the html writer.
@@ -59,7 +59,7 @@ local addfuns = {
          end,
          data_uri = function(entry, _)
             if not entry.data_uri or entry.data_uri == "" then
-               return [[<span class="minor">(no uri)</span>]]
+               return [[<span class="minor">(no data uri)</span>]]
             else
                return entry.data_uri
             end
