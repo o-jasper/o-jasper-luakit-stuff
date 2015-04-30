@@ -9,7 +9,7 @@
 --  Likely good to rename the concept, and have ability to use the concept
 --   multiple times, the same way.
 
--- TODO make it only _compose_ it.
+-- TODO pre-compile some of the sql-queries.
 
 local metatable_of = require("o_jasper_common.meta").metatable_of
 local cur_time = require("o_jasper_common.cur_time")
@@ -391,12 +391,35 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
                                            self.values.taggings)
          ret.tags = {}
          for _, tag in pairs(add.tags) do
-            table.insert(ret.tags, self.db:exec(tags_insert, {add.id, tag}))
+            table.insert(ret.tags, self.db:exec(tags_insert, {add[self.values.idname], tag}))
          end
       end
       return ret
    end,
-   -- TODO updating.
+   -- Modify an entry.
+   update = function(self, modified)
+      if not modified.id then return nil end
+      -- See what is here now.
+      local sqlget = string.format("SELECT %s FROM %s WHERE %s == ?",
+                                   self.values.idname, self.values.table_name,
+                                   self.values.idname)
+      local got = self.db:exec(sqlget, {modified.id})
+      assert(got)
+      if #got == 1 then
+         local sqlset = string.format("UPDATE %s SET %s WHERE %s == ",
+                                      self.values.table_name,
+                                      table.concat(self.values.row_names, ", "),
+                                      self.values.idname,
+                                      qmarks(#self.values.row_names))
+         return self.db:exec(sqlset, self:args_in_order(modified))
+      else
+         return nil  -- Failed one/too many.
+      end
+   end,
+   update_or_enter = function(self, entry)
+      local got = self:update(entry)
+      if got then return got else return self:enter(entry) end
+   end,
    
    -- Delete an entry.
    delete_id = function(self, id, table_name)
