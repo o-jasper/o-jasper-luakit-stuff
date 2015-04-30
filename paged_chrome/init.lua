@@ -3,10 +3,10 @@
 
 local Public ={ paged_chrome_dict = {} }
 
-local chrome = require("chrome")
 local lousy = require("lousy")
 
--- Each page has an `init(view, meta)` and `html(view,meta)`
+local chrome = require("chrome")
+-- Each page has an `init(args, view, meta)` and `html(args, view, meta)`
 function Public.paged_chrome(chrome_name, pages)
    Public.paged_chrome_dict[chrome_name] = pages
    chrome.add(chrome_name,
@@ -22,10 +22,10 @@ function Public.paged_chrome(chrome_name, pages)
                  local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
                  page.chrome_name = chrome_name
                  page.name = use_name
-                 view:load_string(page.html(view, meta), use_uri)
+                 view:load_string(page.html(nil, view, meta), use_uri)
                  
                  function on_first_visual(view, status)
-                    page.init(view, meta, status)
+                    page.init(nil, view, meta)
                     -- Hack to run until first visual.
                     if status == "first-visual" then
                        view:remove_signal("load-status", on_first_visual)
@@ -42,25 +42,26 @@ function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
       or "COULDNT FIND ASSET"
 end
 
--- Makes the above page-object based on templates instead. Requires a:
--- `repl_pattern`             template in which replacements take place.
--- `repl_list(view, meta)`,   method returning replacement rules.
--- `to_js`                    lua functions accessible to javascript.
+-- Makes the above page-object      based on templates instead. Requires a:
+-- `repl_pattern`                   template in which replacements take place.
+--                                  if none -> a simularly named asset is used.
+-- `repl_list(args, view, meta)`,   method returning replacement rules.
+-- `to_js`                          lua functions accessible to javascript.
 local templated_page_metatable = {
    __index = function(self, key)
       local vals = {  
-         html = function(view, meta)
+         html = function(args, view, meta)
             local pattern = self.page.repl_pattern
-            if not pattern then
+            if not pattern then  -- TODO just have `templated_page` do this?
                if self.page.asset then
                   pattern = self.page:asset(self.page.name, ".html")
                else
                   pattern = Public.asset(self.page.name, ".html")
                end
             end
-            return c.full_gsub(pattern, self.page:repl_list(view, meta))
+            return c.full_gsub(pattern, self.page:repl_list(args, view, meta))
          end,
-         init = function(view, _, _)
+         init = function(_, view, _, _)
             if not self.done then  -- Just attach javascript as soon as possible.
                for name, fun in pairs(self.page.to_js) do
                   view:register_function(name, fun(self.page, name))
