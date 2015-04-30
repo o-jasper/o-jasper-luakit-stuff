@@ -42,9 +42,9 @@ local addfuns = {
          end
          add.id = 1000*t_ms + self.cur_id_add  -- NOTE: obviously not foolproof.
          self.last_t_ms = t_ms
-         -- Pass on the rest of the responsibility upstream.
-         return SqlHelp.enter(self, add)
       end
+      -- Pass on the rest of the responsibility upstream.
+      return SqlHelp.enter(self, add)
    end,
 
    -- State for the html writer.
