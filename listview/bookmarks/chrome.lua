@@ -57,22 +57,36 @@ local mod_Enter = {
 
       -- TODO show what the default data_uri would be.
    },
-   repl_list = function(self, args,_,_)
-      -- TODO
-      return setmetatable(
-         { title = "Add bookmark",
-         }, self:repl_list_meta(args))
+   repl_list = function(self, args, _,_)
+      return setmetatable({ title = "Add bookmark", }, self:repl_list_meta(args))
+   end,
+}
+local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
+
+local mod_BookmarksSearch = {
+   -- Want the adding-entries js api too.
+   to_js = c.copy_table(listview.Search.to_js, mod_Enter.to_js),
+   
+   repl_list = function(self, args, view, meta)
+      local got = listview.Search.repl_list(self, args, view, meta)
+      got.above_title = self:asset("parts/enter_span")
+      return got
    end,
 }
 
-local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
+local BookmarksSearch = c.metatable_of(c.copy_meta(listview.Search, mod_BookmarksSearch))
 
-local enter_page = setmetatable({where="listview/bookmarks", log=bookmarks},
-                                Enter)
+local function mk_page(meta, name)
+   local page = setmetatable({where="listview/bookmarks", log=bookmarks}, meta)
+   return paged_chrome.templated_page(page, name)
+end
 
-
-local bookmarks_paged = listview.new_Chrome(bookmarks, "listview/bookmarks")
-bookmarks_paged.enter = paged_chrome.templated_page(enter_page, "enter")
+local bookmarks_paged = {
+   default_page = "search",
+   enter  = mk_page(Enter, "enter"),
+   search = mk_page(BookmarksSearch, "search"),
+   aboutChrome = listview.new_AboutChrome("listview/bookmarks", bookmarks),
+}
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
 
