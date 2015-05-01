@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+local lousy = require "lousy"
+
 local c = require("o_jasper_common")
 
 local paged_chrome = require "paged_chrome"
@@ -15,12 +17,30 @@ local config = (globals.listview or {}).more or {}
 config.page = config.page or {}
 
 -- Make the chrome page.
-local bookmarks_paged = listview.new_Chrome(bookmarks, "listview/bookmarks")
+
+local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")   -- TODO
+local topics    = config.topics or {"entity", "idea", "project", "data_source",
+                                    "vacancy"}
+
+local function default_data_uri_fun(entry)
+   for _,name in pairs(topics) do
+      if entry:has_tag(name) then
+         -- TODO file-appropriatize the title.
+         local dir = string.format("%s/%s/%s", topicsdir, name, entry.title)
+         return dir
+      end
+   end
+end
+
+local default_data_uri = config.default_data_uri or default_data_uri_fun
 
 local mod_Enter = {
    to_js = {
       manual_enter = function(self)  -- This one go onto the bindings for.
          return function(inp)
+            if not inp.data_uri or inp.data_uri == "" then
+               inp.data_uri = default_data_uri_fun(self)
+            end
             add = {
                created=c.cur_time.s(),
                to_uri = inp.uri,
@@ -35,7 +55,7 @@ local mod_Enter = {
          end
       end,
 
-      -- TODO show that the default data_uri would be.
+      -- TODO show what the default data_uri would be.
    },
    repl_list = function(self, args,_,_)
       -- TODO
@@ -49,7 +69,10 @@ local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
 
 local enter_page = setmetatable({where="listview/bookmarks", log=bookmarks},
                                 Enter)
-bookmarks_paged.enter = paged_chrome.templated_page(enter_page)
+
+
+local bookmarks_paged = listview.new_Chrome(bookmarks, "listview/bookmarks")
+bookmarks_paged.enter = paged_chrome.templated_page(enter_page, "enter")
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
 
