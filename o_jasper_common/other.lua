@@ -28,13 +28,18 @@ function Public.copy_table_1(tab)  -- One-deep copy of table.
    return ret
 end
 
-function Public.copy_table(tab)  -- One-deep copy of table.
+function Public.copy_table(tab, add)  -- One-deep copy of table.
    local ret = {}
    for k,v in pairs(tab) do
       if type(v) == "table" then
          ret[k] = Public.copy_table(v)
       else
          ret[k] = v
+      end
+   end
+   if add then
+      for k,v in pairs(add) do
+         tab[k] = v
       end
    end
    return ret
