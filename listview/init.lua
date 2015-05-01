@@ -215,8 +215,9 @@ local paged_chrome = require("paged_chrome")
 function Public.new_Chrome(log, where, default_name)
    assert(log and where)
    return { default_name = default_name or "search",
-            search = paged_chrome.templated_page(Public.new_Search(log, where)),
-            aboutChrome = paged_chrome.templated_page(Public.new_AboutChrome(log, where)),
+            search = paged_chrome.templated_page(Public.new_Search(log, where), "search"),
+            aboutChrome = paged_chrome.templated_page(Public.new_AboutChrome(log, where),
+                                                      "aboutChrome"),
    }
 end
 
