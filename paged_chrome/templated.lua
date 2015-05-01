@@ -14,15 +14,8 @@ local templated_page_metatable = {
    __index = function(self, key)
       local vals = {
          html = function(args, view, meta)
-            local pattern = self.page.repl_pattern
-            if not pattern then  -- TODO just have `templated_page` do this?
-               if self.page.asset then
-                  pattern = self.page:asset(self.page.name, ".html")
-               else
-                  pattern = Public.asset(self.page.name, ".html")
-               end
-            end
-            return c.full_gsub(pattern, self.page:repl_list(args, view, meta))
+            return c.full_gsub(self.page.repl_pattern,
+                               self.page:repl_list(args, view, meta))
          end,
          init = function(_, view, _, _)
             if not self.done then  -- Just attach javascript as soon as possible.
@@ -45,8 +38,20 @@ local templated_page_metatable = {
 --                                  if none -> a simularly named asset is used.
 -- `repl_list(args, view, meta)`,   method returning replacement rules.
 -- `to_js`                          lua functions accessible to javascript.
-function Public.templated_page(page)
-   assert(page)
+function Public.templated_page(page, name)
+   if page.name then  -- Ensure set name.
+      assert( not name or page.name == name )
+   else
+      page.name = name
+   end
+
+   if not page.repl_pattern then  -- Ensure pattern.
+      if page.asset then
+         page.repl_pattern = page:asset(page.name, ".html")
+      else
+         page.repl_pattern = Public.asset(page.name, ".html")
+      end      
+   end
    return setmetatable({page = page}, templated_page_metatable)
 end
 
