@@ -1,12 +1,29 @@
-TODO
+# Bookmarks
+Using listview,(and all its search functions) and with added data-uris.
 
-Adds bookmarks and transparent mirroring to the history table.
+## Installing
+Needs access to the same directories as listviewHistory,
+otherwise, in `~/.config/luakit/rc.lua`, do
+`require listview.bookmarks.chrome"`.
 
-These bookmarks are to have data-uri's where users can put their own
-information.
+## TODO
 
-Not yet clear where adding tables will end, infact, i intend to incorporate
-bookmarks info into history searches and vice-versa.
+* Gui able to *change* bookmarks. (rather than just add)
 
-Neither is it clear to me how to make it extendable nicely. Hence i just
-called it "more".
+* Importing bookmarks from existing system. (that are not in there yet)
+
+* Bindings for adding bookmarks.
+
+  + I dont *quite* like how the existing bookmarks "goes to its page"
+    to fill in data.. Maybe we need split-screen so you can do it,
+    and then un-split the screen, or something.
+
+* Way to add functions to automatically assign data-uris.
+  + A way to look at files behind data URIs. Like a longer description.
+
+* Make a more elaborate history, that looks at other info too. In this
+  case, whether bookmarked.
+
+* Want a way help people "characterize" things for their own memory?
+  
+  Perhaps "not for" bookmarks though!

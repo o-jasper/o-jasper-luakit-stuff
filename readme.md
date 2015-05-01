@@ -13,10 +13,10 @@ just my project. Just not-clogging the namespace, and getting all the damn
 things in one repo.
 
 ## Principles
-In order to keep things easy for others to use/extend too, need more
-principles. This is largely still TODO..
+In order to keep things easy for others to use/extend too, need to try
+make things in a principled way. **I am not sure how to best do this yet.**
 
-* For extension, never require knowledge about the metatables i am using.
+* For extension, never *require* knowledge about the metatables i am using.
 
   Basically, whenever the "user"(still a programmer) provides an object,
   the reference will just tell him what members that object should have.
@@ -26,8 +26,9 @@ principles. This is largely still TODO..
   
 * Namespace everything. TODO: do this to the listview.
   
-* *TODO* similar for how objects are extended.. Needs to be more robust
-  and clear.
+* Users still may need to extend objects i create, and to do it
+  with the fewest lines of code, that might imply needing knowledge
+  about how the metatables work.
   
 # License
 

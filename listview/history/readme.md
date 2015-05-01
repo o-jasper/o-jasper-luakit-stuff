@@ -16,15 +16,16 @@ directory, for instance:
     ln -s path_to_/o-jasper-luakit-stuff/listview
     ln -s path_to_/o-jasper-luakit-stuff/o_jasper_common
     ln -s path_to_/o-jasper-luakit-stuff/paged_chrome
-    # Currently the socket lua lib might be needed.(todo)
 
-And then in `~/.config/luakit/rc.lua`, do `require "hist_n_bookmarks.chrome"`
+It also needs the socket package.. Damn lua doesnt come with millisecond times.
+
+And then in `~/.config/luakit/rc.lua`, do `require listview.history.chrome"`
 
 Then, hopefully it works. 
 Saw [sort-of a plugin system](https://github.com/mason-larobina/luakit-plugins),
 should look at that.
 
 ## TODO
-* Doesnt have a remove button like the one that is included.
-* Hmm, some of the stuff requires the `socket` lua lib for millisecond times,
-  but this afaik should not require that.
+* More elaborate version that will take stuff together from the different
+  info in the SQL db.
+  

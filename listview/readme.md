@@ -31,13 +31,22 @@ These are entirely redefinable.
 In the future there might be a second input with default additions to the
 search. For instance `-tags:hide` to hide things defaultly.
 
+## Install
+This is a library of sorts. Install it by making the directory available.
+I.e. by symlinking.
+
+The subdirectories history and bookmarks(latter not ready for use)
+actually do something.
+
 ## TODO
 
 * Combine multiple tables?
 
 * Document better.
 
-* "Stored search/sql-appends" so that users can create different topics.
+* Make the "stored search/sql-appends" creatable via the GUI.
+
+  + Add way to do raw-sql from there too?(probably not from GUI)
 
 * Put the search term in the address bar, or at least possibly, 
   so people can link to their searches...
@@ -45,12 +54,9 @@ search. For instance `-tags:hide` to hide things defaultly.
   However a malicious link can mess with the SQL database. Perhaps alternatively
   just have the hash of a search stored somewhere, connected to the search.
   Or perhaps possible to only allow it manually.
-  
-  Add a command to search in the history.
 
 * (Optional)continuous scrolling, and other things to make looking at results
   nicer. (keywords in the search should override? indicate that it is overridden?)
-  Possibly instead of "Next 20", "20 more".
 
 * Selecting multiple in one click with shift.
 
