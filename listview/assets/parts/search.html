@@ -1,5 +1,6 @@
 <input id="search_input" oninput="touch_search();" onsubmit="search()" class="live">
   <button onclick="search()">Search</button><br>
+{%below_search}
 <button id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
 <button id="toggle_addsearch_shown" onclick="set_addsearch_shown(!addsearch_shown);">BUG</button>
 <button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
@@ -22,7 +23,9 @@ I
     <button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button><br>
     <button id="toggle_sql_locked" onclick="set_sql_locked(!sql_locked);">BUG</button>
   </span>
+  {%above_sql}
   <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();"></textarea>
+  {%below_sql}
 </span>
 <span id="actions_panel"><br>
   <span id= "verified_area">
@@ -33,3 +36,4 @@ I
   </span>
   {}
 </span>
+{%below_acts}

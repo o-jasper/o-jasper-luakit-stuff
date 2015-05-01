@@ -129,11 +129,14 @@ local mod_Search = {
       local sql_shown, latest_query = true, self.log.latest_query or ""
       return setmetatable(
          {  title = string.format("%s:%s", self.chrome_name, self.name),
-            
             latestQuery   = latest_query,
             table_name    = self.log.values.table_name,
             cycleCnt = self.limit_step,
             sqlShown = self:config().sql_shown and "true" or "false",
+
+            above_title = " ", below_title = " ", below_search = " ", 
+            above_sql = " ", below_sql = " ",
+            below_acts = " ",
          }, self:repl_list_meta(args))
    end,
 }
