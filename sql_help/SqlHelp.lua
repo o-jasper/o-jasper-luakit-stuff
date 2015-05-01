@@ -375,36 +375,69 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       end
       return list
    end,   
+
+   cmd_dict = {
+      enter = function(self)
+         return string.format("INSERT INTO %s VALUES (%s)",
+                              self.values.table_name, qmarks(#self.values.row_names))
+      end,
+      selectid = function(self)
+         return string.format("SELECT %s FROM %s WHERE %s == ?",
+                              self.values.idname, self.values.table_name,
+                              self.values.idname)
+      end,
+      update = function(self)
+         return string.format("UPDATE %s SET %s WHERE %s == ",
+                              self.values.table_name,
+                              table.concat(self.values.row_names, ", "),
+                              self.values.idname,
+                              qmarks(#self.values.row_names))
+      end,
+      tags_insert = function(self)
+         return string.format([[INSERT INTO %s VALUES (?, ?);]],
+                              self.values.taggings)
+      end,
+      delete_entry_id = function(self)
+         return string.format("DELETE FROM %s WHERE %s == ?",
+                              self.values.table_name, self.values.idname)
+      end,
+      delete_tags_id = function(self)
+         return string.format("DELETE FROM %s WHERE to_%s == ?",
+                              self.values.taggings, self.values.idname)
+      end,
+   },
+
+   sql_compiled = {},
    
+   sqlcmd = function(self, what)
+      local got = self.sql_compiled[what]
+      if got then return got end
+      got = self.db:compile(self.cmd_dict[what](self))
+      getmetatable(self).__index.sql_compiled[what] = got
+      return got
+   end,
+
    -- Add an entry.
    enter = function(self, entry)
       assert(self.values.table_name and self.values.row_names)
       
-      local ret = {}
-      local sql = string.format("INSERT INTO %s VALUES (%s)",
-                                self.values.table_name, qmarks(#self.values.row_names))
-      ret.add = self.db:exec(sql, self:args_in_order(entry))
+      local ret = { add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
       -- And all the tags, if we do those.
       if entry.tags and #entry.tags > 0 and self.values.taggings then
          self.tags_last = cur_time.raw()  -- Note time last changed.
-         local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
-                                           self.values.taggings)
+         local tags_insert = self:sqlcmd("tags_insert")
          ret.tags = {}
          for _, tag in pairs(entry.tags) do
-            table.insert(ret.tags, self.db:exec(tags_insert, 
-                                                {entry[self.values.idname], tag}))
+            table.insert(ret.tags, tags_insert:exec({entry[self.values.idname], tag}))
          end
       end
       return ret
    end,
    -- Modify an entry.
+   -- TODO doesnt do tags.. Probably simpler to just delete-and-re-add on same id?
    update = function(self, entry)
       if not entry.id then return nil end
-      -- See what is here now.
-      local sqlget = string.format("SELECT %s FROM %s WHERE %s == ?",
-                                   self.values.idname, self.values.table_name,
-                                   self.values.idname)
-      local got = self.db:exec(sqlget, {entry.id})
+      local got = self:sqlcmd("selectid"):exec(sqlget, {entry.id})
       if #got == 1 then
          self:force_update(entry)
       end
@@ -415,24 +448,15 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    force_update = function(self, entry)
-      local sqlset = string.format("UPDATE %s SET %s WHERE %s == ",
-                                   self.values.table_name,
-                                   table.concat(self.values.row_names, ", "),
-                                   self.values.idname,
-                                   qmarks(#self.values.row_names))
-      return self.db:exec(sqlset, self:args_in_order(entry))
-   end
+      return self:sqlcmd("update"):exec(self:args_in_order(entry))
+   end,
 
    -- Delete an entry.
-   delete_id = function(self, id, table_name)
-      table_name = table_name or self.values.table_name
-      self.db:exec(string.format("DELETE FROM %s WHERE %s == ?",
-                                 table_name, self.values.idname),
-                   { id })
-      
+   delete_id = function(self, id)
+      self:sqlcmd("delete_entry_id"):exec({id})
+
       if self.values.taggings then
-         self.db.exec(string.format("DELETE FROM ? WHERE to_%s == ?",self.values.idname),
-                      { self.values.taggings, id })
+         self:sqlcmd("delete_tags_id"):exec({id})
       end
    end,
 
