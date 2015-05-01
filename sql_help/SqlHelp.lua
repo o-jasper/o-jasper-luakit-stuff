@@ -375,7 +375,11 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       just_tags = function(self)
          return string.format("SELECT tag FROM %s WHERE to_id == ?", self.values.taggings)
       end,
-      
+      has_tag = function(self)
+         return string.format("SELECT tag FROM %s WHERE to_id == ? AND %s == ?",
+                              self.values.taggings, self.values.tagname)
+      end,
+
       enter = function(self)
          return string.format("INSERT INTO %s VALUES (%s)",
                               self.values.table_name, qmarks(#self.values.row_names))
@@ -423,6 +427,12 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
          table.insert(tags, el.tag)
       end
       return tags      
+   end,
+
+   has_tag = function(self, id, tagname)
+      local got = self:sqlcmd("has_tag"):exec({id, tagname})
+      assert(not got or #got < 2)  -- Otherwise.. i dunno.
+      return #got == 1
    end,
 
    -- Add an entry.

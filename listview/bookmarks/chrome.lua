@@ -24,7 +24,7 @@ local topics    = config.topics or {"entity", "idea", "project", "data_source",
 
 local function default_data_uri_fun(entry)
    for _,name in pairs(topics) do
-      if entry:has_tag(name) then
+      if bookmarks:has_tag(entry.id, name) then
          -- TODO file-appropriatize the title.
          local dir = string.format("%s/%s/%s", topicsdir, name, entry.title)
          return dir
@@ -79,6 +79,8 @@ local mod_BookmarksSearch = {
 }
 
 local BookmarksSearch = c.metatable_of(c.copy_meta(listview.Search, mod_BookmarksSearch))
+
+assert(mod_BookmarksSearch.to_js.manual_enter)
 
 local function mk_page(meta, name)
    local page = setmetatable({where="listview/bookmarks", log=bookmarks}, meta)

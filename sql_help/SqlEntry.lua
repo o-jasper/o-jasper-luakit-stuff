@@ -18,6 +18,10 @@ local SqlEntry = {
       return self.origin:just_tags(self[self.values.idname])
    end,
    
+   has_tag = function(self, tagname)
+      return self.origin:has_tag(self[self.values.idname], tagname)
+   end,
+
    ms_t = function(self)
       return math.floor(self[self.values.time]*self.values.timemul)
    end,
