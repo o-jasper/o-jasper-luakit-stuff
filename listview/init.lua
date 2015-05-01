@@ -123,12 +123,20 @@ local Public = {
          return function() return self:asset(what, kind) end
       end,
 
-      repl_list = function(self, args, _, _)
+      repl_list_meta = function(self, args)
          return {
-            common_js     = self:asset("common", ".js"),
-            stylesheet    = self:asset("style", ".css"),
-            title = string.format("%s:%s", self.chrome_name, self.name),
+            __index = function(kv, key)
+               if string.match(key, "[/_%w]") then
+                  return self:asset(key, "")
+               end
+            end,
          }
+      end,
+
+      repl_list = function(self, args, _, _)
+         return setmetatable(
+            {  title = string.format("%s:%s", self.chrome_name, self.name),
+            }, self:repl_list_meta())
       end,
       },
 }
@@ -156,42 +164,39 @@ local mod_Search = {
    repl_list = function(self, args, _, _)
       local query = self:total_query("")
       local sql_shown, latest_query = true, self.log.latest_query or ""
-      return {
-         common_js     = self:asset("common", ".js"),
-         stylesheet    = self:asset("style", ".css"), -- TODO These are from base..
-         title = string.format("%s:%s", self.chrome_name, self.name),
-         search_js     = self:asset("search", ".js"),
-
-         latestQuery   = latest_query,
-         table_name    = self.log.values.table_name,
-         searchInput   = self:asset("parts/search"),
-         search_initial_js = self:asset("parts/search_initial", ".js"),
-         cycleCnt = self.limit_step,
-         sqlShown = self:config().sql_shown and "true" or "false",
-      }
+      return setmetatable(
+         {
+            title = string.format("%s:%s", self.chrome_name, self.name),
+            
+            latestQuery   = latest_query,
+            table_name    = self.log.values.table_name,
+            cycleCnt = self.limit_step,
+            sqlShown = self:config().sql_shown and "true" or "false",
+         }, self:repl_list_meta(args))
    end,
 }
 Public.Search = c.copy_meta(Public.Base, mod_Search)
 
-local mod_Chrome = {
+local mod_AboutChrome = {
    repl_list = function(self, args, _, _)
-      return setmetatable({
-                             title = string.format("%s:%s", self.chrome_name, self.name),
-                             stylesheet    = self:asset("style", ".css"),
-                             --raw_summary = html_list.keyval({self.log.values})
-                       },
-                          {__index=function(_, key)
-                              if self.log.values[key] then
-                                 return self.log.values[key]
-                              elseif key == "raw_summary" then
-                                 return c.tableText(self.log.values,
-                                                    "&nbsp;&nbsp;", "","<br>")
-                              end
-                          end
-                          })
+      return setmetatable(
+         {
+            title         = string.format("%s:%s", self.chrome_name, self.name),
+         },
+         {__index=function(kv, key)
+             if self.log.values[key] then
+                return self.log.values[key]
+             elseif key == "raw_summary" then
+                return c.tableText(self.log.values,
+                                   "&nbsp;&nbsp;", "","<br>")
+             else
+                return Public.Base.repl_list_meta(self, args)(kv, key)
+             end
+         end
+         })
    end,
 }
-Public.AboutChrome = c.copy_meta(Public.Base, mod_Chrome)
+Public.AboutChrome = c.copy_meta(Public.Base, mod_AboutChrome)
 
 local listview_metatables = {}  -- Prep metatables.
 for k,v in pairs(Public) do Public[k] = c.metatable_of(v) end

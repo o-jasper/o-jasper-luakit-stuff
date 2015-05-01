@@ -1,4 +1,4 @@
---  Copyright (C) 27-04-2015 Jasper den Ouden.
+--  Copyright (C) 30-04-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -27,8 +27,8 @@ local mod_Enter = {
                title = inp.title,
                desc = inp.desc,
                data_uri = inp.data_uri,  -- Empty strings are can be auto-reinterpreted.
-               
-               tags = lousy.util.string.split(inp.tags, "[,; ]+") --(these are not done directly)
+               --(these are not done directly)
+               tags = lousy.util.string.split(inp.tags, "[,; ]+")
             }
             local ret = self.log:enter(add)
             for k,v in pairs(ret) do print(k,v) end
@@ -37,13 +37,11 @@ local mod_Enter = {
 
       -- TODO show that the default data_uri would be.
    },
-   repl_list = function(self, view, meta)
+   repl_list = function(self, args,_,_)
       -- TODO
-      return { title = "Add bookmark",
-               common_js = self:asset("common", ".js"),
-               bookmarks_js = self:asset("bookmarks", ".js"),
-               part_enter = self:asset("parts/enter"),
-      }
+      return setmetatable(
+         { title = "Add bookmark",
+         }, self:repl_list_meta(args))
    end,
 }
 

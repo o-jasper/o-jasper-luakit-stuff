@@ -25,7 +25,11 @@ I
   <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();"></textarea>
 </span>
 <span id="actions_panel"><br>
-  <button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
-  <button id="verify_button" onclick="verify();">VerifyThis</button>
-  <button id="delete_selected" onclick="do_next('delete_selected')">Delete<span id="delcnt"></span></button>
+  <span id= "verified_area">
+    <button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
+    <button id="verify_button" onclick="verify();">VerifyThis</button>
+    <button id="delete_selected" onclick="do_next('delete_selected')">Delete<span id="delcnt"></span>
+    </button>
+  </span>
+  {}
 </span>

@@ -46,10 +46,11 @@ function Public.values_now_set(tab)
    return ret
 end
 
+-- TODO.. the pattern is a bit arbitrary.
 function Public.full_gsub(str, subst)  -- Perhaps something for lousy.util.string
    local n, k = 1, 0
    while n > 0 and k < 64 do
-      str, n = string.gsub(str, "{%%([_%w]+)}", subst)
+      str, n = string.gsub(str, "{%%([_./%w]+)}", subst)
       if k%4 == 0 then  -- For some reason n does not tick to zero, check for matches.
          local any = false
          for k,_ in pairs(subst) do 

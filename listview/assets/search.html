@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <title>{%title}</title>
-    <style type="text/css">{%stylesheet}</style>
-    <script type="text/javascript">{%common_js}</script>
-    <script type="text/javascript">{%search_js}</script>
+    <style type="text/css">{%style.css}</style>
+    <script type="text/javascript">{%common.js}</script>
+    <script type="text/javascript">{%search.js}</script>
 </head>
 <body>
 
@@ -13,7 +13,7 @@
 
 <h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
   <span class="minor" id="cnt"></span></h3>
-{%searchInput}
+{%parts/search.html}
 
 <span id="list"></span>
 
@@ -22,7 +22,7 @@
 search_cnt: <span id="search_cnt">1</span>
 </p>
 
-<script type="text/javascript">{%search_initial_js}</script>
+<script type="text/javascript">{%parts/search_initial.js}</script>
 <p><button id="cycle_forw2" onclick="cycle_results()">Next {%cycleCnt} <b>&gt;&gt;</b></button></p>
 </body>
 </html>
