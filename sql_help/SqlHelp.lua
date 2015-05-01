@@ -370,7 +370,12 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       return list
    end,   
 
+   -- Non-search plain commands,
    cmd_dict = {
+      just_tags = function(self)
+         return string.format("SELECT tag FROM %s WHERE to_id == ?", self.values.taggings)
+      end,
+      
       enter = function(self)
          return string.format("INSERT INTO %s VALUES (%s)",
                               self.values.table_name, qmarks(#self.values.row_names))
@@ -409,6 +414,15 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       got = self.db:compile(self.cmd_dict[what](self))
       getmetatable(self).__index.sql_compiled[what] = got
       return got
+   end,
+
+   just_tags = function(self, id)
+      -- Get the tags.
+      local tags = {}
+      for _, el in pairs(self:sqlcmd("just_tags"):exec({id})) do
+         table.insert(tags, el.tag)
+      end
+      return tags      
    end,
 
    -- Add an entry.

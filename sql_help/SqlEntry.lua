@@ -15,15 +15,7 @@ local SqlEntry = {
    tagfinder=[[]],
    
    tags = function(self)
-      local origin = self.origin
-      -- Get the tags.
-      self.tags = {}
-      local sql = string.format("SELECT tag FROM %s WHERE to_id == ?", self.values.taggings)
-      local got = origin.db:exec(sql, {self.id})
-      for _, el in pairs(got) do
-         table.insert(self.tags, el.tag)
-      end
-      return self.tags
+      return self.origin:just_tags(self[self.values.idname])
    end,
    
    ms_t = function(self)
