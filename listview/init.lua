@@ -128,8 +128,7 @@ local mod_Search = {
       local query = self:total_query("")
       local sql_shown, latest_query = true, self.log.latest_query or ""
       return setmetatable(
-         {
-            title = string.format("%s:%s", self.chrome_name, self.name),
+         {  title = string.format("%s:%s", self.chrome_name, self.name),
             
             latestQuery   = latest_query,
             table_name    = self.log.values.table_name,
@@ -143,8 +142,7 @@ Public.Search = c.copy_meta(Public.Base, mod_Search)
 local mod_AboutChrome = {
    repl_list = function(self, args, _, _)
       return setmetatable(
-         {
-            title         = string.format("%s:%s", self.chrome_name, self.name),
+         {   title = string.format("%s:%s", self.chrome_name, self.name),
          },
          {__index=function(kv, key)
              if self.log.values[key] then
@@ -153,7 +151,7 @@ local mod_AboutChrome = {
                 return c.tableText(self.log.values,
                                    "&nbsp;&nbsp;", "","<br>")
              else
-                return Public.Base.repl_list_meta(self, args)(kv, key)
+                return Public.Base.repl_list_meta(self, args).__index(kv, key)
              end
          end
          })
