@@ -34,6 +34,11 @@ local function qmarks(n)  -- Makes a string with a number of question marks in i
    return str
 end
 
+-- NOTE Is actually not less LOC...
+-- local function formatfun(str, inputfun)
+--   return function(...) return string.format(str, inputfun(...)) end
+-- end
+
 local SqlHelp = {
    values = {
       textlike = {"title", "uri", "desc"},
