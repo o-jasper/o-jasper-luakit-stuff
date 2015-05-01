@@ -42,6 +42,7 @@ function Public.templated_page(page, name)
    if page.name then  -- Ensure set name.
       assert( not name or page.name == name )
    else
+      assert(name)
       page.name = name
    end
 
@@ -50,8 +51,9 @@ function Public.templated_page(page, name)
          page.repl_pattern = page:asset(page.name, ".html")
       else
          page.repl_pattern = Public.asset(page.name, ".html")
-      end      
+      end
    end
+   -- The page object contains the entire interface it is based on.(still available)
    return setmetatable({page = page}, templated_page_metatable)
 end
 

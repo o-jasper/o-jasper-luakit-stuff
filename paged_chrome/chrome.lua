@@ -18,7 +18,7 @@ local function paged_chrome(chrome_name, pages)
                  -- TODO.. just use meta.path as the path!?
                  local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
                  page.chrome_name = chrome_name
-                 page.name = use_name
+                 page.page_list = pages
                  view:load_string(page.html(nil, view, meta), use_uri)
                  
                  function on_first_visual(view, status)
