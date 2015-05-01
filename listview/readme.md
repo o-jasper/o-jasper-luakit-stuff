@@ -63,3 +63,5 @@ actually do something.
 * Get sensible location of selection immediately the main search.
 
 * Using keys to navigate gui.
+
+* More customizability, make it prettier.

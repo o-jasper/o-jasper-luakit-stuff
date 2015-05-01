@@ -11,7 +11,7 @@ var add_gui;
 function set_add_gui(yes) {
     add_gui = yes;
     var toggle = ge('toggle_add_gui');
-    toggle.innerText = yes ? "Stop bookmarks" : "Add bookmarks";
+    toggle.innerText = yes ? "Stop bookmark" : "Add bookmark";
     ge('entering_area').hidden = !yes;
 }
 set_add_gui(false);
