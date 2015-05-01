@@ -134,9 +134,10 @@ local mod_Search = {
             cycleCnt = self.limit_step,
             sqlShown = self:config().sql_shown and "true" or "false",
 
-            above_title = " ", below_title = " ", below_search = " ", 
+            above_title = " ", below_title = " ", right_of_title = " ",
+            below_search = " ",
             above_sql = " ", below_sql = " ",
-            below_acts = " ",
+            below_acts = " ", after = " ",
          }, self:repl_list_meta(args))
    end,
 }

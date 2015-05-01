@@ -1,4 +1,4 @@
---  Copyright (C) 30-04-2015 Jasper den Ouden.
+--  Copyright (C) 01-05-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -70,6 +70,10 @@ local mod_BookmarksSearch = {
    repl_list = function(self, args, view, meta)
       local got = listview.Search.repl_list(self, args, view, meta)
       got.above_title = self:asset("parts/enter_span")
+      got.right_of_title = [[&nbsp;&nbsp;
+<button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
+]]
+      got.after = [[<script type="text/javascript">{%bookmarks.js}</script>]]
       return got
    end,
 }
