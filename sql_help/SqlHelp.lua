@@ -9,8 +9,6 @@
 --  Likely good to rename the concept, and have ability to use the concept
 --   multiple times, the same way.
 
--- TODO pre-compile some of the sql-queries.
-
 local metatable_of = require("o_jasper_common.meta").metatable_of
 local cur_time = require("o_jasper_common.cur_time")
 
@@ -180,12 +178,6 @@ local SqlHelp = {
                                            table_name or self.values.table_name))
    end,
    
-   -- Deleting. -- TODO problem is.. then you want to get all the tags too.
-   --   delete = function(self, table_name)
-   --      table.insert(self.cmd, string.format([[DELETE FROM %s m]],
-   --                                           table_name or self.values.table_name))
-   --   end,
-   
    -- Lots of stuff to build searches from.
    equal_one_or_list = function(self, which, input)
       if type(input) == "table" then
@@ -278,9 +270,6 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    -- The actual search build from it.
-   -- TODO thing is.. kindah becomes a myriad of things it has do..
-   --  To keep things organized, separate this off into a file
-   ---  particularly for this purpose.
    search = function(self, str)
       local tagged_list = searchlike.searchlike(searchlike.portions(str),
                                                 self.searchinfo.matchable)
@@ -464,10 +453,6 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
          self:sqlcmd("delete_tags_id"):exec({id})
       end
    end,
-
-   -- Change an entry.
-   -- TODO use update and stuff.
-   -- update_id
 }
 
 local function copy_matchfun(fr, to)
