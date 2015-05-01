@@ -377,43 +377,36 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,   
    
    -- Add an entry.
-   enter = function(self, add)
+   enter = function(self, entry)
       assert(self.values.table_name and self.values.row_names)
       
       local ret = {}
       local sql = string.format("INSERT INTO %s VALUES (%s)",
                                 self.values.table_name, qmarks(#self.values.row_names))
-      ret.add = self.db:exec(sql, self:args_in_order(add))
+      ret.add = self.db:exec(sql, self:args_in_order(entry))
       -- And all the tags, if we do those.
-      if add.tags and #add.tags > 0 and self.values.taggings then
+      if entry.tags and #entry.tags > 0 and self.values.taggings then
          self.tags_last = cur_time.raw()  -- Note time last changed.
          local tags_insert = string.format([[INSERT INTO %s VALUES (?, ?);]],
                                            self.values.taggings)
          ret.tags = {}
-         for _, tag in pairs(add.tags) do
-            table.insert(ret.tags, self.db:exec(tags_insert, {add[self.values.idname], tag}))
+         for _, tag in pairs(entry.tags) do
+            table.insert(ret.tags, self.db:exec(tags_insert, 
+                                                {entry[self.values.idname], tag}))
          end
       end
       return ret
    end,
    -- Modify an entry.
-   update = function(self, modified)
-      if not modified.id then return nil end
+   update = function(self, entry)
+      if not entry.id then return nil end
       -- See what is here now.
       local sqlget = string.format("SELECT %s FROM %s WHERE %s == ?",
                                    self.values.idname, self.values.table_name,
                                    self.values.idname)
-      local got = self.db:exec(sqlget, {modified.id})
-      assert(got)
+      local got = self.db:exec(sqlget, {entry.id})
       if #got == 1 then
-         local sqlset = string.format("UPDATE %s SET %s WHERE %s == ",
-                                      self.values.table_name,
-                                      table.concat(self.values.row_names, ", "),
-                                      self.values.idname,
-                                      qmarks(#self.values.row_names))
-         return self.db:exec(sqlset, self:args_in_order(modified))
-      else
-         return nil  -- Failed one/too many.
+         self:force_update(entry)
       end
    end,
    update_or_enter = function(self, entry)
@@ -421,6 +414,15 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       if got then return got else return self:enter(entry) end
    end,
    
+   force_update = function(self, entry)
+      local sqlset = string.format("UPDATE %s SET %s WHERE %s == ",
+                                   self.values.table_name,
+                                   table.concat(self.values.row_names, ", "),
+                                   self.values.idname,
+                                   qmarks(#self.values.row_names))
+      return self.db:exec(sqlset, self:args_in_order(entry))
+   end
+
    -- Delete an entry.
    delete_id = function(self, id, table_name)
       table_name = table_name or self.values.table_name
