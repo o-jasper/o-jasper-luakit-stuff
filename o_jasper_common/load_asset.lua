@@ -13,25 +13,55 @@ end
 
 local memorize_data = {}  -- Keeps track of what we already got.
 
--- TODO should also have `get_asset_path`
+
+local Public = {}
+
+local function open_asset(path)
+   for _, dir in pairs(search_dirs) do
+      local got = io.open(dir .. path, "r")
+      if got then return got, dir end
+   end
+end
 
 -- Search all the assets, and load it if exists.
-local function load_asset(path, dont_memorize)
+function Public.load_asset(path, dont_memorize)
    if not dont_memorize and memorize_data[path] then
       return memorize_data[path]
    end
-   for _, dir in pairs(search_dirs) do
-      local got = io.open(dir .. path, "r")
-      if got then
-         local ret = got:read("*a")
-         if not dont_memorize then
-            memorize_data[path] = ret
-         end
-         got:close()
-         return ret
+   local got, _ = open_asset(path)
+   if got then
+      local ret = got:read("*a")
+      if not dont_memorize then
+         memorize_data[path] = ret
       end
+      got:close()
+      return ret
    end
-   return nil
 end
 
-return load_asset
+-- Search assets, return directory if exists.
+function Public.asset_dir(path)
+   local got, dir = open_asset(path)
+   if got then
+      got:close()
+      return dir
+   end
+end
+
+function Public.load_search_asset(where, path, dont_memorize)
+   if type(where) ~= "table" then where = {where} end
+   for _, where_path in pairs(where) do
+      local got = Public.load_asset(where_path .. "/" .. path, dont_memorize)
+      if got then return got end
+   end
+end
+
+function Public.search_asset_dir(where, path)
+   if type(where) ~= "table" then where = {where} end
+   for _, where_path in pairs(where) do
+      local got = Public.asset_dir(where_path ..path)
+      if got then return got end
+   end
+end
+
+return Public

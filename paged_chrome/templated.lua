@@ -6,12 +6,8 @@ local Public ={}
 local c = require "o_jasper_common"
 
 function Public.asset(where, key)
-   if type(where) ~= "table" then where = {where} end
-   for _, path in pairs(where) do
-      local got = c.load_asset(path .. "/assets/" .. key)
-      if got then return got end
-   end
-   return string.format("ASSET NOT FOUND %s", key)
+   return c.load_search_asset(where, "/assets/" .. key) or
+      string.format("ASSET NOT FOUND %s", key)
 end
 
 local templated_page_metatable = {
