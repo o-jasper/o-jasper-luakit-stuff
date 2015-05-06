@@ -19,16 +19,21 @@ local function paged_chrome(chrome_name, pages)
                  local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
                  page.chrome_name = chrome_name
                  page.page_list = pages
-                 view:load_string(page.html(nil, view, meta), use_uri)
+                 view:load_string(page.html(meta, view), use_uri)
                  
-                 function on_first_visual(view, status)
-                    page.init(nil, view, meta)
-                    -- Hack to run until first visual.
-                    if status == "first-visual" then
-                       view:remove_signal("load-status", on_first_visual)
+                 if page.init ~= false then
+                    -- Performance much less important that quickly troubleshooting.
+                    assert(page.init ~= nil,
+                           [[If you dont need page initiation, set `page.init` to `false`]])
+                    function on_first_visual(view, status)
+                       page.init(meta, view)
+                       -- Hack to run until first visual.
+                       if status == "first-visual" then
+                          view:remove_signal("load-status", on_first_visual)
+                       end
                     end
+                    view:add_signal("load-status", on_first_visual)
                  end
-                 view:add_signal("load-status", on_first_visual)
               end)
 end
 
