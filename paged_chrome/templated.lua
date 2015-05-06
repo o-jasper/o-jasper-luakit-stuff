@@ -22,7 +22,7 @@ local templated_page_metatable = {
                   local got = obj.rl[key]
                   if got then
                      return got
-                  else
+                  elseif string.match(key, "[/_%w]") then
                      for _, path in pairs(self.page.where_list) do
                         local got = c.load_asset(path .. "/assets/" .. key .. ".html")
                         if got then return got end
