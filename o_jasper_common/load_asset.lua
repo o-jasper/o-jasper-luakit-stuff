@@ -13,6 +13,8 @@ end
 
 local memorize_data = {}  -- Keeps track of what we already got.
 
+-- TODO should also have `get_asset_path`
+
 -- Search all the assets, and load it if exists.
 local function load_asset(path, dont_memorize)
    if not dont_memorize and memorize_data[path] then

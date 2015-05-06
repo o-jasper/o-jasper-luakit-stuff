@@ -7,22 +7,29 @@ local c = require "o_jasper_common"
 
 function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
    return c.load_asset("assets/" .. what .. (kind or ".html"))
-      or "COULDNT FIND ASSET"
 end
+
+local real_asset = require "paged_chrome.asset"
 
 local templated_page_metatable = {
    __index = function(self, key)
       local vals = {
          html = function(args, view)
             local repl_list = self.page:repl_list(args, view)
-            if self.page.asset then
-               local function use_asset_too(obj, key)
-                  local got = obj.repl_list[key]
-                  if got then return got end
-
-                  return self.page:asset(key, ".html")
+            
+            if self.page.where_list then
+               local function asset_too(obj, key)
+                  local got = obj.rl[key]
+                  if got then
+                     return got
+                  else
+                     for _, path in pairs(self.page.where_list) do
+                        local got = c.load_asset(path .. "/assets/" .. key .. ".html")
+                        if got then return got end
+                     end
+                  end
                end
-               repl_list = setmetatable({repl_list=repl_list}, {__index = use_asset_too})
+               repl_list = setmetatable({rl=repl_list}, {__index = asset_too })
             end
             return c.full_gsub(self.page.repl_pattern, repl_list)
          end,

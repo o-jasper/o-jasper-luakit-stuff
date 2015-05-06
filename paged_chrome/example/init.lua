@@ -18,7 +18,11 @@ local templated = {
 <a style="font-size:70%" href="luakit://{%chrome_name}/direct">to direct</a>
 
 <span style="color:gray;font-size:70%">{%date}</span>
-<script>document.getElementById("add").innerText = get_str();</script>]],
+
+<p>{%auto}</p>
+
+<script>document.getElementById("add").innerText = get_str();</script>
+]],
    
    to_js = { 
       get_str = function() 
@@ -29,8 +33,10 @@ local templated = {
    },
    
    repl_list = function(args, view)
-      return { chrome_name = chrname, date=os.date() }
+      return { chrome_name = chrname, date = os.date() }
    end,
+
+   where_list = {"paged_chrome/example"}
 }
 
 local pages = {
