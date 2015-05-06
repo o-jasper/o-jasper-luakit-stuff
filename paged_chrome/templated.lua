@@ -6,16 +6,25 @@ local Public ={}
 local c = require "o_jasper_common"
 
 function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
-   return load_asset("assets/" .. what .. (kind or ".html"))
+   return c.load_asset("assets/" .. what .. (kind or ".html"))
       or "COULDNT FIND ASSET"
 end
 
 local templated_page_metatable = {
    __index = function(self, key)
       local vals = {
-         html = function(args, view, meta)
-            return c.full_gsub(self.page.repl_pattern,
-                               self.page:repl_list(args, view, meta))
+         html = function(args, view)
+            local repl_list = self.page:repl_list(args, view)
+            if self.page.asset then
+               local function use_asset_too(obj, key)
+                  local got = obj.repl_list[key]
+                  if got then return got end
+
+                  return self.page:asset(key, ".html")
+               end
+               repl_list = setmetatable({repl_list=repl_list}, {__index = use_asset_too})
+            end
+            return c.full_gsub(self.page.repl_pattern, repl_list)
          end,
          init = function(_, view, _, _)
             if not self.done then  -- Just attach javascript as soon as possible.
@@ -36,7 +45,7 @@ local templated_page_metatable = {
 -- Makes the above page-object      based on templates instead. Requires a:
 -- `repl_pattern`                   template in which replacements take place.
 --                                  if none -> a simularly named asset is used.
--- `repl_list(args, view, meta)`,   method returning replacement rules.
+-- `repl_list(args, view)`,   method returning replacement rules.
 -- `to_js`                          lua functions accessible to javascript.
 function Public.templated_page(page, name)
    if page.name then  -- Ensure set name.
