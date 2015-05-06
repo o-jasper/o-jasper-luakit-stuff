@@ -15,7 +15,7 @@ config.page = config.page or {}
 
 local function chrome_describe(log)
    assert(log)
-   local pages = listview.new_Chrome(log, "listview/history")
+   local pages = listview.new_Chrome(log, {"listview/history", "listview"})
    pages.search.limit_cnt = config.page.cnt or 20
    pages.search.limit_step = config.page.step or pages.search.step_cnt
    return pages

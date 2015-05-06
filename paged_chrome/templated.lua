@@ -6,10 +6,12 @@ local Public ={}
 local c = require "o_jasper_common"
 
 function Public.asset(where, key)
+   if type(where) ~= "table" then where = {where} end
    for _, path in pairs(where) do
-      local got = c.load_asset(path .. "/assets/" .. key .. ".html")
+      local got = c.load_asset(path .. "/assets/" .. key)
       if got then return got end
    end
+   return string.format("ASSET NOT FOUND %s", key)
 end
 
 local real_asset = require "paged_chrome.asset"

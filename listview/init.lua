@@ -127,18 +127,18 @@ local mod_Search = {
    repl_list = function(self, args, _, _)
       local query = self:total_query("")
       local sql_shown, latest_query = true, self.log.latest_query or ""
-      return setmetatable(
-         {  title = string.format("%s:%s", self.chrome_name, self.name),
-            latestQuery   = latest_query,
-            table_name    = self.log.values.table_name,
-            cycleCnt = self.limit_step,
-            sqlShown = self:config().sql_shown and "true" or "false",
-
-            above_title = " ", below_title = " ", right_of_title = " ",
-            below_search = " ",
-            above_sql = " ", below_sql = " ",
-            below_acts = " ", after = " ",
-         }, self:repl_list_meta(args))
+      return { 
+         title = string.format("%s:%s", self.chrome_name, self.name),
+         latestQuery   = latest_query,
+         table_name    = self.log.values.table_name,
+         cycleCnt = self.limit_step,
+         sqlShown = self:config().sql_shown and "true" or "false",
+         
+         above_title = " ", below_title = " ", right_of_title = " ",
+         below_search = " ",
+         above_sql = " ", below_sql = " ",
+         below_acts = " ", after = " ",
+      }
    end,
 }
 Public.Search = c.copy_meta(Public.Base, mod_Search)
@@ -154,8 +154,6 @@ local mod_AboutChrome = {
              elseif key == "raw_summary" then
                 return c.tableText(self.log.values,
                                    "&nbsp;&nbsp;", "","<br>")
-             else
-                return Public.Base.repl_list_meta(self, args).__index(kv, key)
              end
          end
          })
@@ -166,13 +164,15 @@ Public.AboutChrome = c.copy_meta(Public.Base, mod_AboutChrome)
 local listview_metatables = {}  -- Prep metatables.
 for k,v in pairs(Public) do Public[k] = c.metatable_of(v) end
 
+local function tablize(x) if type(x) ~= "table" then return {x} else return x end end
+
 function Public.new_Search(log, where)
    assert(log and where)
-   return setmetatable({log = log, where=where}, Public.Search)
+   return setmetatable({log = log, where=tablize(where)}, Public.Search)
 end
 function Public.new_AboutChrome(log, where)
    assert(log and where)
-   return setmetatable({log=log, where=where}, Public.AboutChrome)
+   return setmetatable({log=log, where=tablize(where)}, Public.AboutChrome)
 end
 
 local paged_chrome = require("paged_chrome")

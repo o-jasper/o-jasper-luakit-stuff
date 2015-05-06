@@ -19,7 +19,7 @@ local templated = {
 
 <span style="color:gray;font-size:70%">{%date}</span>
 
-<p>{%auto}</p>
+<p>{%auto.html}</p>
 
 <script>document.getElementById("add").innerText = get_str();</script>
 ]],

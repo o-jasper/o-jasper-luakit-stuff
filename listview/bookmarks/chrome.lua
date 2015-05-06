@@ -58,7 +58,7 @@ local mod_Enter = {
       -- TODO show what the default data_uri would be.
    },
    repl_list = function(self, args, _,_)
-      return setmetatable({ title = "Add bookmark", }, self:repl_list_meta(args))
+      return { title = "Add bookmark", }
    end,
 }
 local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
