@@ -1,13 +1,22 @@
-
-* *NOTE* it is likely better to try emulate an existing lua server system,
-  assuming one of them is well-thought out and has ajax or some such.
-  (i'd expect so)
+# Paged Chrome pages
 
 Two ways to define a page, the template-based one is better IMO, the former
 is "closer to what happens".
 
-If you do not use `view`, `meta`, you have a better shot at it being able
+If you do not use `view`, and stick to `args.path` have a better shot at it being able
 to work as served page.
+
+## Installing
+Make sure both `o_jasper_common` and `paged_chrome` is accessible.
+For instance, by symlinking the directories.
+
+Then just `paged_chrome = require "paged_chrome"`
+
+# Using
+`paged_chrome(chrome_name, table)` adds the chrome page to luakit.
+
+The table is one of pages by directory names, except for `default_name`,
+which indicates where to redirect if the page does not exist.
 
 ## Defining by template
 It is advised to use this interface, and then use `templated_page(page)`
@@ -15,33 +24,27 @@ to turn it into the object below.
 
 `page.to_js` dictionary of lua functions you want it to be able to use.
 
-`page.repl_list(args)` dictionary of values to replace in a template.
+`page.repl_list(args, view)` dictionary of values to replace in a template.
 
 `page.repl_pattern` is the template itself, just as a value. Can instead
 create the file `"assets/{%page_name}.html"`, where it looks alternatively.
 
 ## Paged chrome.
+This is the actual interface that is used, as said, the above is turned
+into this one via `templated_page(page)`
+
 `paged_chrome.paged_chrome(chrome_name, pages)` adds a chrome page, pages
 are stored at `paged_chrome_dict[]`, you can add more afterward.
 
 `pages.default_name` indicates a default page. Other ones are pages themselves;
 
-`page.html(args, view, meta)` should return the html of the page.
+`page.html(args, view)` should return the html of the page.
 
-`page.init(args, view, meta)` initialized the page.
+`page.init(args, view)` initialized the page.
 
-Here, `view`, `meta` are given as `chrome.add` has them in there. Likely it
-will just register javascript-accessible functions here.
-
-## Other
-
-`paged_chrome.asset(what,kind)` uses the `o_jasper_common` `load_asset`, but looks in
-the local `"assets/"` directory and `kind` is defaultly `.html`.
+## Example:
+See `example/init.lua`.
 
 ## TODO
 
-* The note above about being equivalent to a server is overriding.
-  
-  Might try hand at using Luvit and making the javascript bindings ajax-like.
-
-* If an `page.repl_list` entry is not found, what is best option?
+* Make the template-based one usable as a server. (ajax-like bindings)

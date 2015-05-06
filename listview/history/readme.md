@@ -17,7 +17,7 @@ directory, for instance:
     ln -s path_to_/o-jasper-luakit-stuff/o_jasper_common
     ln -s path_to_/o-jasper-luakit-stuff/paged_chrome
 
-It also needs the socket package.. Damn lua doesnt come with millisecond times.
+It also needs the socket package.. Lua doesnt come with millisecond times.
 
 And then in `~/.config/luakit/rc.lua`, do `require listview.history.chrome"`
 
