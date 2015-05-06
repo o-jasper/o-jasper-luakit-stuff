@@ -1,4 +1,6 @@
-local lib = require "ffi.tox.raw"
+-- Just stripping the preceeding `tox_` at the moment.
+
+local lib = require "raw"
 
 local funlist = {
    "version_major",
@@ -6,7 +8,7 @@ local funlist = {
    "version_patch",
    "version_is_compatible",
    "options_default",
-   "tox_options_new",
+   "options_new",
    "options_free",
    "bootstrap",
    "add_tcp_relay",
@@ -48,4 +50,3 @@ for _, name in pairs(funlist) do
    Public[name] = lib["tox_" .. name]
 end
 return Public
-                  

@@ -1,3 +1,3 @@
-local tox = require "raw"
+local tox = require "init"
 
-print(tox.tox_version_major(), tox.tox_version_minor(), tox.tox_version_minor)
+print(tox.version_major(), tox.version_minor(), tox.version_minor)
