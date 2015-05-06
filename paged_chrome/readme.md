@@ -43,7 +43,7 @@ are stored at `paged_chrome_dict[]`, you can add more afterward.
 `page.init(args, view)` initialized the page.
 
 ## Example:
-See `example/init.lua`.
+`example/init.lua` shows how to use both of the above.
 
 ## TODO
 

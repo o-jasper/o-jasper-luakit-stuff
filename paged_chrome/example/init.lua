@@ -1,17 +1,18 @@
 local paged_chrome = require"paged_chrome"
 
-local chrname = "pagedChromeExample"  --pointlessly illegal chars?
+local chrome_name = "pagedChromeExample"  --pointlessly illegal chars?
 
 local direct = {
    -- Suggest using just args.path, allows it to maybe be server-servable in the future.
    -- NOTE: 
    html = function(args, view)
       return string.format([[<p>Direct, no replacements.</p><hr>
-<a style="font-size:70%%" href="luakit://%s/templated">to templated</a>]], chrname)
+<a style="font-size:70%%" href="luakit://%s/templated">to templated</a>]], chrome_name)
    end,
    init = false,  -- To say we dont need an init.
 }
 
+-- This is the recommended way.
 local templated = {
    repl_pattern = [[<p>Templated, using replacements</p>
 <p id="add"></p><hr>
@@ -33,7 +34,7 @@ local templated = {
    },
    
    repl_list = function(args, view)
-      return { chrome_name = chrname, date = os.date() }
+      return { chrome_name = chrome_name, date = os.date() }
    end,
 
    where = {"paged_chrome/example"}
@@ -47,4 +48,4 @@ local pages = {
    templated = paged_chrome.templated_page(templated, "templated"),
 }
 
-paged_chrome.paged_chrome(chrname, pages)
+paged_chrome.paged_chrome(chrome_name, pages)
