@@ -14,8 +14,6 @@ function Public.asset(where, key)
    return string.format("ASSET NOT FOUND %s", key)
 end
 
-local real_asset = require "paged_chrome.asset"
-
 local templated_page_metatable = {
    __index = function(self, key)
       local vals = {
