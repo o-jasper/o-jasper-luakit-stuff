@@ -5,8 +5,11 @@ local Public ={}
 
 local c = require "o_jasper_common"
 
-function Public.asset(what, kind)  -- TODO get rid of listview.. somehow..
-   return c.load_asset("assets/" .. what .. (kind or ".html"))
+function Public.asset(where, key)
+   for _, path in pairs(where) do
+      local got = c.load_asset(path .. "/assets/" .. key .. ".html")
+      if got then return got end
+   end
 end
 
 local real_asset = require "paged_chrome.asset"
@@ -17,16 +20,13 @@ local templated_page_metatable = {
          html = function(args, view)
             local repl_list = self.page:repl_list(args, view)
             
-            if self.page.where_list then
+            if self.page.where then
                local function asset_too(obj, key)
                   local got = obj.rl[key]
                   if got then
                      return got
                   elseif string.match(key, "[/_%w]") then
-                     for _, path in pairs(self.page.where_list) do
-                        local got = c.load_asset(path .. "/assets/" .. key .. ".html")
-                        if got then return got end
-                     end
+                     return Public.asset(self.page.where, key)
                   end
                end
                repl_list = setmetatable({rl=repl_list}, {__index = asset_too })

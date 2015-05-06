@@ -36,7 +36,7 @@ local templated = {
       return { chrome_name = chrname, date = os.date() }
    end,
 
-   where_list = {"paged_chrome/example"}
+   where = {"paged_chrome/example"}
 }
 
 local pages = {
