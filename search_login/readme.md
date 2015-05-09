@@ -24,13 +24,6 @@ so you can organize that if you want to.
 
 ### Potential improvement
 
-* [Depends on this pull request](https://github.com/mason-larobina/luakit/pull/269)
-  If that is pulled you can probably ignore this point.
-  
-  Either get the relevant changes from that branch(`lib/lousy/init.lua` and 
-  `lib/lousy/load_asset.lua`), or you can
-  [change `local js = ..``](https://github.com/o-jasper/o-jasper-luakit-stuff/blob/master/search_login/init.lua#L39) to be a string with the contents of the `enter_pw.js` file.
-
 * **The search for the input forms does not succeed sufficiently**. It does
   have the option of you-pre-filling in the name, and selecting the password
   form manually.
@@ -50,6 +43,15 @@ so you can organize that if you want to.
 * Are these passwords floating in memory now a bit? Improvable?
 
 * Not very tested. Make issues if you encounter a bug.
+
+### Suggestion
+Defaultly `gpg-agent` only remembers the passphrase for ~5minutes,
+in `~/.gnupg/gpg-agent.conf` you can set `default-cache-ttl`. Seems like it
+applies equally on all keys, if you have keys that you dont want to cache
+for too long, i dont see the option/configuration for that at the moment.
+
+One way is to firejail it using `private` to give the browser its entire home
+directory.
 
 ### Other
 Heavily inspired on Matthias Beyers
