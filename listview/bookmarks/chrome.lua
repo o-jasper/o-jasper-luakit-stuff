@@ -34,6 +34,19 @@ end
 
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
+local function plus_cmd_add(ret, log)
+   if log.cmd_add then
+      ret.cmd_add_uri   = log.cmd_add.uri
+      ret.cmd_add_title = log.cmd_add.title
+      ret.cmd_add_gui = "true"
+      log.cmd_add = nil
+   else
+      ret.cmd_add_uri   = ""
+      ret.cmd_add_title = ""
+      ret.cmd_add_gui = "false"
+   end
+end
+
 local mod_Enter = {
    to_js = {
       manual_enter = function(self)
@@ -58,7 +71,9 @@ local mod_Enter = {
       -- TODO show what the default data_uri would be.
    },
    repl_list = function(self, args, _,_)
-      return { title = "Add bookmark", }
+      local ret = { title = "Add bookmark", }
+      plus_cmd_add(ret, self.log)
+      return ret
    end,
 }
 local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
@@ -74,6 +89,8 @@ local mod_BookmarksSearch = {
 <button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
 ]]
       got.after = [[<script type="text/javascript">{%bookmarks.js}</script>]]
+
+      plus_cmd_add(got, self.log)
       return got
    end,
 }
@@ -96,19 +113,26 @@ local bookmarks_paged = {
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
 
-if config.take_bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
+local take = config.take or {}
+
+if take.bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("bookmarks", bookmarks_paged)
 end
 
 -- Add bindings.
 local cmd = lousy.bind.cmd
 
-local function on_command(w, query)
-   bookmarks.latest_query = query
+local function cmd_bookmarks(w, query)
+   bookmarks.cmd_query = query  -- bit "global-value-ie"
    local v = w:new_tab("luakit://listviewBookmarks/search")
-   -- if query then  -- This would be without the nasty "global value" thing.
-   --  v:eval_js(string.format("ge('search').value = %q; search();", query))
-   -- end
 end
-add_cmds({ cmd("listviewBookmarks", on_command) })
-if config.take_bookmarks_cmd then add_cmds({ cmd("bookmarks", on_command) }) end
+add_cmds({ cmd("listviewBookmarks", cmd_bookmarks) })
+if take.bookmarks_cmd then add_cmds({ cmd("bookmarks", cmd_bookmarks) }) end
+
+
+local function cmd_bookmark_new(w, add)
+   bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title}
+   local v = w:new_tab(config.add_bookmark_page or "luakit://listviewBookmarks/search")
+end
+add_cmds({ cmd("listviewBookmark_new", cmd_bookmark_new) })
+if take.bookmark_cmd then add_cmds({ cmd("bookmark_new", cmd_bookmark_new) }) end

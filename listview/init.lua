@@ -126,10 +126,10 @@ local mod_Search = {
 
    repl_list = function(self, args, _, _)
       local query = self:total_query("")
-      local sql_shown, latest_query = true, self.log.latest_query or ""
+      local sql_shown, cmd_query = true, (self.log.cmd and self.log.cmd_query) or ""
       return { 
          title = string.format("%s:%s", self.chrome_name, self.name),
-         latestQuery   = latest_query,
+         latestQuery   = cmd_query,
          table_name    = self.log.values.table_name,
          cycleCnt = self.limit_step,
          sqlShown = self:config().sql_shown and "true" or "false",

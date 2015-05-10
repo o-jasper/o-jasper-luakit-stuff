@@ -14,4 +14,5 @@ function set_add_gui(yes) {
     toggle.innerText = yes ? "Stop bookmark" : "Add bookmark";
     ge('entering_area').hidden = !yes;
 }
-set_add_gui(false);
+
+set_add_gui({%cmd_add_gui});
