@@ -1,3 +1,4 @@
+
 -- Get luakit environment
 local package_path = require("package").path
 local string_split = require("lousy").util.string.split
@@ -13,13 +14,15 @@ end
 
 local memorize_data = {}  -- Keeps track of what we already got.
 
-
 local Public = {}
 
-local function open_asset(path)
-   for _, dir in pairs(search_dirs) do
+local function open_asset(path, search_in)
+   search_in = search_in or search_dirs
+   for _, dir in pairs(search_in) do
       local got = io.open(dir .. path, "r")
-      if got then return got, dir end
+      if got then
+         return got, dir
+      end
    end
 end
 
@@ -51,8 +54,13 @@ end
 function Public.load_search_asset(where, path, dont_memorize)
    if type(where) ~= "table" then where = {where} end
    for _, where_path in pairs(where) do
-      local got = Public.load_asset(where_path .. "/" .. path, dont_memorize)
-      if got then return got end
+      local splitpath = string_split(where_path, "/")
+      while #splitpath > 0 do
+         local got = Public.load_asset(table.concat(splitpath, "/") .. "/" .. path,
+                                       dont_memorize)
+         if got then return got end
+         table.remove(splitpath)
+      end
    end
 end
 
