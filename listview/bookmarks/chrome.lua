@@ -35,16 +35,12 @@ end
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
 local function plus_cmd_add(ret, log)
-   if log.cmd_add then
-      ret.cmd_add_uri   = log.cmd_add.uri
-      ret.cmd_add_title = log.cmd_add.title
-      ret.cmd_add_gui = "true"
-      log.cmd_add = nil
-   else
-      ret.cmd_add_uri   = ""
-      ret.cmd_add_title = ""
-      ret.cmd_add_gui = "false"
+   local cmd_add = log.cmd_add or {}
+   for _,k in pairs({"uri", "title", "desc"}) do  -- Ill conceived but harmless.
+      ret["cmd_add_" .. k] = cmd_add[k] or ""
    end
+   ret.cmd_add_gui = log.cmd_add and "true" or "false"
+   log.cmd_add = nil
 end
 
 local mod_Enter = {
@@ -130,8 +126,8 @@ add_cmds({ cmd("listviewBookmarks", cmd_bookmarks) })
 if take.bookmarks_cmd then add_cmds({ cmd("bookmarks", cmd_bookmarks) }) end
 
 
-local function cmd_bookmark_new(w, add)
-   bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title}
+local function cmd_bookmark_new(w, desc)
+   bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title, desc=desc}
    local v = w:new_tab(config.add_bookmark_page or "luakit://listviewBookmarks/search")
 end
 add_cmds({ cmd("listviewBookmark_new", cmd_bookmark_new) })
