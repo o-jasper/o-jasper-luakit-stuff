@@ -36,7 +36,7 @@ local default_data_uri = config.default_data_uri or default_data_uri_fun
 
 local mod_Enter = {
    to_js = {
-      manual_enter = function(self)  -- This one go onto the bindings for.
+      manual_enter = function(self)
          return function(inp)
             if not inp.data_uri or inp.data_uri == "" then
                inp.data_uri = default_data_uri_fun(self)
@@ -88,7 +88,7 @@ local function mk_page(meta, name)
 end
 
 local bookmarks_paged = {
-   default_page = "search",
+   default_name = "search",
    enter  = mk_page(Enter, "enter"),
    search = mk_page(BookmarksSearch, "search"),
    aboutChrome = listview.new_AboutChrome("listview/bookmarks", bookmarks),
