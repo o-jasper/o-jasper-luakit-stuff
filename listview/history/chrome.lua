@@ -33,7 +33,7 @@ end
 local cmd = lousy.bind.cmd
 
 local function on_command(w, query)
-   history.latest_query = query
+   history.cmd_query = query
    local v = w:new_tab("luakit://listviewHistory/search")
    -- if query then  -- This would be without the nasty "global value" thing.
    --  v:eval_js(string.format("ge('search').value = %q; search();", query))
@@ -42,4 +42,11 @@ end
 
 add_cmds({ cmd("listviewHistory", on_command) })
 
-if config.take_history_cmd then add_cmds({ cmd("history", on_command) }) end
+local take = config.take or {}
+if take.all then take = setmetatable({}, {__index=function(...) return true end}) end
+
+local function firstarg(fun) return function(x) return fun(x) end end
+
+if take.history_cmd then add_cmds({ cmd("history", on_command) }) end
+if take.binds then add_binds("normal", { buf("^gh", firstarg(on_command)) }) end
+
