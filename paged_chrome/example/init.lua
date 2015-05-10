@@ -23,6 +23,7 @@ local templated = {
 <p>{%auto.html}</p>
 
 <script>document.getElementById("add").innerText = get_str();</script>
+<script src="luakit://{%chrome_name}/js.js"></script>
 ]],
    
    to_js = { 
@@ -42,7 +43,11 @@ local templated = {
 
 local pages = {
    default_name = "direct",
-   direct = direct, 
+   direct = direct,
+
+   ["js.js"] = { html=function(...) return [[alert("This probably wont execute.");]] end,
+                 init=false },
+
    -- Unfortunately have to repeat ourselves here.(`templated` twice)
    -- (well repeat ourselves more to get stuff in variables so indentation decent)
    templated = paged_chrome.templated_page(templated, "templated"),
