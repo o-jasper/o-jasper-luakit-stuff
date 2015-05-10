@@ -110,6 +110,7 @@ local bookmarks_paged = {
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
 
 local take = config.take or {}
+if take.all then take = setmetatable({}, {__index=function(...) return true end}) end
 
 if take.bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("bookmarks", bookmarks_paged)
@@ -127,8 +128,17 @@ if take.bookmarks_cmd then add_cmds({ cmd("bookmarks", cmd_bookmarks) }) end
 
 
 local function cmd_bookmark_new(w, desc)
-   bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title, desc=desc}
+   bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title, desc=desc or ""}
    local v = w:new_tab(config.add_bookmark_page or "luakit://listviewBookmarks/search")
 end
 add_cmds({ cmd("listviewBookmark_new", cmd_bookmark_new) })
 if take.bookmark_cmd then add_cmds({ cmd("bookmark_new", cmd_bookmark_new) }) end
+
+local function firstarg(fun) return function(x) return fun(x) end end
+
+-- Add keybindings.
+if take.binds then
+   add_binds("normal", 
+             { buf("^gb", firstarg(cmd_bookmarks)),
+               key({}, "B", firsarg(cmd_bookmarks)) })
+end
