@@ -1,6 +1,6 @@
 -- Just stripping the preceeding `tox_` at the moment.
 
-local lib = require "raw"
+local raw = require "raw"
 
 local funlist = {
    "version_major",
@@ -47,6 +47,22 @@ local funlist = {
 
 local Public = {}
 for _, name in pairs(funlist) do
-   Public[name] = lib["tox_" .. name]
+   Public[name] = raw["tox_" .. name]
 end
+
+local ffi = require "ffi"
+
+function Public.options_new()
+   local err = ffi.new("TOX_ERR_OPTIONS_NEW[1]")
+   local ret = raw.tox_options_new(err)
+   return ret, err
+end
+
+function Public.new(opts, data)
+   -- Idea.. metatable something something.
+   local err = ffi.new("TOX_ERR_NEW[1]")
+   local ret = raw.tox_new(opts, ffi.new("uint8_t[?]", data), #data, err)
+   return ret, err
+end
+
 return Public
