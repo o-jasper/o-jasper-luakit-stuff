@@ -1,4 +1,4 @@
---  Copyright (C) 27-04-2015 Jasper den Ouden.
+--  Copyright (C) 10-05-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -30,14 +30,11 @@ if config.take_history_chrome then  -- Take over the 'plain name'. (default:no)
 end
 
 -- Add bindings.
-local cmd = lousy.bind.cmd
+local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
 
 local function on_command(w, query)
-   history.cmd_query = query
+   history.cmd_query = query  -- Bit "global-value-ie.
    local v = w:new_tab("luakit://listviewHistory/search")
-   -- if query then  -- This would be without the nasty "global value" thing.
-   --  v:eval_js(string.format("ge('search').value = %q; search();", query))
-   -- end
 end
 
 add_cmds({ cmd("listviewHistory", on_command) })
