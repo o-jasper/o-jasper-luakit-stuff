@@ -30,7 +30,9 @@ td{padding:0.4em 0.7em ; vertical-align: text-top; align:left}
 
 .live{ background-color:#8F8; }
 .dead {background-color:#FFF; color:#555 }
-.selected{ background-color:#CCF;}
+
+.selected{ background-color:#CCF; }
+.main_selected{ background-color:#ECF; }
 
 .sql_minor{ font-family:"Lucida Console", Monaco, monospace;
 background-color:#EEE; color:#999}

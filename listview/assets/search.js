@@ -125,23 +125,35 @@ function incr_selected_cnt(delta) {
     ge('delcnt').innerText = "(" + selected_cnt + ")";
 }
 
+var main_sel = null;
+var selected = {};
+
+function set_main_sel(to) { main_sel = to; }
+
 function clear_selected() {
     selected_cnt = 0;
     for(k in selected) {
         var el = ge(selected[k]);
         if(el) { el.className = null; }
     }
+    set_main_sel(null);
     selected = {};
     ge('delcnt').innerText = "(0)";
 }
-
-var selected = {};
 
 function select_toggle(id) {
     var cursel = selected[id];
     selected[id] = !cursel;
     incr_selected_cnt(cursel ? -1 : +1);
-    ge("id_" + id).className = (cursel ? null : "selected");
+
+    if(cursel) {
+        if( id == main_sel ){ set_main_sel(null); }
+        ge("id_" + id).className = null;
+    } else {
+        if( main_sel ) { ge("id_" + main_sel).className = "selected"; }
+        set_main_sel(id);
+        ge("id_" + id).className = "main_selected";
+    }
 }
 
 var _do_next = null;
