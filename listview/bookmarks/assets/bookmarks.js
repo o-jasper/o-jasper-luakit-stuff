@@ -11,8 +11,8 @@ function set_add_gui(yes) {
 
 function set_change_mode(id) {
     change_id = id;
-    ge("add_change").innerText = to ? "Add" : "Change";
-    if(to) { set_add_gui(true); }
+    ge("add_change").innerText = id ? "Add" : "Change";
+    if(id) { set_add_gui(true); }
 }
 
 function enter_values() {

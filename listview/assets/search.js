@@ -125,6 +125,16 @@ function incr_selected_cnt(delta) {
     ge('delcnt').innerText = "(" + selected_cnt + ")";
 }
 
+function clear_selected() {
+    selected_cnt = 0;
+    for(k in selected) {
+        var el = ge(selected[k]);
+        if(el) { el.className = null; }
+    }
+    selected = {};
+    ge('delcnt').innerText = "(0)";
+}
+
 var selected = {};
 
 function select_toggle(id) {
@@ -153,12 +163,11 @@ function verify() {
 
 function delete_selected() {
     for(id in selected) {
-        if(selected[id]) {
-            delete_id(id);
-            ge("id_" + id).hidden = true;  // TODO Fancy fade stuff?
-            ge("id_" + id).innerHTML = "";
-        }
+        delete_id(id);
+        ge("id_" + id).innerHTML = "";
+        ge("id_" + id).hidden = true;  // TODO Fancy fade stuff?
     }
+    clear_selected();
 }
 
 function touch_addsearch_name() {
