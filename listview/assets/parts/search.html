@@ -12,27 +12,6 @@ I
 <button class="smaller" id="cycle_back" onclick="cycle_results(+1)">&gt;&gt;</button>
 I
 <button id = "toggle_actions_panel" onclick="set_actions_panel(!actions_panel)">BUG</button>
-
 <br>
-<span id="addsearch_area">
-  <input id="addsearch_name_input" value="default" style="width:10%" oninput="touch_addsearch_name()">
-  <input id="addsearch_input" style="width:80%" oninput="touch_search();" onsubmit="search()">
-</span>
-<span id="sql_input_area">
-  <span style="float:left;">
-    <button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button><br>
-    <button id="toggle_sql_locked" onclick="set_sql_locked(!sql_locked);">BUG</button>
-  </span>
-  {%above_sql}
-  <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();"></textarea>
-  {%below_sql}
-</span>
-<span id="actions_panel"><br>
-  <span id= "verified_area">
-    <button id="toggle_safe_mode" onclick="set_safe_mode(!safe_mode);">BUG</button>
-    <button id="verify_button" onclick="verify();">VerifyThis</button>
-    <button id="delete_selected" onclick="do_next('delete_selected')">Delete<span id="delcnt"></span>
-    </button>
-  </span>
-</span>
-{%below_acts}
+{%parts/addsearch.html}
+{%parts/actions.html}

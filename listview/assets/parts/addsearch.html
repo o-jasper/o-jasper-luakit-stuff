@@ -2,3 +2,12 @@
   <input id="addsearch_name_input" value="default" style="width:10%" oninput="touch_addsearch_name()">
   <input id="addsearch_input" style="width:80%" oninput="touch_search();" onsubmit="search()">
 </span>
+<span id="sql_input_area">
+  <span style="float:left;">
+    <button id="toggle_by_search" onclick="set_by_search(!by_search);">BUG</button><br>
+    <button id="toggle_sql_locked" onclick="set_sql_locked(!sql_locked);">BUG</button>
+  </span>
+  {%above_sql}
+  <textarea id="sql_input" rows="5" cols="90" oninput="touch_sql();"></textarea>
+  {%below_sql}
+</span>
