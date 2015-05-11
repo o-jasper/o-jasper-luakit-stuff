@@ -25,3 +25,12 @@ function enter_values() {
     if( change_id ){ entry.id = change_id }
     manual_enter(entry);
 }
+
+function set_main_sel(to) {
+    main_sel = to;
+    ge("change_main_sel").disable = !main_sel;
+}
+
+function change_main_sel() {
+    set_change_mode(main_sel);
+}
