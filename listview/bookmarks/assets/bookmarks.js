@@ -11,7 +11,7 @@ function set_add_gui(yes) {
 
 function set_change_mode(id) {
     change_id = id;
-    ge("add_change").innerText = id ? "Add" : "Change";
+    ge("add_change").innerText = id ? "Change" : "Add";
     if(id) { set_add_gui(true); }
 }
 
@@ -32,5 +32,13 @@ function set_main_sel(to) {
 }
 
 function change_main_sel() {
-    set_change_mode(main_sel);
+    if(main_sel) {
+        set_change_mode(main_sel);
+        var entry = get_id(main_sel);
+        alert(main_sel + "  " + entry);
+        for(k in entry) {   // Set all the values.
+            var el = ge("inp_" + k);
+            if(el) { el.value = entry[k]; }
+        }
+    }
 }

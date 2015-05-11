@@ -372,23 +372,15 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
 
    -- Non-search plain commands,
    cmd_dict = {
-      just_tags = function(self)
-         return string.format("SELECT tag FROM %s WHERE to_id == ?", self.values.taggings)
-      end,
-      has_tag = function(self)
-         return string.format("SELECT tag FROM %s WHERE to_id == ? AND %s == ?",
-                              self.values.taggings, self.values.tagname)
-      end,
+      just_tags = "SELECT tag FROM {%taggings} WHERE to_id == ?",
+      has_tag   = "SELECT tag FROM {%taggings} WHERE to_id == ? AND {%tagname} == ?",
 
       enter = function(self)
          return string.format("INSERT INTO %s VALUES (%s)",
                               self.values.table_name, qmarks(#self.values.row_names))
       end,
-      selectid = function(self)
-         return string.format("SELECT %s FROM %s WHERE %s == ?",
-                              self.values.idname, self.values.table_name,
-                              self.values.idname)
-      end,
+      selectid = "SELECT %{idname} FROM {%table_name} WHERE {%idname} == ?",
+
       update = function(self)
          return string.format("UPDATE %s SET %s WHERE %s == ",
                               self.values.table_name,
@@ -396,18 +388,11 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
                               self.values.idname,
                               qmarks(#self.values.row_names))
       end,
-      tags_insert = function(self)
-         return string.format([[INSERT INTO %s VALUES (?, ?);]],
-                              self.values.taggings)
-      end,
-      delete_entry_id = function(self)
-         return string.format("DELETE FROM %s WHERE %s == ?",
-                              self.values.table_name, self.values.idname)
-      end,
-      delete_tags_id = function(self)
-         return string.format("DELETE FROM %s WHERE to_%s == ?",
-                              self.values.taggings, self.values.idname)
-      end,
+      tags_insert     = "INSERT INTO {%taggings} VALUES (?, ?);",
+      delete_entry_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
+
+      delete_tags_id  = "DELETE FROM {%taggings} WHERE to_{%idname} == ?",
+      get_id          = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
    },
 
    sql_compiled = {},
@@ -415,7 +400,13 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    sqlcmd = function(self, what)
       local got = self.sql_compiled[what]
       if got then return got end
-      got = self.db:compile(self.cmd_dict[what](self))
+      local maybefun = self.cmd_dict[what]
+      if type(maybefun) == "string" then
+         got = string.gsub(maybefun, "{%%([_./%w]+)}", self.values)
+      else
+         got = maybefun(self)
+      end
+      got = self.db:compile(got)
       getmetatable(self).__index.sql_compiled[what] = got
       return got
    end,
@@ -476,6 +467,13 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       if self.values.taggings then
          self:sqlcmd("delete_tags_id"):exec({id})
       end
+   end,
+
+   get_id = function(self, id)
+      local ret = self:sqlcmd("get_id"):exec(sqlget, {id})
+      print(id)
+      for k,v in pairs(ret) do print(k, v) end
+      return ret[1]
    end,
 }
 

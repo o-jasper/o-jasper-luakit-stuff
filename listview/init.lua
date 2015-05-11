@@ -56,6 +56,10 @@ local to_js = {
          return self:config().addsearch[name]
    end end,
 
+   get_id = function(self) return function(id)
+         return self.log:get_id(id)
+   end end,
+
    delete_id = function(self) return function(id)
          self.log:delete_id(id)
    end end,
