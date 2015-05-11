@@ -24,6 +24,7 @@ function enter_values() {
                 }
     if( change_id ){ entry.id = change_id }
     manual_enter(entry);
+    search();
 }
 
 function set_main_sel(to) {
@@ -35,7 +36,6 @@ function change_main_sel() {
     if(main_sel) {
         set_change_mode(main_sel);
         var entry = get_id(main_sel);
-        alert(main_sel + "  " + entry);
         for(k in entry) {   // Set all the values.
             var el = ge("inp_" + k);
             if(el) { el.value = entry[k]; }

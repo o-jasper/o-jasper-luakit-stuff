@@ -379,20 +379,23 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
          return string.format("INSERT INTO %s VALUES (%s)",
                               self.values.table_name, qmarks(#self.values.row_names))
       end,
-      selectid = "SELECT %{idname} FROM {%table_name} WHERE {%idname} == ?",
+      selectid = "SELECT {%idname} FROM {%table_name} WHERE {%idname} == ?",
 
-      update = function(self)
-         return string.format("UPDATE %s SET %s WHERE %s == ",
+      update = function(self)  -- Unused, just delete-and-re-add.
+         local changer = {}
+         for _, v in pairs(self.values.row_names) do
+            table.insert(changer, v .. " = ?")
+         end
+         return string.format("UPDATE %s SET %s WHERE %s == ?",
                               self.values.table_name,
-                              table.concat(self.values.row_names, ", "),
-                              self.values.idname,
-                              qmarks(#self.values.row_names))
+                              table.concat(changer, ", "),
+                              self.values.idname)
       end,
       tags_insert     = "INSERT INTO {%taggings} VALUES (?, ?);",
       delete_entry_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
 
       delete_tags_id  = "DELETE FROM {%taggings} WHERE to_{%idname} == ?",
-      get_id          = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
+      get_id = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
    },
 
    sql_compiled = {},
@@ -446,9 +449,9 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    -- TODO doesnt do tags.. Probably simpler to just delete-and-re-add on same id?
    update = function(self, entry)
       if not entry.id then return nil end
-      local got = self:sqlcmd("selectid"):exec(sqlget, {entry.id})
+      local got = self:sqlcmd("selectid"):exec({entry.id})
       if #got == 1 then
-         self:force_update(entry)
+         return self:force_update(entry) or self:get_id(entry.id)
       end
    end,
    update_or_enter = function(self, entry)
@@ -457,7 +460,11 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    force_update = function(self, entry)
-      return self:sqlcmd("update"):exec(self:args_in_order(entry))
+      self:delete_id(entry.id)
+      return self:enter(entry)
+--      local inp = self:args_in_order(entry) -- Does it matter?
+--      table.insert(inp, entry.id)
+--      return self:sqlcmd("update"):exec(inp)
    end,
 
    -- Delete an entry.
@@ -470,10 +477,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
 
    get_id = function(self, id)
-      local ret = self:sqlcmd("get_id"):exec(sqlget, {id})
-      print(id)
-      for k,v in pairs(ret) do print(k, v) end
-      return ret[1]
+      return self:sqlcmd("get_id"):exec({id})[1]
    end,
 }
 

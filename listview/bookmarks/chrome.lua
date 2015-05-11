@@ -60,8 +60,7 @@ local mod_Enter = {
                --(these are not done directly)
                tags = lousy.util.string.split(inp.tags, "[,; ]+")
             }
-            local ret = self.log:update_or_enter(add)
-            for k,v in pairs(ret) do print(k,v) end
+            self.log:update_or_enter(add)
          end
       end,
 
