@@ -1,4 +1,4 @@
---  Copyright (C) 01-05-2015 Jasper den Ouden.
+--  Copyright (C) 11-05-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -13,7 +13,7 @@ local paged_chrome = require "paged_chrome"
 local listview = require "listview"
 local bookmarks  = require "listview.bookmarks.bookmarks"
 
-local config = (globals.listview or {}).more or {}
+local config = (globals.listview or {}).bookmarks or {}
 config.page = config.page or {}
 
 -- Make the chrome page.
@@ -51,6 +51,7 @@ local mod_Enter = {
                inp.data_uri = default_data_uri_fun(self)
             end
             add = {
+               id = inp.id,  -- Potentailly not provided.
                created=c.cur_time.s(),
                to_uri = inp.uri,
                title = inp.title,
@@ -59,7 +60,7 @@ local mod_Enter = {
                --(these are not done directly)
                tags = lousy.util.string.split(inp.tags, "[,; ]+")
             }
-            local ret = self.log:enter(add)
+            local ret = self.log:update_or_enter(add)
             for k,v in pairs(ret) do print(k,v) end
          end
       end,
@@ -84,7 +85,9 @@ local mod_BookmarksSearch = {
       got.right_of_title = [[&nbsp;&nbsp;
 <button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
 ]]
-      got.after = [[<script type="text/javascript">{%bookmarks.js}</script>]]
+      got.after = [[<script type="text/javascript">{%bookmarks.js}</script>
+<script type="text/javascript">{%bookmarks_init.js}</script>
+]]
 
       plus_cmd_add(got, self.log)
       return got
@@ -117,7 +120,7 @@ if take.bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
 end
 
 -- Add bindings.
-local cmd = lousy.bind.cmd
+local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
 
 local function cmd_bookmarks(w, query)
    bookmarks.cmd_query = query  -- bit "global-value-ie"
@@ -140,5 +143,5 @@ local function firstarg(fun) return function(x) return fun(x) end end
 if take.binds then
    add_binds("normal", 
              { buf("^gb", firstarg(cmd_bookmarks)),
-               key({}, "B", firsarg(cmd_bookmarks)) })
+               key({}, "B", firstarg(cmd_bookmark_new)) })
 end
