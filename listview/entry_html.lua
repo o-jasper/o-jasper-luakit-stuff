@@ -18,12 +18,16 @@ Public.default_html_calc = {
       return c.tagsHTML(self:tags(), state.tagsclass)
    end,
 
-   dateHTML = function(self, state)
-      return tt.dateHTML(state, self:ms_t())
+   delta_dateHTML = function(self, state)
+      return tt.delta_dateHTML(state, self:ms_t())
    end,
    
    timemarks = function(self, state)
       return tt.timemarks(state, self:ms_t())
+   end,
+
+   resay_timemarks = function(self, state)
+      return tt.resay_timemarks(state, self:ms_t())
    end,
 
    identifier = function(self, _) return self[self.values.idname] end,

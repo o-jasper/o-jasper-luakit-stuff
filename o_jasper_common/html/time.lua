@@ -27,7 +27,7 @@ function Public.delta_t_html(dt, pre, aft)
    end
 end
 
-function Public.dateHTML(state, ms_t)
+function Public.delta_dateHTML(state, ms_t)
    local ret = ""
    if not state.last_time then
       ret = os.date(nil, math.floor(ms_t/1000))
@@ -59,6 +59,38 @@ function Public.timemarks(state, ms_t)
       end
    end
    return str
+end
+
+
+function Public.resay_timemarks(state, ms_t)
+   local tm = state.resay_timemarks
+   local timemarks = state.config.resay_timemarks or
+      { {"year", [[</tr><tr><td colspan="2"><span class="year_change">Newyear {%year}<br><hr></span></td>]]},
+        {"yday", [[</tr><tr><td colspan="2"><span class="day_change">{%dayname} {%day}
+{%monthname}<br><hr></span></td>]]},
+        --{"hour", [[</tr><tr><td class="hour_change">at {%hour}:{%min}</td>]]},
+        init = " ", nochange = " ",
+      }
+   
+   if not tm then
+      state.resay_timemarks = os.date("*t", math.floor(ms_t/1000))
+      return timemarks.init
+   end
+   local d = os.date("*t", math.floor(ms_t/1000))
+   for _, el in pairs(timemarks) do -- Things we care to mark.
+      local k, pattern = el[1], el[2]
+      -- If that aspect of the date is no longer the same, increament it.
+      if d[k] ~= tm[k] then
+         tm[k] = d[k]
+         d.dayname = ({"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                       "Saturday"})[d.wday]
+         d.monthname = ({"Januari", "Februari", "March", "April", "May",
+                        "June", "Juli", "Augustus", "September", "Oktober",
+                        "November", "December"})[d.month]
+         return string.gsub(pattern, "{%%([_./%w]+)}", d)
+      end
+   end
+   return timemarks.nochange
 end
 
 return Public

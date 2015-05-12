@@ -195,7 +195,7 @@ function load_next_chunk() {
     el.id = null;
 
     cycle_limit_values(+1); //Just change the parameters and search.
-    search();
+    search(false);
     update_sql_shown();
     ge("cnt").innerText = "";
 }

@@ -41,7 +41,11 @@ background-color:#8F8; }
 .sql_dead{ font-family:"Lucida Console", Monaco, monospace;
 background-color:#FFF; color:#555 }
 
-.time{color:#080;}
+.delta_time{color:#383;font-size:60%}
+.year_change{margin-left:10%; font-weight:bold;}
+.day_change{margin-left:10%; font-weight:bold;}
+.hour_change{font-size:70%}
+
 .timeunit{color:#080; font-size:60%; font-weight:bold; align:left;}
 .timemark{font-weight:bold}
 
