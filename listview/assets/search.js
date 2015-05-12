@@ -8,7 +8,7 @@ var by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
     if( !by_search && !yes ){ return; }
     ge('sql_input_area').hidden = !yes;
-    ge('toggle_sql_shown').innerText = yes ? "Shown sql" : "Hidden sql";
+    ge('toggle_sql_shown').innerHTML = yes ? "<strike>sql</strike>" : "sql";
     hide_button('toggle_by_search', !yes);
     hide_button('toggle_sql_locked', !yes);
 
@@ -22,7 +22,7 @@ function set_sql_shown(yes) {
 function set_addsearch_shown(yes) {
     addsearch_shown = yes;
     ge('addsearch_area').hidden = !yes;
-    ge('toggle_addsearch_shown').innerText = yes ? "Show whole" : "Hidden whole";
+    ge('toggle_addsearch_shown').innerHTML = yes ? "<strike>add</strike>" : "add";
 }
 
 function sql_input_class(by_search, locked) {
@@ -93,6 +93,7 @@ function update_sql_shown() {
 function search(reset_state) {
     if(reset_state == null){ reset_state = true; }
     if(reset_state) { // Burn the existing stuff.
+        thresh_y = 0;
         ge("list_area").innerHTML = '<span id="list"></span><span id="list_subsequent"></span>'
         reset_limit_values();
     }

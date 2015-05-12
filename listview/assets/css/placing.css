@@ -1,24 +1,24 @@
  #side_panel {
     position:fixed;
-    top:30%;
+    top:0%;
+    width:6.6em;
+    padding:0.5em;
 
-    width:10%;
-    margin-left: 0.5em;
     vertical-align:text-top;
 }
 #top_panel {
     top:0%;
-    left:0%;
+    left:6.6em;
+    padding-left:0.5em;
 
     width:100%;
 
     position:fixed;
     float:left;
-    margin-left:3%;
     background-color:white;
 }
 #list_area {
     position:absolute;
-    left:13%;
+    left:6em;
     top:6em;
 }

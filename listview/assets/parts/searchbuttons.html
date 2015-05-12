@@ -1,12 +1,14 @@
-<button id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
-<button id="toggle_addsearch_shown" onclick="set_addsearch_shown(!addsearch_shown);">BUG</button>
-<button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button>
-<button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button>
-I
-<button class="smaller" id="less_results" onclick="more_results(-1)"><b>-</b></button>
-<button class="smaller" id="more_results" onclick="more_results(+1)"><b>+</b></button>
-<button class="smaller" id="cycle_forw" onclick="cycle_results(-1)">&lt;&lt;</button>
-<button class="smaller" id="cycle_back" onclick="cycle_results(+1)">&gt;&gt;</button>
-I
+<button style="width:3.05em" id="toggle_sql_shown" onclick="set_sql_shown(!sql_shown);">BUG</button>
+<button style="width:3.05em" class="smaller" id="toggle_addsearch_shown" onclick="set_addsearch_shown(!addsearch_shown);">BUG</button><br>
+<button id="toggle_continuous" onclick="set_continuous(!continuous, true);">BUG</button><br>
+
+<button id="toggle_as_msg" onclick="set_as_msg(!as_msg, true);">BUG</button><br>
+
+<!-- NOTE: these dont work well currently, the resetting really wants to do it.-->
+<button hidden="true" class="smaller" id="less_results" onclick="more_results(-1)"><b>-</b></button>
+<button hidden="true" class="smaller" id="more_results" onclick="more_results(+1)"><b>+</b></button>
+<button hidden="true" class="smaller" id="cycle_forw" onclick="cycle_results(-1)">&lt;&lt;</button>
+<button hidden="true" class="smaller" id="cycle_back" onclick="cycle_results(+1)">&gt;&gt;</button>
+
 <button id="toggle_actions_panel" onclick="set_actions_panel(!actions_panel)">BUG</button>
 <br>
