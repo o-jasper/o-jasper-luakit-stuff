@@ -27,3 +27,5 @@ otherwise, in `~/.config/luakit/rc.lua`, do
 * Want a way help people "characterize" things for their own memory?
   
   Perhaps "not for" bookmarks though!
+
+* Way to browse the old bookmarks system aswel.

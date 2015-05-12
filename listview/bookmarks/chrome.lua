@@ -108,6 +108,7 @@ end
 local bookmarks_paged = {
    default_name = "search",
    enter  = mk_page(Enter, "enter"),
+   import  = mk_page(require "listview.bookmarks.import_page", "import"),
    search = mk_page(BookmarksSearch, "search"),
    aboutChrome = listview.new_AboutChrome(assets_where, bookmarks),
 }
