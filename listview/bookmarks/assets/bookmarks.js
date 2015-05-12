@@ -36,9 +36,11 @@ function change_main_sel() {
     if(main_sel) {
         set_change_mode(main_sel);
         var entry = get_id(main_sel);
+
         for(k in entry) {   // Set all the values.
             var el = ge("inp_" + k);
             if(el) { el.value = entry[k]; }
         }
+        ge("inp_uri").value = entry.to_uri;
     }
 }

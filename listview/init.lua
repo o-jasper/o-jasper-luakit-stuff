@@ -57,7 +57,17 @@ local to_js = {
    end end,
 
    get_id = function(self) return function(id)
-         return self.log:get_id(id)
+         local ret, got = {}, self.log:get_id(id)
+
+         for k,v in pairs(got) do
+            if type(v) ~= "table" and type(v) ~= "userdata" then
+               ret[k] = v 
+            end
+         end
+         if got.values.taggings then
+            ret.tags = got:tags()
+         end
+         return ret
    end end,
 
    delete_id = function(self) return function(id)

@@ -131,16 +131,16 @@ if take.bookmarks_cmd then add_cmds({ cmd("bookmarks", cmd_bookmarks) }) end
 
 local function cmd_bookmark_new(w, desc)
    bookmarks.cmd_add = {uri = w.view.uri, title = w.view.title, desc=desc or ""}
-   local v = w:new_tab(config.add_bookmark_page or "luakit://listviewBookmarks/search")
+   w:new_tab(config.add_bookmark_page or "luakit://listviewBookmarks/search")
 end
 add_cmds({ cmd("listviewBookmark_new", cmd_bookmark_new) })
 if take.bookmark_cmd then add_cmds({ cmd("bookmark_new", cmd_bookmark_new) }) end
 
-local function firstarg(fun) return function(x) return fun(x) end end
-
 -- Add keybindings.
 if take.binds then
    add_binds("normal", 
-             { buf("^gb", firstarg(cmd_bookmarks)),
-               key({}, "B", firstarg(cmd_bookmark_new)) })
+             { buf("^gb",   function(w) cmd_bookmark_new(w) end),
+               key({}, "B", function(w) cmd_bookmark_new(w) end), })
 end
+
+-- TODO export some stuff.
