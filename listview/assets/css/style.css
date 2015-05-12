@@ -1,3 +1,5 @@
+a{text-decoration:none}
+
 input{ width:50%; font-weight:bold; }
 button{ font-weight:bold; width:6.5em; }
 button.smaller{ font-weight:bold; width:2em; }
@@ -41,6 +43,7 @@ background-color:#8F8; }
 .sql_dead{ font-family:"Lucida Console", Monaco, monospace;
 background-color:#FFF; color:#555 }
 
+.time{color:#555;font-size:80%}
 .delta_time{color:#383;font-size:60%}
 .year_change{margin-left:10%; font-weight:bold;}
 .day_change{margin-left:10%; font-weight:bold;}

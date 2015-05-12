@@ -32,6 +32,18 @@ Public.default_html_calc = {
 
    identifier = function(self, _) return self[self.values.idname] end,
 }
+for k,v in pairs(os.date("*t", 0)) do
+   Public.default_html_calc[k] = function(self, _) 
+      return os.date("*t", math.floor(self:ms_t()/1000))[k]
+   end
+end
+
+function Public.default_html_calc.dayname(self, _)
+   return Public.day_names[os.date("*t", math.floor(self:ms_t()/1000)).wday]
+end
+function Public.default_html_calc.monthname(self, _)
+   return Public.day_names[os.date("*t", math.floor(self:ms_t()/1000)).wday]
+end
 
 function Public.repl(entry, state)
    assert(entry)
