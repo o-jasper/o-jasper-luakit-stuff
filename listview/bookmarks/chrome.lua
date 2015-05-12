@@ -54,12 +54,12 @@ local mod_Enter = {
                inp.data_uri = default_data_uri_fun(self)
             end
             add = {
-               id = inp.id,  -- Potentailly not provided.
-               created=c.cur_time.s(),
-               to_uri = inp.uri,
-               title = inp.title,
-               desc = inp.desc,
-               data_uri = inp.data_uri,  -- Empty strings are can be auto-reinterpreted.
+               id = inp.id,  -- Potentially not provided.
+               created = c.cur_time.s(),
+               to_uri = inp.uri or "",
+               title = inp.title or "",
+               desc = inp.desc or "",
+               data_uri = inp.data_uri or "",  -- Empty strings are can be auto-reinterpreted.
                --(these are not done directly)
                tags = lousy.util.string.split(inp.tags, "[,; ]+")
             }
