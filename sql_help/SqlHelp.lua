@@ -1,4 +1,4 @@
---  Copyright (C) 24-04-2015 Jasper den Ouden.
+--  Copyright (C) 11-05-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -48,7 +48,8 @@ local SqlHelp = {
    c = false, tags_last = 0, last_id_time = 0,
    
    searchinfo = {
-      matchable = {"like:", "-like:", "tags:", "-tags", "-", "not:", "\\-", "or:",
+      matchable = {"like:", "-like:", "tag:", "tags:", "-tag:", "-tags:",
+                   "-", "not:", "\\-", "or:",
                    "uri:", "desc:", "title:",
                    "urilike:", "desclike:", "titlelike:",
                    "before:", "after:", "limit:"
@@ -282,10 +283,9 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       local match_funs = self.searchinfo.match_funs
 
       for i, el in pairs(tagged_list) do
-         local m, v = el.m, el.v
          self:comb()
-         local fun = (match_funs[m] or match_funs.default)
-         fun(self, state, m, v)
+         local fun = (match_funs[el.m] or match_funs.default)
+         fun(self, state, el.m, el.v)
 
          if state.reset then self.how = "AND" end
       end
@@ -483,6 +483,10 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       return self:entry_fun(self:sqlcmd("get_id"):exec({id})[1])
    end,
 }
+
+local mf = SqlHelp.searchinfo.match_funs
+mf["tag:"] = mf["tags:"]
+mf["-tag:"] = mf["-tags:"]
 
 local function copy_matchfun(fr, to)
    if type(to) ~= "table" then to = {to} end
