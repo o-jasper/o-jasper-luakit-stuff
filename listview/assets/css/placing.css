@@ -1,0 +1,10 @@
+#side_panel {
+  top:20%;
+  position: fixed;
+  margin-left: 0.5em;
+  float:left;
+}
+#top_panel {
+  top:20%;
+  position: fixed;
+}

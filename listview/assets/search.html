@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <title>{%title}</title>
-    <style type="text/css">{%style.css}</style>
+    <style type="text/css">{%css/placing.css}</style>
+    <style type="text/css">{%ccs/style.css}</style>
     <script type="text/javascript">{%common.js}</script>
     <script type="text/javascript">{%search.js}</script>
 </head>
@@ -11,18 +12,25 @@
 
 <!-- TODO "Enter" should submit them -->
 
-{%above_title}
-<h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
-  <span class="minor" id="cnt"></span>{%right_of_title}</h3>
-{%below_title}
-{%parts/search.html}
+<table>
+
+<div id="top_panel">
+  {%above_title}
+  <h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
+    <span class="minor" id="cnt"></span>{%right_of_title}</h3>
+  {%below_title}
+  {%parts/search.html}
+  {%parts/addsearch.html}
+</div>
+<div id="side_panel">
+  {%parts/searchbuttons.html}
+  {%parts/actions.html}
+</div>
 
 <span id="list"></span>
 
 <hr>
-<p class="minor">chrome run count: {%chromeRanCnt},
-search_cnt: <span id="search_cnt">1</span>
-</p>
+<p class="minor">search_cnt: <span id="search_cnt">1</span></p>
 
 <p><button id="cycle_forw2" onclick="cycle_results()">Next {%cycleCnt} <b>&gt;&gt;</b></button></p>
 
