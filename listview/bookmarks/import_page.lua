@@ -5,11 +5,16 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-return {
+local c = require("o_jasper_common")
+local listview = require("listview")
+
+local mod_BookmarksImport = {
    to_js = {
       do_it = function(self) return function ()
             require("listview.bookmarks.import")(require("bookmarks").db,
                                                  require "listview.bookmarks.bookmarks")
       end end,
-   }
+   },
 }
+
+return c.metatable_of(c.copy_meta(listview.Base, mod_BookmarksImport))

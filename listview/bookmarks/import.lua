@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+local string_split = require("lousy").util.string.split
+
 return function(from_db, into)
    local n, m = 0, 32
    
@@ -15,13 +17,14 @@ return function(from_db, into)
    while #got > 0 do  -- Not all of them at the same time.
       for _, el in pairs(got) do
          if #(to_uri_search:exec({el.uri})) == 0 then
-            into:enter({ uri = el.uri, title = el.title, desc = el.desc,
-                         created = el.created,
-                         tags = string_split(el.tags),
+            into:enter({ to_uri = el.uri or "", title = el.title or "", desc = el.desc or "",
+                         created = el.created or os.time(),
+                         data_uri = "",
+                         tags = el.tags and string_split(el.tags) or {},
                        })
          end
       end
       n = n + m
-      from_collect:exec({n,m})
+      got = from_collect:exec({n,m})
    end
 end

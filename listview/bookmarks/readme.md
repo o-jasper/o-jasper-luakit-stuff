@@ -28,4 +28,5 @@ otherwise, in `~/.config/luakit/rc.lua`, do
   
   Perhaps "not for" bookmarks though!
 
-* Way to browse the old bookmarks system aswel.
+* Way to browse the old bookmarks system aswel, better importing
+  functions. (although simple is fine)
