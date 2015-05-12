@@ -55,13 +55,14 @@ actually do something.
   just have the hash of a search stored somewhere, connected to the search.
   Or perhaps possible to only allow it manually.
 
-* (Optional)continuous scrolling, and other things to make looking at results
-  nicer. (keywords in the search should override? indicate that it is overridden?)
+* Better gui
+  + (Optional)continuous scrolling, and other things to make looking at results
+    nicer. (keywords in the search should override? indicate that it is overridden?)
 
-* Selecting multiple in one click with shift.
+  + Selecting multiple in one click with shift.
 
-* Get sensible location of selection immediately the main search.
+  + Get sensible location of selection immediately the main search.
 
-* Using keys to navigate gui.
+  + Using keys to navigate gui.
 
-* More customizability, make it prettier.
+  + More customizability, make it prettier.      

@@ -1,4 +1,4 @@
---  Copyright (C) 01-05-2015 Jasper den Ouden.
+--  Copyright (C) 11-05-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -64,9 +64,7 @@ local to_js = {
                ret[k] = v 
             end
          end
-         if got.values.taggings then
-            ret.tags = got:tags()
-         end
+         if got.values.taggings then ret.tags = got:tags() end
          return ret
    end end,
 
