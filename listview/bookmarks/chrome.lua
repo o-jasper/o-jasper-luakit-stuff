@@ -22,8 +22,7 @@ table.insert(assets_where, "listview/bookmarks")
 -- Make the chrome page.
 
 local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")   -- TODO
-local topics    = config.topics or {"entity", "idea", "project", "data_source",
-                                    "vacancy"}
+local topics    = config.topics or {"entity", "idea", "project", "data_source", "vacancy"}
 
 local function default_data_uri_fun(entry)
    for _,name in pairs(topics) do

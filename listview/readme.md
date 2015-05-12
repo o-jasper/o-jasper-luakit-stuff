@@ -56,8 +56,6 @@ actually do something.
   Or perhaps possible to only allow it manually.
 
 * Better gui
-  + (Optional)continuous scrolling, and other things to make looking at results
-    nicer. (keywords in the search should override? indicate that it is overridden?)
 
   + Selecting multiple in one click with shift.
 

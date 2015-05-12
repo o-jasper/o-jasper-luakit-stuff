@@ -15,7 +15,7 @@ local Public = {}
 
 Public.default_html_calc = {
    tagsHTML = function (self, state)
-      return ot.tagsHTML(self:tags(), state.tagsclass)
+      return c.tagsHTML(self:tags(), state.tagsclass)
    end,
 
    dateHTML = function(self, state)
