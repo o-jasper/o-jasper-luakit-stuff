@@ -12,27 +12,30 @@
 
 <!-- TODO "Enter" should submit them -->
 
-<table>
+<div id="list">
+  <hr>
+  <p class="minor">search_cnt: <span id="search_cnt">1</span></p>
 
-<div id="top_panel">
-  {%above_title}
-  <h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
-    <span class="minor" id="cnt"></span>{%right_of_title}</h3>
-  {%below_title}
-  {%parts/search.html}
-  {%parts/addsearch.html}
+  <p><button id="cycle_forw2" onclick="cycle_results()">Next {%cycleCnt}
+      <b>&gt;&gt;</b></button></p>
 </div>
+
 <div id="side_panel">
   {%parts/searchbuttons.html}
   {%parts/actions.html}
 </div>
 
-<span id="list"></span>
+<div id="top_panel">
+  {%above_title}
+  <h3>Search <span class="minor">in</span> <span class="table_name">{%table_name}</span>
+    <span class="minor" id="cnt"></span>{%right_of_title}
+  </h3>
+  {%below_title}
+  {%parts/search.html}
+  {%parts/addsearch.html}
+</div>
 
-<hr>
-<p class="minor">search_cnt: <span id="search_cnt">1</span></p>
 
-<p><button id="cycle_forw2" onclick="cycle_results()">Next {%cycleCnt} <b>&gt;&gt;</b></button></p>
 
 <script type="text/javascript">{%search_init.js}</script>
 {%after}

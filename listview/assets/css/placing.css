@@ -1,10 +1,20 @@
-#side_panel {
-  top:20%;
-  position: fixed;
-  margin-left: 0.5em;
-  float:left;
+ #side_panel {
+    position:fixed;
+    width:10%;
+    margin-left: 0.5em;
+    vertical-align:text-top;
 }
 #top_panel {
-  top:20%;
-  position: fixed;
+    top:0%;
+    width:90%;
+    left:10%;
+    position:fixed;
+    float:left;
+    margin-left:3%;
+    background-color:white;
+}
+#list {
+    position:absolute;
+    left:13%;
+    top:6em;
 }
