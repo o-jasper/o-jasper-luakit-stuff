@@ -46,7 +46,8 @@ local function js_listupdate(listview, list, as_msg)
    end
    return { list=final_html_list(listview, list, as_msg),
             cnt=cnt,
-            search_cnt=search_cnt
+            search_cnt=search_cnt,
+            last_id = list[#list].id,
    }
 end
 

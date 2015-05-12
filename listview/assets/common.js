@@ -6,7 +6,7 @@ function set_ids(idvals) {
         if( k == "sql_input" ){  // TODO block at right time.
             ge(k).value = idvals[k];
         }
-        else{
+        else if(idvals[k]) {
             ge(k).innerHTML = idvals[k];
         }
     }
@@ -22,4 +22,11 @@ function hide_button(name, yes) {
     var el = ge(name);
     el.hidden   = hide_buttons && yes;
     el.disabled = yes;
+}
+
+function in_viewport(el) {
+    var height = window.innerHeight;
+    var top    = el.offsetBottom;
+    var bottom = el.offsetTop;
+    return top > 0 ? top <= height : (bottom > 0 && bottom <= height);
 }
