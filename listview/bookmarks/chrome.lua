@@ -16,6 +16,9 @@ local bookmarks  = require "listview.bookmarks.bookmarks"
 local config = (globals.listview or {}).bookmarks or {}
 config.page = config.page or {}
 
+local assets_where = config.assets or {}
+table.insert(assets_where, "listview/bookmarks")
+
 -- Make the chrome page.
 
 local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")   -- TODO
@@ -98,7 +101,7 @@ local BookmarksSearch = c.metatable_of(c.copy_meta(listview.Search, mod_Bookmark
 assert(mod_BookmarksSearch.to_js.manual_enter)
 
 local function mk_page(meta, name)
-   local page = setmetatable({where="listview/bookmarks", log=bookmarks}, meta)
+   local page = setmetatable({where=assets_where, log=bookmarks}, meta)
    return paged_chrome.templated_page(page, name)
 end
 
@@ -106,7 +109,7 @@ local bookmarks_paged = {
    default_name = "search",
    enter  = mk_page(Enter, "enter"),
    search = mk_page(BookmarksSearch, "search"),
-   aboutChrome = listview.new_AboutChrome("listview/bookmarks", bookmarks),
+   aboutChrome = listview.new_AboutChrome(assets_where, bookmarks),
 }
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
