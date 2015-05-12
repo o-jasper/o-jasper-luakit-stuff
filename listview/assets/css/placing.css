@@ -1,13 +1,17 @@
  #side_panel {
     position:fixed;
+    top:30%;
+
     width:10%;
     margin-left: 0.5em;
     vertical-align:text-top;
 }
 #top_panel {
     top:0%;
-    width:90%;
-    left:10%;
+    left:0%;
+
+    width:100%;
+
     position:fixed;
     float:left;
     margin-left:3%;

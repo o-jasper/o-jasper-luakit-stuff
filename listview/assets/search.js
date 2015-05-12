@@ -92,6 +92,10 @@ function update_sql_shown() {
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function search(reset_state) {
     if(reset_state == null){ reset_state = true; }
+    if(reset_state) { // Burn the existing stuff.
+        ge("list_area").innerHTML = '<span id="list"></span><span id="list_subsequent"></span>'
+        reset_limit_values();
+    }
     if(by_search){ 
         set_ids(do_search(full_search_input(), as_msg));
     } else {
@@ -197,7 +201,7 @@ function load_next_chunk() {
     cycle_limit_values(+1); //Just change the parameters and search.
     search(false);
     update_sql_shown();
-    ge("cnt").innerText = "";
+    ge("cnt").innerText = ""; // TODO be nice to have something show..
 }
 
 var thresh_y = 0;

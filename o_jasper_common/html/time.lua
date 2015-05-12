@@ -61,13 +61,24 @@ function Public.timemarks(state, ms_t)
    return str
 end
 
+Public.day_names = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                    "Saturday"}
+Public.month_names = {"Januari", "Februari", "March", "April", "May",
+                      "June", "Juli", "Augustus", "September", "Oktober",
+                      "November", "December"}
+
+function Public.additional_time_strings(d)
+   d.dayname = Public.day_names[d.wday]
+   d.monthname = Public.month_names[d.month]
+   return d
+end
 
 function Public.resay_timemarks(state, ms_t)
    local tm = state.resay_timemarks
    local timemarks = state.config.resay_timemarks or
-      { {"year", [[</tr><tr><td colspan="2"><span class="year_change">Newyear {%year}<br><hr></span></td>]]},
-        {"yday", [[</tr><tr><td colspan="2"><span class="day_change">{%dayname} {%day}
-{%monthname}<br><hr></span></td>]]},
+      { {"year", [[<<tr><td colspan="2"><span class="year_change">Newyear {%year}<br><hr></span></td></tr>]]},
+        {"yday", [[<tr><tr><td colspan="2"><span class="day_change">{%dayname} {%day}
+{%monthname}<br><hr></span></td></tr>]]},
         --{"hour", [[</tr><tr><td class="hour_change">at {%hour}:{%min}</td>]]},
         init = " ", nochange = " ",
       }
@@ -82,12 +93,7 @@ function Public.resay_timemarks(state, ms_t)
       -- If that aspect of the date is no longer the same, increament it.
       if d[k] ~= tm[k] then
          tm[k] = d[k]
-         d.dayname = ({"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                       "Saturday"})[d.wday]
-         d.monthname = ({"Januari", "Februari", "March", "April", "May",
-                        "June", "Juli", "Augustus", "September", "Oktober",
-                        "November", "December"})[d.month]
-         return string.gsub(pattern, "{%%([_./%w]+)}", d)
+         return string.gsub(pattern, "{%%([_./%w]+)}", Public.additional_time_strings(d))
       end
    end
    return timemarks.nochange
