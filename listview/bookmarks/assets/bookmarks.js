@@ -29,7 +29,7 @@ function enter_values() {
 
 function set_main_sel(to) {
     main_sel = to;
-    ge("change_main_sel").disable = !main_sel;
+    ge("change_main_sel").disabled = !main_sel;
 }
 
 function change_main_sel() {
