@@ -89,17 +89,13 @@ function update_sql_shown() {
     if( sql_shown && !sql_locked ) { set_ids(show_sql(full_search_input())); }
 }
 
-function search() {
-    _search();
-}
-
-
 // TODO time it and turn off continuous, which then has 'force continuous' option.
-function _search() {
+function search(reset_state) {
+    if(reset_state == null){ reset_state = true; }
     if(by_search){ 
         set_ids(do_search(full_search_input(), as_msg));
     } else {
-        set_ids(manual_sql(ge('sql_input').value, as_msg));
+        set_ids(manual_sql(ge('sql_input').value, as_msg, reset_state));
     }
     var gl = got_limit(); // TODO .. This is also connected to whether by-sql.
     ge("less_results").disabled = gl;
@@ -111,13 +107,13 @@ function _search() {
 
 function cycle_results(n) {
     cycle_limit_values(n); //Just change the parameters and search.
-    _search();
+    search();
     update_sql_shown();
 }
 
 function more_results(more) {
     change_cnt(more);
-    _search();
+    search();
     update_sql_shown();
 }
 
@@ -199,7 +195,7 @@ function load_next_chunk() {
     el.id = null;
 
     cycle_limit_values(+1); //Just change the parameters and search.
-    _search();
+    search();
     update_sql_shown();
     ge("cnt").innerText = "";
 }

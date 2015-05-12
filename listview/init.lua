@@ -15,12 +15,15 @@ local c = require("o_jasper_common")
 local html_list = require "listview.html_list"
 local html_entry = require "listview.entry_html"
 
+local html_state;
+
 local function final_html_list(listview, list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    if not as_msg then
       return html_list.keyval(list)
    elseif listview.log.initial_state then
-      return html_entry.list(listview, list, listview.log:initial_state())
+      return html_entry.list(listview, list,
+                             html_state or listview.log:initial_state())
    else
       return html_entry.list(listview, list)
    end
@@ -44,7 +47,7 @@ local function js_listupdate(listview, list, as_msg)
                           math.min(listview.limit_i + listview.limit_cnt,
                                    listview.limit_i + #list))
    end
-   return { list=final_html_list(listview, list, as_msg),
+   return { list=final_html_list(listview, list, as_msg, reset_state),
             cnt=cnt,
             search_cnt=search_cnt,
    }
@@ -80,8 +83,13 @@ local to_js = {
          return js_listupdate(self, self.log:exec(sql), as_msg)
    end end,
    
-   do_search = function(self) return function(search, as_msg)
-         return js_listupdate(self, self:total_query(search):result(), as_msg)
+   do_search = function(self) return function(search, as_msg, reset_state)
+         if reset_state then
+            html_state = listview.log:initial_state()
+            listview.limit_i = nil
+            listview.limit_cnt = nil
+         end
+         return js_listupdate(self, self:total_query(search):result(), as_msg, reset_state)
    end end,
 
 -- TODO.. can we provide an interface to self directly?
