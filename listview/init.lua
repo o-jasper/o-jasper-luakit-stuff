@@ -47,7 +47,6 @@ local function js_listupdate(listview, list, as_msg)
    return { list=final_html_list(listview, list, as_msg),
             cnt=cnt,
             search_cnt=search_cnt,
-            last_id = list[#list].id,
    }
 end
 
@@ -163,7 +162,7 @@ local mod_AboutChrome = {
          },
          {__index=function(kv, key)
              if self.log.values[key] then
-                return self.log.values[key]
+                 return self.log.values[key]
              elseif key == "raw_summary" then
                 return c.tableText(self.log.values,
                                    "&nbsp;&nbsp;", "","<br>")

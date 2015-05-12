@@ -38,6 +38,7 @@ function set_by_search(yes) {
     ge('sql_input').className = sql_input_class(yes, sql_locked);
     ge('search_input').className    = (yes ? "live" : "dead");
 }
+
 function set_sql_locked(yes) {
     sql_locked = yes
     ge('toggle_sql_locked').innerText = yes ? "Written sql" : "Linked sql";
@@ -92,6 +93,7 @@ function search() {
     _search();
 }
 
+
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function _search() {
     if(by_search){ 
@@ -103,7 +105,7 @@ function _search() {
     ge("less_results").disabled = gl;
     ge("more_results").disabled = gl;
     ge("cycle_forw").disabled = gl;
-    ge("cycle_forw2").disabled = gl;
+    //ge("cycle_forw2").disabled = gl;
     ge("cycle_back").disabled = gl;
 }
 
@@ -187,5 +189,26 @@ function touch_addsearch_name() {
     if(got || got == "") {  // Empty strings are false...
         ge('addsearch_input').value = got;
         if(continuous){ search(); }
+    }
+}
+
+function load_next_chunk() {
+    ge("list").id = null; // Note this is a bit hacky.
+    var el = ge("list_subsequent");
+    el.innerHTML = '<span id="list"></span><span id="list_subsequent"></span>';
+    el.id = null;
+
+    cycle_limit_values(+1); //Just change the parameters and search.
+    _search();
+    update_sql_shown();
+    ge("cnt").innerText = "";
+}
+
+var thresh_y = 0;
+
+document.onscroll = function() {
+    if(window.pageYOffset > thresh_y ) {
+        thresh_y += window.innerHeight/2;
+        load_next_chunk();
     }
 }
