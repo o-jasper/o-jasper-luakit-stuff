@@ -21,12 +21,6 @@ function History:history_entry(entry)
    return setmetatable(entry, HistoryEntry)
 end
 
-function History.listfun(self, list)
-   for _, data in pairs(list) do
-      data.origin = self
-      setmetatable(data, HistoryEntry)
-   end
-   return list
-end
+History.entry_fun = History.history_entry
 
 return c.metatable_of(History)

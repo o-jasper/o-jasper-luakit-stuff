@@ -120,11 +120,15 @@ local SqlHelp = {
    },
    
    -- Intended as replacable ("virtual")
-   listfun = function(_, list)
+   entry_fun = function(self, data)
+      assert(type(data) == "table")
+      data.origin = self
+      setmetatable(data, SqlEntry)
+      return data
+   end,
+   list_fun = function(self, list)
       for _, data in pairs(list) do
-         assert(type(data) == "table")
-         data.origin = self
-         setmetatable(data, SqlEntry)
+         self:entry_fun(data)
       end
       return list
    end,
@@ -141,7 +145,7 @@ local SqlHelp = {
                           getmetatable(self))
    end,
    
-   exec = function(self, ...) return self:listfun(self.db:exec(...)) end,
+   exec = function(self, ...) return self:list_fun(self.db:exec(...)) end,
    
    -- Stuff to help me construct queries based on searches.
    extcmd = function(self, str, ...)
@@ -346,7 +350,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
    
    -- Get the result of the current query on a DB.
-   result = function(self, db) return self:listfun(self:raw_result(db)) end,
+   result = function(self, db) return self:list_fun(self:raw_result(db)) end,
    
    -- Represents the entry as list in the order of the names.
    args_in_order = function(self, entry)
@@ -446,11 +450,10 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       return ret
    end,
    -- Modify an entry.
-   -- TODO doesnt do tags.. Probably simpler to just delete-and-re-add on same id?
    update = function(self, entry)
       if not entry.id then return nil end
       local got = self:sqlcmd("selectid"):exec({entry.id})
-      if #got == 1 then
+      if #got == 1 then  -- It must exist, otherwise it isnt an update.
          return self:force_update(entry) or self:get_id(entry.id)
       end
    end,
@@ -477,7 +480,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
 
    get_id = function(self, id)
-      return self:sqlcmd("get_id"):exec({id})[1]
+      return self:entry_fun(self:sqlcmd("get_id"):exec({id})[1])
    end,
 }
 

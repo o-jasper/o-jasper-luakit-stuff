@@ -21,17 +21,9 @@ local addfuns = {
 
    bookmark_entry = function(self, entry)
       entry.origin = self
-      return setmetatable(entry, BookmarkEntry)
+      return setmetatable(entry, BookmarksEntry)
    end,
    
-   listfun = function(self, list)
-      for _, data in pairs(list) do
-         data.origin = self
-         setmetatable(data, BookmarksEntry)
-      end
-      return list
-   end,
-
    enter = function(self, add)
       if not add.id then
          local t_ms = c.cur_time.ms()
@@ -72,6 +64,9 @@ local addfuns = {
       return { html_calc=html_calc }
    end,
 }
+
+addfuns.entry_fun = addfuns.bookmark_entry
+
 
 for k,v in pairs(addfuns) do Bookmarks[k] = v end
 
