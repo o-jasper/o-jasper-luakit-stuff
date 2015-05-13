@@ -63,4 +63,13 @@ actually do something.
 
   + Using keys to navigate gui.
 
-  + More customizability, make it prettier.      
+  + More customizability, make it prettier.
+  
+  + Non-obnoxious indicator whenever it searches.
+  
+  + Continuous scroll is annoyingly interupted by searching. When using it,
+    turn off continuous updating.
+    
+  + Hitting return should submit the search form.
+
+* Quick old bookmarks thing.

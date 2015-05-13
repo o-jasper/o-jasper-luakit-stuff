@@ -8,15 +8,13 @@ otherwise, in `~/.config/luakit/rc.lua`, do
 
 ## TODO
 
-* Gui able to *change* bookmarks. (rather than just add)
+* Changing bookmarks by clicking on the part to change and interface for
+  adding, similarly.
 
-* Importing bookmarks from existing system. (that are not in there yet)
-
-* Bindings for adding bookmarks.
-
-  + I dont *quite* like how the existing bookmarks "goes to its page"
-    to fill in data.. Maybe we need split-screen so you can do it,
-    and then un-split the screen, or something.
+* The keybinding for adding bookmarks doesnt seem to pick up the data..
+  
+  Also, having a small second panel come up instead of going to a
+  separate tab. (would involve `config/window.lua` and stuff)
 
 * Way to add functions to automatically assign data-uris.
   + A way to look at files behind data URIs. Like a longer description.
