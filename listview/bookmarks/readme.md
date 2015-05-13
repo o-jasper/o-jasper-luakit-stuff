@@ -22,9 +22,5 @@ otherwise, in `~/.config/luakit/rc.lua`, do
 * Make a more elaborate history, that looks at other info too. In this
   case, whether bookmarked.
 
-* Want a way help people "characterize" things for their own memory?
-  
-  Perhaps "not for" bookmarks though!
-
-* Way to browse the old bookmarks system aswel, better importing
-  functions. (although simple is fine)
+* Add [sessman](https://github.com/IsoLinearCHiP/luakit-sessman) things
+  stored-in-bookmarks with `sess_{%name}` tags indicating them.
