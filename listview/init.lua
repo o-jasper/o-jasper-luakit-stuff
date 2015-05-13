@@ -21,12 +21,10 @@ local function final_html_list(listview, list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    if not as_msg then
       return html_list.keyval(list)
-   elseif listview.log.initial_state then
+   else
+      assert(listview.log.initial_state)
       html_state = html_state or listview.log:initial_state()
       return html_entry.list(listview, list, html_state)                             
-   else
-      html_state = html_state or {}
-      return html_entry.list(listview, list, html_state)
    end
 end
 
@@ -86,7 +84,6 @@ local to_js = {
    
    do_search = function(self) return function(search, as_msg, reset_state)
          if reset_state then
-            print("reset")
             html_state = listview.log:initial_state()
          end
          return js_listupdate(self, self:total_query(search):result(), as_msg)

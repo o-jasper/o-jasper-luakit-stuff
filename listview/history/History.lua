@@ -14,7 +14,9 @@ History.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:",
                                 "urilike:", "titlelike:",
                                 "before:", "after:", "limit:"}
 
+
 function History:config() return config end
+function History:initial_state() return {} end
 
 function History:history_entry(entry)
    entry.origin = self
