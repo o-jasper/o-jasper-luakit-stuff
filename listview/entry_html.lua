@@ -35,16 +35,22 @@ Public.default_html_calc = {
    end,
 }
 for k,v in pairs(os.date("*t", 0)) do
-   Public.default_html_calc[k] = function(self, _) 
-      return os.date("*t", math.floor(self:ms_t()/1000))[k]
-   end
+   Public.default_html_calc[k] = "{%time_" .. k .. "}"
+end
+
+Public.default_html_calc.min  = "{%time_M}"
+Public.default_html_calc.hour = "{%time_H}"
+Public.default_html_calc.month  = "{%time_h}"
+
+local function datetab(ms_t)
+   return os.date("*t", math.floor(ms_t/1000))
 end
 
 function Public.default_html_calc.dayname(self, _)
-   return Public.day_names[os.date("*t", math.floor(self:ms_t()/1000)).wday]
+   return Public.day_names[datetab(self:ms_t()).wday]
 end
 function Public.default_html_calc.monthname(self, _)
-   return Public.day_names[os.date("*t", math.floor(self:ms_t()/1000)).wday]
+   return Public.day_names[datetab(self:ms_t()).wday]
 end
 
 function Public.repl(entry, state)
@@ -59,8 +65,17 @@ function Public.repl(entry, state)
    end
    local function calc(_, key)
       local fun = state.html_calc[key]
-      if fun then
+      if type(fun) == "function" then
          return fun(entry, state)
+      elseif type(fun) == "string" then
+         return fun
+      elseif string.match(key, "time_.+") then
+         local got = datetab(entry:ms_t())[string.sub(key, 6)]
+         if got then
+            return got
+         else
+            return os.date("%" .. string.sub(key, 6), math.floor(entry:ms_t()/1000))
+         end
       end
    end
    return setmetatable(pass, {__index=calc})
