@@ -205,11 +205,12 @@ function load_next_chunk() {
     ge("cnt").innerText = ""; // TODO be nice to have something show..
 }
 
-var thresh_y = 0;
+var thresh_y = window.innerHeight/2;
 
 document.onscroll = function() {
-    if(window.pageYOffset > thresh_y ) {
+    if( window.pageYOffset > thresh_y ) {
         thresh_y += window.innerHeight/2;
         load_next_chunk();
+        set_continuous(false);
     }
 }

@@ -9,3 +9,5 @@ set_safe_mode(true);
 ge('search_input').value = "{%latestQuery}"
 touch_addsearch_name();
 search();
+
+ge('search_input').onkeydown = function(event){ if(event.keyCode == 13){ search(); } }
