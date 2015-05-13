@@ -49,7 +49,11 @@ function Public.repl(entry, state)
    assert(entry)
    local pass = {}
    for _,name in pairs(entry.values.row_names) do  -- Grab the data.
-      pass[name] = entry[name]
+      if not entry[name] or entry[name] == "" then
+         pass[name] = " "
+      else
+         pass[name] = entry[name]
+      end
    end
    local function calc(_, key)
       local fun = state.html_calc[key]
