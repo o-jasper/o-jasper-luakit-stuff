@@ -41,11 +41,7 @@ local addfuns = {
 
    -- State for the html writer.
    initial_state = function(self)
-      local html_calc = c.copy_table(entry_html.default_html_calc)
       local mod_html_calc = {
-         identifier = function(entry, _)
-            return c.int_to_string(entry[entry.values.idname])
-         end,
          data_uri = function(entry, _)
             if not entry.data_uri or entry.data_uri == "" then
                return [[<span class="minor">(no data uri)</span>]]
@@ -57,6 +53,7 @@ local addfuns = {
             return entry.title or entry.uri or "(no title)"
          end
       }
+      local html_calc = c.copy_table(entry_html.default_html_calc)
       for k,v in pairs(mod_html_calc) do html_calc[k] = v end
       return { html_calc=html_calc }
    end,

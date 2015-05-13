@@ -63,13 +63,8 @@ actually do something.
 
   + Get sensible location of selection immediately the main search.
 
-  + Using keys to navigate gui.
+  + Using keyboard keys to navigate gui.
 
-  + More customizability, make it prettier.
+  + More customizability, make it prettier. Location of buttons doesnt seem "well balanced"
   
   + Non-obnoxious indicator whenever it searches.
-  
-  + Continuous scroll is annoyingly interupted by searching. When using it,
-    turn off continuous updating.
-    (people might be reading the result from the list while writing their
-     new search)

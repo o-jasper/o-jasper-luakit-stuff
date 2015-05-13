@@ -194,6 +194,7 @@ end
 
 local paged_chrome = require("paged_chrome")
 
+-- Better not use.
 function Public.new_Chrome(log, where, default_name)
    assert(log and where)
    return { default_name = default_name or "search",
