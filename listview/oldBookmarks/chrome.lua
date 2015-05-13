@@ -26,5 +26,6 @@ local function chrome_describe(log)
 end
 
 -- Make the chrome page.
-local old_bookmarks_paged = chrome_describe(old_bookmarks)
-paged_chrome.paged_chrome("listviewOldBookmarks", old_bookmarks_paged)
+local paged = chrome_describe(old_bookmarks)
+assert(paged.search.page.log.initial_state)
+paged_chrome.paged_chrome("listviewOldBookmarks", paged)

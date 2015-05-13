@@ -2,10 +2,9 @@ local c = require "o_jasper_common"
 
 local OldBookmarksEntry = c.copy_meta(require("sql_help").SqlEntry)
 
-OldBookmarksEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
-   table_name = "history",
---   taggings = "history_implied", -- (possibly record what outside stuff is loaded)
---   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
+OldBookmarksEntry.values = {
+   table_name = "bookmarks",
+
    idname = "id",
    row_names = {"id", "uri", "title", "desc", "tags", "created", "modified"},
 

@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local OldBookmarks = require "listview.history.OldBookmarks"
+local OldBookmarks = require "listview.oldBookmarks.OldBookmarks"
 
 local bookmarks = require("bookmarks")
 bookmarks.init()
