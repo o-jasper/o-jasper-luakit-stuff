@@ -13,6 +13,19 @@ local SqlEntry = require("sql_help").SqlEntry
 
 local Public = {}
 
+local function int_to_string(i)
+   local largenum = 10000000000000
+   if math.floor(i/largenum) == 0 then
+      return tostring(i)
+   else
+      local str = tostring(i%largenum)
+      while #str ~= 13 do  -- TODO is it right.. didnt i solve this before..?
+         str = "0" .. str
+      end
+      return tostring(math.floor(i/largenum)) .. str
+   end
+end
+
 Public.default_html_calc = {
    tagsHTML = function (self, state)
       return ot.tagsHTML(self:tags(), state.tagsclass)
@@ -30,7 +43,9 @@ Public.default_html_calc = {
       return tt.resay_timemarks(state, self:ms_t())
    end,
 
-   identifier = function(self, _) return self[self.values.idname] end,
+   identifier = function(self, _)
+      return int_to_string(self[self.values.idname])
+   end,
 }
 for k,v in pairs(os.date("*t", 0)) do
    Public.default_html_calc[k] = function(self, _) 
