@@ -55,6 +55,8 @@ actually do something.
   just have the hash of a search stored somewhere, connected to the search.
   Or perhaps possible to only allow it manually.
 
+* Split up javascript functionality better.
+
 * Better gui
 
   + Selecting multiple in one click with shift.
@@ -69,7 +71,5 @@ actually do something.
   
   + Continuous scroll is annoyingly interupted by searching. When using it,
     turn off continuous updating.
-    
-  + Hitting return should submit the search form.
-
-* Quick old bookmarks thing.
+    (people might be reading the result from the list while writing their
+     new search)
