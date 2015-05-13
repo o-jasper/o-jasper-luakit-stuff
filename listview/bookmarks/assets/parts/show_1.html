@@ -2,13 +2,10 @@
 
 <tr id="id_{%identifier}" onclick="select_toggle('{%identifier}')">
   <td>
-    <span class="time">{%hour}:{%min}</span>
-  </td>
-  <td>
-    <span class="tagswhole">{%tagsHTML}</span>
-  </td>
-  <td><a href="{%to_uri}" class="it_title">{%title}</a>
+    <span class="time">{%hour}:{%min}</span>&nbsp;
+    <a href="{%to_uri}" class="it_title">{%title}</a>
     <p class="desc">{%desc}</p>
     <code>{%data_uri}</code>
+    <span class="tagswhole">{%tagsHTML}</span>
   </td>
 </tr>
