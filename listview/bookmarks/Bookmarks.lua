@@ -44,10 +44,7 @@ local addfuns = {
       local html_calc = c.copy_table(entry_html.default_html_calc)
       local mod_html_calc = {
          identifier = function(entry, _)
-            local val = entry[entry.values.idname]
-            return string.format("%d%d",  -- Ugly way to show the entire number.
-               math.floor(val/1000000000),
-                              math.floor(val%1000000000))
+            return c.int_to_string(entry[entry.values.idname])
          end,
          data_uri = function(entry, _)
             if not entry.data_uri or entry.data_uri == "" then

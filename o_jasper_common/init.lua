@@ -8,6 +8,6 @@ for k,v in pairs(require "o_jasper_common.load_asset") do Public[k] = v end
 
 Public.full_gsub = require "o_jasper_common.full_gsub"
 
-Public.tableText = require("o_jasper_common.text").tableText
+for k,v in pairs(require "o_jasper_common.text") do Public[k] = v end
 
 return Public
