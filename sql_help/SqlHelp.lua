@@ -45,6 +45,7 @@ local SqlHelp = {
       idname = "id", 
       time = "id", timemul = 0.001,
    },
+   entry_meta = SqlEntry,
    c = false, tags_last = 0, last_id_time = 0,
    
    searchinfo = {
@@ -124,7 +125,7 @@ local SqlHelp = {
    entry_fun = function(self, data)
       assert(type(data) == "table")
       data.origin = self
-      setmetatable(data, SqlEntry)
+      setmetatable(data, self.entry_meta)
       return data
    end,
    list_fun = function(self, list)
@@ -137,8 +138,8 @@ local SqlHelp = {
    -- Important: gotta be a _new_ one!
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
-   new_SqlHelp = function(self, initial, fun)
-      -- TODO multiple table names?
+   new_SqlHelp = function(self, initial, fun)  -- TODO rename to `copy`
+      -- TODO multiple table names? 
       initial = initial or {string.format([[SELECT * FROM %s m]], self.values.table_name)}
       return setmetatable({db=self.db, 
                            input = {}, cmd=initial,
@@ -220,12 +221,13 @@ local SqlHelp = {
    end,
    
    -- Add a like command.
-   like = function(self, value, what, n)
-      self:extcmd([[%s LIKE ?]], n and what .." NOT" or what)
+   like = function(self, value, what)
+      self:extcmd([[%s LIKE ?]], what)
       self:inp(value)
    end,
    not_like = function(self, value, what)
-      self:like(value, what, true)
+      self:extcmd([[%s NOT LIKE ?]], what)
+      self:inp(value)
    end,
    
    -- a LIKE command on all textlike parts.

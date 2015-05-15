@@ -18,6 +18,4 @@ local mod_BookmarksEntry = {
    },
 }
 
-local BookmarksEntry = c.copy_meta(sql_help.SqlEntry, mod_BookmarksEntry)
-
-return c.metatable_of(BookmarksEntry)
+return c.metatable_of(c.copy_meta(sql_help.SqlEntry, mod_BookmarksEntry))
