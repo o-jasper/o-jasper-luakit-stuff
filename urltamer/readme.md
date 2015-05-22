@@ -5,33 +5,9 @@ available.
 **Status** seems to work.. okey, but over-blocks, and probably under-blocks
 too.
 
-## Give things a list of things to do
-I am not very sure about the way this part works, and if that is right!
-One way to use it is to give it a string:
+## Specifying how to treat uris
 
- `shortlist[domain].way` currently holds it a series of commands.
- `:something=...` sets stuff in `way.something` a list if multiple,
- `:something.....` (no `=`) runs a
- command, and *not* starting with `:` tries to match it and runs `way.fun`
- if it does.
- 
-`add_urlcmd` takes a list of `urlcmd(name, function)` and `add_urlfunc` 
-the same with `urlfunc`. The function takes as arguments:
-
-* `way` how it is configured.
-  + `way.hard` takes yes/no's seriously immediately. `way.hardyes`, `way.hardno` 
-    apply only to yes/no. `way.nexthard.+` only apply to a limited number.
-* `info` information gathered about the url-get.
-* `result` what your current result is.
-  + `result.redirect` redirects
-  + `result.yes`, `result.no` determines whether to go forward or not.
-    No overrides yes defaultly.
-* `arguments` arguments given in case of a command,.
-
-Try not get fancy with this. Just implement anything vaguely complicated in
-the `urlcmd` and use the list to gather data.
-
-`specifics.lua` contains examples.
+TODO
 
 ## `responder[domain].resource_request_starting = function(info, result) ... end`
 it overrides the above. The `result`/`info` is the same as the above system uses.
@@ -69,6 +45,10 @@ depending on load times)
 
 `info.dt` is a convenience for the time since. **TODO** do it for other ones. 
 
+`info:own_domain()` returns whether the request is from the same domain as the 
+originating page. `info:uri_match(match)` returns true if any from a
+lua-regex(list) match.
+
 ### The result `result`
 You can do what you want with `result`, only `result.redirect` contains a string
 if you want to redirect. It has to be allowed to do that.
@@ -78,11 +58,19 @@ for the result.
 
 ## TODO
 
+* Log user-specify-edly with a good default, including time-limits on keeping
+  stuff.
+  
+  + Keep a list of stuff-blocked-for-this, and have a function where you can
+    allow just-those this times. A better way that `:UrlPermissive` to get
+    around overblocking.
+
 * How `parametered_matches.lua` works is a bit too much imperative really.
   All i want is  for the data be storable in SQL in the future for easy
   configuration, and `lua` does the actual work.
   
-  Perhaps this is just a matter of using it right.
+  NOTE: probably i will just interpret the string as lua.
+  (`loadstring()`)
   
 * Storing config in SQL and an interface to quickly configure.
 

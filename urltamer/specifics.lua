@@ -68,6 +68,8 @@ shortlist["github.com"] = function(info, result)
                                  "^https://github.com/.+/.+/pullrequest_comments$"})
 end
 
-shortlist["xkcd.com"] = { way=[[:nexthardyes=1
-:fun=allow
-^http://imgs.xkcd.com/comics/.+.png$]] }
+shortlist["xkcd.com"] = function(info, result)
+   fun_everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
+end
+
+pattern_shortlist["^luakit://.+"] = permissive

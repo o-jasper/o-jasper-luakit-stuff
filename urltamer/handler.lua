@@ -15,7 +15,7 @@ config.log_everywhere = (config.log_everywhere == nil) or config.log_everywhere
 -- Values directly returned, for instance member functions.
 local info_metaindex_direct = {
    own_domain = function(self)
-      return self.from_domain ~= "no_vuri" and self.from_domain ~= self.domain
+      return self.from_domain ~= "no_vuri" or self.from_domain == self.domain
    end,
 
    uri_match = function(self, match)
@@ -55,7 +55,7 @@ local info_metatable = {__index=function(self, key)
    local got = rawget(self, key) or info_metaindex_direct[key]
   -- Return value, because set, or because specified by metatable.c
    if got or type(got) == "boolean" then
-      return got(self, key)
+      return got
    else
       local determiner = info_metaindex_determine[key]
       if determiner then  -- To be determined by functions.
@@ -95,7 +95,7 @@ function fun_everywhere(info, result)
 end
 
 -- If not shortlisted, keep it on own domain,
-not_listed = [[fun_everywhere]]
+not_listed = fun_everywhere
 shortlist = {}
 pattern_shortlist = {}
 
@@ -105,7 +105,7 @@ function respond_to(info, result)
       if string.match(info.uri, k) then domain_way = v end
    end
    if not domain_way then
-      domain_way = (shortlist[info.from_domain]or {}).way or not_listed
+      domain_way = shortlist[info.from_domain] or not_listed
    end
    -- TODO sql table. (possibly via metatable)
    if type(domain_way) == "string" then
@@ -159,11 +159,6 @@ webview.init_funcs.url_respond_signals = function (view, w)
    view:add_signal("resource-request-starting", function (v, uri)
           uri_cnt = uri_cnt + 1
 
-          if (uri and string.match(uri, "^luakit://.+")) or
-             (v.uri and string.match(v.uri, "^luakit://.+")) then
-             print("luakit")
-             return
-          end
           -- Get info on domain.
           local info  = new_info(v, uri)
 
