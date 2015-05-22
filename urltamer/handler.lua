@@ -7,9 +7,24 @@
 
 require "urltamer.common"
 require "urltamer.domain_status"
+local config = globals.urltamer or {}
+
+config.late_dt = config.late_dt or 4000
+config.log_everywhere = (config.log_everywhere == nil) or config.log_everywhere
 
 -- Values directly returned, for instance member functions.
-local info_metaindex_direct = {}
+local info_metaindex_direct = {
+   own_domain = function(self)
+      return self.from_domain ~= "no_vuri" and self.from_domain ~= self.domain
+   end,
+
+   uri_match = function(self, match)
+      for i, el in ensure_pairs(match) do
+         if string.match(self.uri, el) then return i end
+      end
+   end,
+}
+
 -- Values that are determined and memoized. (though memoizing is not necessarily better)
 local info_metaindex_determine = {
    tags = function(self, _) return "" end,
@@ -60,37 +75,54 @@ function new_info(v, uri)
    return info
 end
 
-everywhere = [[:hard=true
-:about_blank_redirect vuri yes
-:allow_userevent
-:hard=false
-:block_late 1000
-:set_result weakyes true
-:hardno=true
-:fun=disallow
-^.+[.][fF][lL][vV]$
-^.+[.][sS][wW][fF]$
-:hardno=false]]
+function fun_base(info, result, also_allow)
+   if info.uri == "about:blank" or info.by_userevent then
+      result.allow = true
+   elseif also_allow and info:uri_match(also_allow) then
+      result.allow = true
+   elseif info.dt > config.late_dt or
+        info:uri_match({"^.+[.][fF][lL][vV]$", "^.+[.][sS][wW][fF]$"}) then
+      result.was_late = true
+      result.allow = false
+   else
+      result.allow = true
+   end
+end
+
+function fun_everywhere(info, result)
+   fun_base(info, result)
+   if not info:own_domain() then result.allow = false end
+end
 
 -- If not shortlisted, keep it on own domain,
-no_shortlist = [[:own_domain]]
-
+not_listed = [[fun_everywhere]]
 shortlist = {}
+pattern_shortlist = {}
 
 function respond_to(info, result)
-   local domain_way = (shortlist[info.from_domain]or {}).way or no_shortlist
-   return parametered_matches(everywhere .. "\n" .. domain_way,
-                              info.uri, info, result,
-                              urlcommands, urlfuncs)
+   local domain_way = nil
+   for k,v in pairs(pattern_shortlist) do
+      if string.match(info.uri, k) then domain_way = v end
+   end
+   if not domain_way then
+      domain_way = (shortlist[info.from_domain]or {}).way or not_listed
+   end
+   -- TODO sql table. (possibly via metatable)
+   if type(domain_way) == "string" then
+      -- TODO use the environment argument.
+      load("return " .. domain_way, nil, "t")(info, result)
+   else
+      domain_way(info, result)
+   end
 end
 
 responses = {}
 log = {}
 uri_cnt = 0
 
-stats = {}
+stats = {} -- TODO maybe have the respond-to thingy do it.
 function keep_stats(info, result, prep, status, prnt)
-   if prnt then print(info.uri, info.vuri, result.line) end
+   if prnt then print(prep, info.uri, info.vuri, result.line) end
    for _, el in pairs(result.remarks) do
       stats[prep .. el] = (stats[prep .. el] or 0) + 1
       if prnt then
@@ -141,8 +173,7 @@ webview.init_funcs.url_respond_signals = function (view, w)
              return true
           end
 
-          -- User events can poke a hole. (TODO.. ensure they're actually user events?)
-          -- TODO just stuff it in the info.
+          -- User events can poke a hole, if it listens to `by_userevent`
           local allowed = cur_allowed[info.uri]
           if allowed then
              allowed[2] = allowed[2] - 1
@@ -153,12 +184,12 @@ webview.init_funcs.url_respond_signals = function (view, w)
              cur_allowed[info.uri] = nil
           end
 
-          local allow, result = 
-             (responder.resource_request_starting or respond_to)(info, new_result())
+          local result = { remarks = {} }
+          (responder.resource_request_starting or respond_to)(info, result)
 
           if result.log then table.insert(log, {info, result}) end
           
-          if not allow then
+          if not result.allow or result.disallow then
              keep_stats(info, result or {}, "block:", info.status, true)
              return false
           elseif result.redirect then
