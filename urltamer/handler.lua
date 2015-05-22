@@ -11,6 +11,7 @@ local config = globals.urltamer or {}
 
 config.late_dt = config.late_dt or 4000
 config.log_everywhere = (config.log_everywhere == nil) or config.log_everywhere
+config.logger = require "urltamer.print_logger"
 
 -- Values directly returned, for instance member functions.
 local info_metaindex_direct = {
@@ -117,24 +118,7 @@ function respond_to(info, result)
 end
 
 responses = {}
-log = {}
 uri_cnt = 0
-
-stats = {} -- TODO maybe have the respond-to thingy do it.
-function keep_stats(info, result, prep, status, prnt)
-   if prnt then print(prep, info.uri, info.vuri, result.line) end
-   for _, el in pairs(result.remarks) do
-      stats[prep .. el] = (stats[prep .. el] or 0) + 1
-      if prnt then
-         print(string.format("%s%s:%s %d", prep, status, el, stats[prep .. el]))
-         if el == "block_late" then
-            print(info.dt)
-         end
-      end
-      info.finally = string.sub(prep, 1, #prep - 1)
-      local dt= info.dt
-   end
-end
 
 cur_allowed = {}
 allowed_t = 100
@@ -175,19 +159,20 @@ webview.init_funcs.url_respond_signals = function (view, w)
 
           local result = { remarks = {} }
           respond_to(info, result)
-
-          if result.log then table.insert(log, {info, result}) end
-          
+         
           if not result.allow or result.disallow then
-             keep_stats(info, result or {}, "block:", info.status, true)
-             return false
+             result.ret = false
           elseif result.redirect then
-             keep_stats(info, result or {}, "redirect:", info.status)
-             return result.redirect
+             result.ret = result.redirect
           else
-             keep_stats(info, result or {}, "allow:", info.status)
-             return true
+             result.ret = true
           end
+
+          if (result.log or config.logall) and config.logger then
+             config.logger:insert(info, result)
+          end
+          
+          return result.ret
    end)
    view:add_signal("load-status",
        function (v, status)
