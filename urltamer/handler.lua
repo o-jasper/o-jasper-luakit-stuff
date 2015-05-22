@@ -162,12 +162,6 @@ webview.init_funcs.url_respond_signals = function (view, w)
           -- Get info on domain.
           local info  = new_info(v, uri)
 
-          local responder = responses[info.from_domain] or {}
-          if responder.impervious then
-             if not allow then print("Imperviousness", info.uri) end
-             return true
-          end
-
           -- User events can poke a hole, if it listens to `by_userevent`
           local allowed = cur_allowed[info.uri]
           if allowed then
@@ -180,7 +174,7 @@ webview.init_funcs.url_respond_signals = function (view, w)
           end
 
           local result = { remarks = {} }
-          (responder.resource_request_starting or respond_to)(info, result)
+          respond_to(info, result)
 
           if result.log then table.insert(log, {info, result}) end
           
