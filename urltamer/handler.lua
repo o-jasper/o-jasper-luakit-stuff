@@ -10,18 +10,20 @@ require "urltamer.domain_status"
 local config = globals.urltamer or {}
 
 config.late_dt = config.late_dt or 4000
-config.log_everywhere = (config.log_everywhere == nil) or config.log_everywhere
+config.log_all = (config.log_all == nil) or config.log_all
 config.logger = require "urltamer.print_logger"
 
 -- Values directly returned, for instance member functions.
 local info_metaindex_direct = {
    own_domain = function(self)
-      return self.from_domain ~= "no_vuri" or self.from_domain == self.domain
+      return self.from_domain == "no_vuri" or self.from_domain == self.domain
    end,
 
    uri_match = function(self, match)
       for i, el in ensure_pairs(match) do
-         if string.match(self.uri, el) then return i end
+         if string.match(self.uri, el) then 
+            return i
+         end
       end
    end,
 }
@@ -80,6 +82,7 @@ function fun_base(info, result, also_allow)
    if info.uri == "about:blank" or info.by_userevent then
       result.allow = true
    elseif also_allow and info:uri_match(also_allow) then
+      result.specific_allow = true
       result.allow = true
    elseif info.dt > config.late_dt or
         info:uri_match({"^.+[.][fF][lL][vV]$", "^.+[.][sS][wW][fF]$"}) then
@@ -90,9 +93,11 @@ function fun_base(info, result, also_allow)
    end
 end
 
-function fun_everywhere(info, result)
-   fun_base(info, result)
-   if not info:own_domain() then result.allow = false end
+function fun_everywhere(info, result, also_allow)
+   fun_base(info, result, also_allow)
+   if not info:own_domain() and not (info.by_userevent or result.specific_allow) then
+      result.allow = false
+   end
 end
 
 -- If not shortlisted, keep it on own domain,
@@ -168,7 +173,7 @@ webview.init_funcs.url_respond_signals = function (view, w)
              result.ret = true
           end
 
-          if (result.log or config.logall) and config.logger then
+          if (result.log or config.log_all) and config.logger then
              config.logger:insert(info, result)
           end
           

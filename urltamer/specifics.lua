@@ -10,8 +10,6 @@ shortlist["www.reddit.com"] = function(info, result)
    if info:uri_match("^https*://pixel[.]redditmedia[.]com/pixel/of_doom[.]png.+") then
       result.allow = false
       result.disallow = true
-   elseif info:uri_match() then
-      result.allow = true
    else  -- And allow some api stuff.
       local apilist = {"comment", "del", "editusertext", "hide", "info", "marknsfw",
                        "morechildren", "report", "save", "saved_categories.json",
