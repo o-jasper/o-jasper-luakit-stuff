@@ -38,4 +38,21 @@ function UriRequests.insert(self, info, result)
    self:enter(info)
 end
 
+function UriRequests.config(self) return config end
+
+local entry_html = require "listview.entry_html"
+
+function UriRequests.initial_state(self)
+   local mod_html_calc = {
+      resultHTML = function(entry, _)
+         return ({["true"]="allowed", ["false"]="blocked"})[entry.result] or
+            [[<span class="redirect_ann">redirected:</span>
+<span class="redirect">{%result}</span]]
+      end,
+   }
+   local html_calc = c.copy_table(entry_html.default_html_calc)
+   for k,v in pairs(mod_html_calc) do html_calc[k] = v end
+   return { html_calc=html_calc }
+end
+
 return c.metatable_of(UriRequests)

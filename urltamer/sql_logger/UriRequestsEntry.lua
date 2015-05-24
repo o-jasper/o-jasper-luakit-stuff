@@ -8,7 +8,7 @@ UriRequestsEntry.values = {  -- Note: it is overkill, shared with history_meta.v
    idname = "id",
    row_names = {"id", "time", "uri", "vuri", "domain", "from_domain", "result"},
 
-   time = "time", timemul = 1000,
+   time = "time", timemul = 1,
    order_by = "time",
    textlike = {"uri", "vuri"},
 
