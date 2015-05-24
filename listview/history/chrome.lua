@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local listview = require("listview")
+local listview = require "listview"
 local history  = require "listview.history.history"
 
 local paged_chrome = require("paged_chrome")

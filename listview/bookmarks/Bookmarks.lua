@@ -13,7 +13,7 @@ local c = require "o_jasper_common"
 local SqlHelp = require("sql_help").SqlHelp
 local Bookmarks = c.copy_meta(SqlHelp)
 
-local entry_html = require("listview.entry_html")
+local entry_html = require "listview.entry_html"
 
 local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 Bookmarks.values = BookmarksEntry.values

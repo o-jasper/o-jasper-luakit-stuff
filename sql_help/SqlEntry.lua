@@ -10,10 +10,7 @@ local cur_time_raw = require("o_jasper_common.cur_time").raw
 
 -- Makes a metatable for entries, to get functions handy.
 local SqlEntry = {
-   taggings="taggings",
-   string_els={}, int_els={},
-   tagfinder=[[]],
-   
+
    tags = function(self)
       return self.origin:just_tags(self[self.values.idname])
    end,
@@ -35,7 +32,7 @@ local SqlEntry = {
    --      self.origin:update_id(self)
    --   end,
    
-   otherwise = function(self, key)
+   otherwise = function(self, key) -- TODO Uhm..
       local meta = getmetatable(self).meta
       if meta.values.string_els[key] then
          meta.defaults[key] = ""

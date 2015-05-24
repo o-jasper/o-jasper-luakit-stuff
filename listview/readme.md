@@ -59,6 +59,8 @@ actually do something.
 
 * Better gui
 
+  + Editing at where it is? (how to turn editing on?)
+
   + Selecting multiple in one click with shift.
 
   + Get sensible location of selection immediately the main search.
