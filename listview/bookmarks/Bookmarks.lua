@@ -1,3 +1,10 @@
+--  Copyright (C) 24-05-2015 Jasper den Ouden.
+--
+--  This is free software: you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published
+--  by the Free Software Foundation, either version 3 of the License, or
+--  (at your option) any later version.
+
 local config = globals.listview_bookmarks or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
@@ -17,12 +24,9 @@ Bookmarks.values = BookmarksEntry.values
 local addfuns = {
    cur_id_add = 0,
 
-   config = function(self) return config end,
+   entry_meta = BookmarksEntry,
 
-   bookmark_entry = function(self, entry)
-      entry.origin = self
-      return setmetatable(entry, BookmarksEntry)
-   end,
+   config = function(self) return config end,
    
    enter = function(self, add)
       if not add.id then
@@ -58,8 +62,6 @@ local addfuns = {
       return { html_calc=html_calc }
    end,
 }
-
-addfuns.entry_fun = addfuns.bookmark_entry
 
 
 for k,v in pairs(addfuns) do Bookmarks[k] = v end
