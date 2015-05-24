@@ -1,3 +1,7 @@
 .allowed{ color:green }
 
 .blocked{ color:red }
+
+.uri_part_first{ color:#666 ; font-size:70%; }
+.uri_part_domain{ font-weight:bold }
+.uri_part_file{}

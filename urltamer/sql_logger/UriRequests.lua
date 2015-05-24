@@ -42,6 +42,8 @@ function UriRequests.config(self) return config end
 
 local entry_html = require "listview.entry_html"
 
+local fancy_uri = require("o_jasper_common.html.uri").fancy_uri
+
 function UriRequests.initial_state(self)
    local mod_html_calc = {
       resultHTML = function(entry, _)
@@ -51,6 +53,9 @@ function UriRequests.initial_state(self)
       end,
       urlallowed = function(...) return [[<span class="allowed">allowed</span>]] end,
       urlblocked = function(...) return [[<span class="blocked">blocked</span>]] end,
+
+      vuriHTML = function(entry, _) return fancy_uri(entry.vuri) end,
+      uriHTML = function(entry, _) return fancy_uri(entry.uri) end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
