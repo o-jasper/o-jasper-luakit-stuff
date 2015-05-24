@@ -122,11 +122,10 @@ function respond_to(info, result)
    end
 end
 
-responses = {}
-uri_cnt = 0
+local uri_cnt = 0
 
 cur_allowed = {}
-allowed_t = 100
+config.allowed_t = config.allowed_t or 100
 
 function userevent_uri(uri, vuri)
    status_now(_domain_of_uri(uri), "userevent-uri")
@@ -155,7 +154,7 @@ webview.init_funcs.url_respond_signals = function (view, w)
           local allowed = cur_allowed[info.uri]
           if allowed then
              allowed[2] = allowed[2] - 1
-             if allowed_t > allowed[1] - info.time and allowed[2] > 0 and
+             if config.allowed_t > allowed[1] - info.time and allowed[2] > 0 and
                 (v.uri == nil or v.uri == allowed[3]) then
                 info.by_userevent = allowed
              end
@@ -183,16 +182,5 @@ webview.init_funcs.url_respond_signals = function (view, w)
        function (v, status)
           local info = new_info(v, nil)
           status_now(_domain_of_uri(uri), status)
-
-          local responder = responses[info.from_domain] or {}          
-          if responder and responder.load_status then
-             return responder.load_status(info)
-          end
        end)
-
---   view:add_signal("button-press", function (v, mods, button, context)
---           if button == 1 and v.hovered_uri then
---              v:emit_signal("userevent-uri", v.hovered_uri)
---           end
---       end)
 end
