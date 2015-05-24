@@ -1,6 +1,6 @@
 -- Logs by printing everything.
 
-local logger = {
+return {
    insert = function(self, info, result)
       if result.redirect then
          print("redirect:", info.uri, "to", result.redirect)
@@ -11,8 +11,3 @@ local logger = {
       end
    end,
 }
-
-return logger
-
-
-

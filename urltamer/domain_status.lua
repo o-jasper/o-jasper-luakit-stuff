@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+local cur_time = require "o_jasper_common.cur_time"
+
 _domain_status = {}
 function domain_status(domain)
    local got = _domain_status[domain]
@@ -17,7 +19,7 @@ end
 
 local last_cleanup, cleanup_interval = 0, 1000
 function cleanup_status()
-   last_cleanup = gettime()
+   last_cleanup = cur_time.ms()
    -- NOTE: no cleanup yet.
 end
 
@@ -25,9 +27,9 @@ function status_now(domain, status)
    local got = domain_status(domain)
    got.status = status
    got.times = got.times or {}
-   got.times[status] = gettime()
+   got.times[status] = cur_time.ms()
 
-   if gettime() - last_cleanup > cleanup_interval then
+   if cur_time.ms() - last_cleanup > cleanup_interval then
       cleanup_status()
    end
 end

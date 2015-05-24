@@ -7,7 +7,10 @@
 
 require "urltamer.common"
 require "urltamer.domain_status"
+
 local config = globals.urltamer or {}
+
+local cur_time = require "o_jasper_common.cur_time"
 
 config.late_dt = config.late_dt or 4000
 config.log_all = (config.log_all == nil) or config.log_all
@@ -73,7 +76,7 @@ end,
 }
 
 function new_info(v, uri)
-   local info = {v=v, uri=uri, time=gettime()}
+   local info = {v=v, uri=uri, time=cur_time.ms()}
    setmetatable(info, info_metatable)
    return info
 end
@@ -129,9 +132,13 @@ local uri_cnt = 0
 cur_allowed = {}
 config.allowed_t = config.allowed_t or 100
 
+local function _domain_of_uri(uri)
+   return type(uri) == "string" and domain_of_uri(uri) or "none"
+end
+
 function userevent_uri(uri, vuri)
    status_now(_domain_of_uri(uri), "userevent-uri")
-   cur_allowed[uri] = {socket.gettime()*1000, 2, vuri or uri}
+   cur_allowed[uri] = {cur_time.ms(), 2, vuri or uri}
 end
 
 window.init_funcs.inspector_setup = function (w)

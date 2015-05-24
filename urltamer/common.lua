@@ -14,14 +14,6 @@ function domain_of_uri(uri)
    end
 end
 
-function _domain_of_uri(uri)
-   return type(uri) == "string" and domain_of_uri(uri) or "none"
-end
-
-local socket = require("socket") -- TODO better place to get decent time?
-
-function gettime() return 1000*socket.gettime() end
-
 function ensure_table(x) 
    if not x then return {} end
    if type(x) == "table" then return x else return {x} end 
