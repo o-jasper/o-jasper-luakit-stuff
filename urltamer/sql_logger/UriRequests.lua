@@ -45,10 +45,12 @@ local entry_html = require "listview.entry_html"
 function UriRequests.initial_state(self)
    local mod_html_calc = {
       resultHTML = function(entry, _)
-         return ({["true"]="allowed", ["false"]="blocked"})[entry.result] or
+         return ({["true"]="{%urlallowed}", ["false"]="{%urlblocked}"})[entry.result] or
             [[<span class="redirect_ann">redirected:</span>
 <span class="redirect">{%result}</span]]
       end,
+      urlallowed = function(entry, _) return [[<span class="allowed">allowed</span>]] end,
+      urlblocked = function(entry, _) return [[<span class="blocked">blocked</span>]] end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
