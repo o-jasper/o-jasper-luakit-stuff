@@ -1,4 +1,5 @@
 require "urltamer"
+local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
 local config = globals.urltamer or {}
 
@@ -17,7 +18,6 @@ if config.add_cmds == nil or config.add_cmds then
       pattern_shortlist[uri_to_pattern(query)] = nil
       print("Made normal:", query)
    end
-
    
    local lousy = require("lousy")
    local key, buf, cmd = lousy.bind.key, lousy.bind.buf, lousy.bind.cmd

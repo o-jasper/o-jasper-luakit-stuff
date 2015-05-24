@@ -5,10 +5,10 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "urltamer.common"
 require "urltamer.domain_status"
 
 local ensure = require "o_jasper_common.ensure"
+local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
 local config = globals.urltamer or {}
 
