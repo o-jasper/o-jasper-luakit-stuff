@@ -24,6 +24,11 @@ function hide_button(name, yes) {
     el.disabled = yes;
 }
 
+function toggle_editmode(of_name, yes) {
+    ge(of_name).hidden = yes;
+    ge("edit_" + of_name).hidden = !yes;
+}
+
 function in_viewport(el) {
     var height = window.innerHeight;
     var top    = el.offsetBottom;
