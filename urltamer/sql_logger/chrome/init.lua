@@ -11,9 +11,11 @@ local function chrome_describe(log)
    assert(log)
    
    local where = config.assets or {}
+   table.insert(where, "listview")
    table.insert(where, "urltamer/sql_logger/chrome")
    local pages = listview.new_Chrome(log, where)
 
+   config.page = config.page or {}
    pages.search.limit_cnt = config.page.cnt or 20
    pages.search.limit_step = config.page.step or pages.search.step_cnt
    return pages
@@ -29,4 +31,4 @@ local function on_command(w, query)
    local v = w:new_tab("luakit://listviewURLs/search")
 end
 
-add_cmds({ cmd("listviewHistory", on_command) })
+add_cmds({ cmd("listviewURLs", on_command) })

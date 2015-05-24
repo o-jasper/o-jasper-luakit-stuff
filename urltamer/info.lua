@@ -30,7 +30,7 @@ local info_metaindex_determine = {
    tags = function(self, _) return "" end,
    domain = function(self, _) return domain_of_uri(self.uri or "no_uri") end,
    
-   vuri = function(self, _) return self.v.uri end,
+   vuri = function(self, _) return self.v.uri or "" end,
    from_domain = function(self, _) return domain_of_uri(self.vuri or "no_vuri") end,
 
    current_status = function(self, _)

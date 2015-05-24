@@ -18,7 +18,7 @@ local new_info  = require("urltamer.info").new_info
 
 config.late_dt = config.late_dt or 4000
 config.log_all = (config.log_all == nil) or config.log_all
-config.logger = require "urltamer.print_logger"
+config.logger = require "urltamer.sql_logger"
 
 handler = {}
 
@@ -66,9 +66,7 @@ function respond_to(info, result)
    end
 end
 
-local uri_cnt = 0
-
-cur_allowed = {}
+local uri_cnt, cur_allowed = 0, {}
 config.allowed_t = config.allowed_t or 100
 
 local function _domain_of_uri(uri)

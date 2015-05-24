@@ -3,7 +3,7 @@ local config = (globals.urltamer or {}).uri_requests or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
-local UriRequestsEntry = require "listview.history.UriRequestsEntry"
+local UriRequestsEntry = require "urltamer.sql_logger.UriRequestsEntry"
 
 local UriRequests = c.copy_meta(require("sql_help").SqlHelp)
 UriRequests.values = UriRequestsEntry.values
@@ -24,9 +24,21 @@ UriRequests.entry_meta = UriRequestsEntry
 
 local cur_time = require "o_jasper_common.cur_time"
 
+local last_id = 0
+
 function UriRequests.insert(self, info, result)
-   info.result = result   -- Just add what isnt in there yet.
+   info.id = 1000*cur_time.ms()
+   while info.id <= last_id do
+      info.id = info.id + 1
+   end
+   last_id = info.id
+
+   info.result = result.ret   -- Just add what isnt in there yet.
    info.time = cur_time.ms()
+
+--   for k,v in pairs(self:args_in_order(info)) do
+--      print(k, self.values.row_names[k], v, info[self.values.row_names[k]])
+--   end
    self:enter(info)
 end
 
