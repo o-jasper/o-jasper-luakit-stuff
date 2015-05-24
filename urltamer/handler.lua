@@ -78,7 +78,9 @@ function new_info(v, uri)
    return info
 end
 
-function fun_base(info, result, also_allow)
+handler = {}
+
+function handler.base(info, result, also_allow)
    if info.uri == "about:blank" or info.by_userevent then
       result.allow = true
    elseif also_allow and info:uri_match(also_allow) then
@@ -93,15 +95,15 @@ function fun_base(info, result, also_allow)
    end
 end
 
-function fun_everywhere(info, result, also_allow)
-   fun_base(info, result, also_allow)
+function handler.everywhere(info, result, also_allow)
+   handler.base(info, result, also_allow)
    if not info:own_domain() and not (info.by_userevent or result.specific_allow) then
       result.allow = false
    end
 end
 
 -- If not shortlisted, keep it on own domain,
-not_listed = fun_everywhere
+not_listed = handler.everywhere
 shortlist = {}
 pattern_shortlist = {}
 

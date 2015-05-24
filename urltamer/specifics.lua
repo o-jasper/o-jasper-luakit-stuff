@@ -1,7 +1,7 @@
 -- Specific things to do.
 
 shortlist["www.reddit.com"] = function(info, result)
-   fun_everywhere(info, result,
+   handler.everywhere(info, result,
                   {"^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]jpg$",
                    "^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]css",
                    "^https://www[.]reddit.com/api/login/.+",
@@ -25,7 +25,7 @@ shortlist["www.reddit.com"] = function(info, result)
 end
 
 shortlist["www.youtube.com"] = function(info, result)
-   fun_everywhere(info, result,
+   handler.everywhere(info, result,
                   {"^https*://i[.]ytimg[.]com/vi/.+/m*q*default[.]jpg$",
                    "^https://s[.]ytimg[.]com/yts/jsbin/www-pageframe-.+/www-pageframe[.]js^",
                    "^https://s[.]ytimg.com/yts/jsbin/www-en_US-[.]+/common[.]js^",
@@ -37,13 +37,13 @@ shortlist["www.youtube.com"] = function(info, result)
 end
 
 shortlist["www.tvgids.nl"] = function(info, result)
-   fun_everywhere(info, result, {"^http://www[.]tvgids[.]nl/json/lists/.+",
+   handler.everywhere(info, result, {"^http://www[.]tvgids[.]nl/json/lists/.+",
                                  "^https*://www[.]tvgids[.]nl/*.+",
                                  "^https*://tvgidsassets[.]nl/*.+"})
 end
 
 shortlist["imgur.com"] = function(info, result)
-   fun_everywhere(info, result, "^http://.[.]imgur[.]com/.+")
+   handler.everywhere(info, result, "^http://.[.]imgur[.]com/.+")
 end
 
 --shortlist["duckduckgo.com"] = {
@@ -62,7 +62,7 @@ shortlist["bits.wikimedia.org"] = permissive
 shortlist["okturtles.slack.com"] = permissive
 
 shortlist["github.com"] = function(info, result)
-   fun_everywhere(info, result, {"^https://github.com/.+/.+/issue_comments$",
+   handler.everywhere(info, result, {"^https://github.com/.+/.+/issue_comments$",
                                  "^https://github.com/.+/.+/pullrequest_comments$",
                                  "^https://avatars[%d]+.githubusercontent.com/.+",
                                  "^https://assets[-]cdn.github.com/assets/.+"
@@ -70,7 +70,7 @@ shortlist["github.com"] = function(info, result)
 end
 
 shortlist["xkcd.com"] = function(info, result)
-   fun_everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
+   handler.everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
 end
 
 pattern_shortlist["^luakit://.+"] = permissive
