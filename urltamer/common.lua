@@ -13,11 +13,3 @@ function domain_of_uri(uri)
       end
    end
 end
-
-function ensure_table(x) 
-   if not x then return {} end
-   if type(x) == "table" then return x else return {x} end 
-end
-function ensure_pairs(x) 
-   if type(x) =="function" then return x else return pairs(ensure_table(x)) end
-end

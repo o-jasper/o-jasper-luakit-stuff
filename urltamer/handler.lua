@@ -8,6 +8,8 @@
 require "urltamer.common"
 require "urltamer.domain_status"
 
+local ensure = require "o_jasper_common.ensure"
+
 local config = globals.urltamer or {}
 
 local cur_time = require "o_jasper_common.cur_time"
@@ -23,7 +25,7 @@ local info_metaindex_direct = {
    end,
 
    uri_match = function(self, match)
-      for i, el in ensure_pairs(match) do
+      for i, el in ensure.pairs(match) do
          if string.match(self.uri, el) then 
             return i
          end
