@@ -15,43 +15,6 @@ local c = require("o_jasper_common")
 local html_list = require "listview.html_list"
 local html_entry = require "listview.entry_html"
 
-local html_state = nil;
-
-local function final_html_list(listview, list, as_msg)
-   local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   if not as_msg then
-      return html_list.keyval(list)
-   else
-      assert(listview.log.initial_state)
-      html_state = html_state or listview.log:initial_state()
-      return html_entry.list(listview, list, html_state)                             
-   end
-end
-
-local search_cnt = 0
-
-local function js_listupdate(listview, list, as_msg)
-   search_cnt = search_cnt + 1
-   -- TODO bit fussy.. really getting the return value straight out would be handy..
-   local cnt = "BUG"
-   local gl = listview.got_limit
-   if gl then
-      if #gl == 1 then
-         cnt = string.format("results 0 to %d", gl[1])
-      else
-         cnt = string.format("results %d to %d", gl[1], gl[1] + gl[2])
-      end
-   else
-      cnt = string.format("results %d to %d", listview.limit_i,
-                          math.min(listview.limit_i + listview.limit_cnt,
-                                   listview.limit_i + #list))
-   end
-   return { list=final_html_list(listview, list, as_msg, reset_state),
-            cnt=cnt,
-            search_cnt=search_cnt,
-   }
-end
-
 local to_js = {
 
    addsearch = function(self) return function(name)
@@ -79,14 +42,14 @@ local to_js = {
    end end,
    
    manual_sql = function(self) return function(sql, as_msg)
-         return js_listupdate(self, self.log:exec(sql), as_msg)
+         return self:js_listupdate(self.log:exec(sql), as_msg)
    end end,
    
    do_search = function(self) return function(search, as_msg, reset_state)
          if reset_state then
-            html_state = listview.log:initial_state()
+            self.html_state = listview.log:initial_state()
          end
-         return js_listupdate(self, self:total_query(search):result(), as_msg)
+         return self:js_listupdate(self:total_query(search):result(), as_msg)
    end end,
 
 -- TODO.. can we provide an interface to self directly?
@@ -123,6 +86,10 @@ local Public = { Base = require "listview.Base" }
 
 -- The search part.
 local mod_Search = {
+
+   -- html_state = nil,
+   search_cnt = 0,
+
    limit_i=0, limit_cnt=20,limit_step=20,
 
    to_js = to_js,
@@ -156,6 +123,40 @@ local mod_Search = {
          above_sql = " ", below_sql = " ",
          below_acts = " ", after = " ",
       }
+   end,
+
+   js_listupdate = function (self, list, as_msg)
+      self.search_cnt = self.search_cnt + 1
+      -- TODO bit fussy.. really getting the return value straight out would be handy..
+      local cnt = "BUG"
+      local gl = self.got_limit
+      if gl then
+         if #gl == 1 then
+            cnt = string.format("results 0 to %d", gl[1])
+         else
+            cnt = string.format("results %d to %d", gl[1], gl[1] + gl[2])
+         end
+      else
+         cnt = string.format("results %d to %d", self.limit_i,
+                             math.min(self.limit_i + self.limit_cnt,
+                                      self.limit_i + #list))
+      end
+      return { list=self:final_html_list(list, as_msg, reset_state),
+               cnt=cnt,
+               search_cnt=self.search_cnt,
+      }
+   end,
+   
+   final_html_list = function(self, list, as_msg)
+      local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
+      if not as_msg then
+         return html_list.keyval(list)
+      else
+         assert(self.log.initial_state)
+         --print(self.log.initial_state, html_state, self.log:initial_state())
+         self.html_state = self.html_state or self.log:initial_state()
+         return html_entry.list(self, list, self.html_state)                             
+      end
    end,
 }
 Public.Search = c.copy_meta(Public.Base, mod_Search)
