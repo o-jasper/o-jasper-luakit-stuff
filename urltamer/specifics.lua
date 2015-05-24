@@ -51,7 +51,7 @@ end
 --   -- https://duckduckgo.com/html/?q=.+
 --}
 -- Exceptions instead?
-local function permissive(info, result)
+function permissive(info, result)
    result.allow = true
 end
 
@@ -63,7 +63,10 @@ shortlist["okturtles.slack.com"] = permissive
 
 shortlist["github.com"] = function(info, result)
    fun_everywhere(info, result, {"^https://github.com/.+/.+/issue_comments$",
-                                 "^https://github.com/.+/.+/pullrequest_comments$"})
+                                 "^https://github.com/.+/.+/pullrequest_comments$",
+                                 "^https://avatars[%d]+.githubusercontent.com/.+",
+                                 "^https://assets[-]cdn.github.com/assets/.+"
+                                })
 end
 
 shortlist["xkcd.com"] = function(info, result)
