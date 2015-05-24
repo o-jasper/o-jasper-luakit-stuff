@@ -15,7 +15,11 @@ local Public = {}
 
 Public.default_html_calc = {
    tagsHTML = function (self, state)
-      return ot.tagsHTML(self:tags(), state.tagsclass)
+      if self.values.taggings then
+         return ot.tagsHTML(self:tags(), state.tagsclass)
+      else
+         return " "
+      end
    end,
 
    delta_dateHTML = function(self, state)
@@ -53,6 +57,7 @@ function Public.default_html_calc.monthname(self, _)
    return Public.day_names[datetab(self:ms_t()).wday]
 end
 
+-- Replacement list.
 function Public.repl(entry, state)
    assert(entry)
    local pass = {}
