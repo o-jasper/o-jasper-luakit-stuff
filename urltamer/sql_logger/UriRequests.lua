@@ -24,14 +24,14 @@ UriRequests.entry_meta = UriRequestsEntry
 
 local cur_time = require "o_jasper_common.cur_time"
 
-local last_id = 0
+UriRequests.last_id = 1000*cur_time.ms()
 
 function UriRequests.insert(self, info, result)
    info.id = 1000*cur_time.ms()
-   while info.id <= last_id do
+   while info.id <= self.last_id do
       info.id = info.id + 1
    end
-   last_id = info.id
+   self.last_id = info.id
    info.result = tostring(result.ret)   -- Just add what isnt in there yet.
    info.time = cur_time.ms()
 
@@ -49,8 +49,8 @@ function UriRequests.initial_state(self)
             [[<span class="redirect_ann">redirected:</span>
 <span class="redirect">{%result}</span]]
       end,
-      urlallowed = function(entry, _) return [[<span class="allowed">allowed</span>]] end,
-      urlblocked = function(entry, _) return [[<span class="blocked">blocked</span>]] end,
+      urlallowed = function(...) return [[<span class="allowed">allowed</span>]] end,
+      urlblocked = function(...) return [[<span class="blocked">blocked</span>]] end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
