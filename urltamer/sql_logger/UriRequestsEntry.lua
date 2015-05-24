@@ -4,8 +4,7 @@ local UriRequestsEntry = c.copy_meta(require("sql_help").SqlEntry)
 
 UriRequestsEntry.values = {  -- Note: it is overkill, shared with history_meta.vlaues.
    table_name = "uri_requests",
---   taggings = "history_implied", -- (possibly record what outside stuff is loaded)
---   tagfinder=[[SELECT tag FROM history_implied WHERE to_id == ?]],
+
    idname = "id",
    row_names = {"id", "time", "uri", "vuri", "domain", "from_domain", "result"},
 

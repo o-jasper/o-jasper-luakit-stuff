@@ -32,13 +32,9 @@ function UriRequests.insert(self, info, result)
       info.id = info.id + 1
    end
    last_id = info.id
-
-   info.result = result.ret   -- Just add what isnt in there yet.
+   info.result = tostring(result.ret)   -- Just add what isnt in there yet.
    info.time = cur_time.ms()
 
---   for k,v in pairs(self:args_in_order(info)) do
---      print(k, self.values.row_names[k], v, info[self.values.row_names[k]])
---   end
    self:enter(info)
 end
 

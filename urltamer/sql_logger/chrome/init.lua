@@ -11,8 +11,8 @@ local function chrome_describe(log)
    assert(log)
    
    local where = config.assets or {}
-   table.insert(where, "listview")
    table.insert(where, "urltamer/sql_logger/chrome")
+   table.insert(where, "listview")
    local pages = listview.new_Chrome(log, where)
 
    config.page = config.page or {}
