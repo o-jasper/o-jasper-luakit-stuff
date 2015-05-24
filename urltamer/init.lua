@@ -5,6 +5,5 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "urltamer.domain_status"
 require "urltamer.handler"
 require "urltamer.specifics"

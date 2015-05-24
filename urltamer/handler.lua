@@ -5,7 +5,7 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-require "urltamer.domain_status"
+local domain_status = require "urltamer.domain_status"
 
 local ensure = require "o_jasper_common.ensure"
 local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
@@ -42,11 +42,11 @@ local info_metaindex_determine = {
    from_domain = function(self, _) return domain_of_uri(self.vuri or "no_vuri") end,
 
    current_status = function(self, _)
-      local got = _domain_status[self.from_domain]
+      local got = domain_status._status[self.from_domain]
       if not got then
          got = {}
          assert(self.from_domain, string.format("aint got (%s)", self.from_domain))
-         _domain_status[self.from_domain] = got
+         domain_status._status[self.from_domain] = got
       end
       return got
    end,
@@ -139,7 +139,7 @@ local function _domain_of_uri(uri)
 end
 
 function userevent_uri(uri, vuri)
-   status_now(_domain_of_uri(uri), "userevent-uri")
+   domain_status.now(_domain_of_uri(uri), "userevent-uri")
    cur_allowed[uri] = {cur_time.ms(), 2, vuri or uri}
 end
 
@@ -192,6 +192,6 @@ webview.init_funcs.url_respond_signals = function (view, w)
    view:add_signal("load-status",
        function (v, status)
           local info = new_info(v, nil)
-          status_now(_domain_of_uri(uri), status)
+          domain_status.now(_domain_of_uri(uri), status)
        end)
 end
