@@ -1,6 +1,7 @@
 
 local Bookmarks = require "listview.bookmarks.Bookmarks"
-local db = require "listview.acquire_db"
+
+local db = (globals.listview or {}).bookmarks or {}.db or require "listview.acquire_db"
 
 -- Add bookmark tables if needed.
 db:exec [[
