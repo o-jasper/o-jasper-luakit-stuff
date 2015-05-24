@@ -4,9 +4,11 @@ local config = (globals.urltamer or {}).sql_logger or {}
 local UriRequests = require "urltamer.sql_logger.UriRequests"
 local db = config.db or require "listview.acquire_db"
 
--- Add bookmark tables if needed.
-db:exec [[
-   CREATE TABLE IF NOT EXISTS uri_requests (
+local ret
+if not ret then
+   -- Add table if needed.
+   db:exec [[
+CREATE TABLE IF NOT EXISTS uri_requests (
      id INTEGER PRIMARY KEY,
      time INTEGER,
   
@@ -19,9 +21,6 @@ db:exec [[
      result TEXT NOT NULL
    );
 ]]
-
-local ret
-if not ret then
    ret = setmetatable({db = db}, UriRequests)
 end
 
