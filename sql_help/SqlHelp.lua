@@ -221,7 +221,7 @@ local SqlHelp = {
    end,
    
    -- Add a like command.
-   like = function(self, value, what)
+   like = function(self, what, value)
       self:extcmd([[%s LIKE ?]], what)
       self:inp(value)
    end,
@@ -241,7 +241,7 @@ local SqlHelp = {
       end
       for i, what in pairs(self.values.textlike) do
          self:comb((i == 1 and self.c .. ((n and " NOT(") or "(")) or "OR")
-         self:like(search, what)
+         self:like(what, search)
       end
       self:addstr(")")
    end,
