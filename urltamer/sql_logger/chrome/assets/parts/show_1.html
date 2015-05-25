@@ -4,7 +4,10 @@
   <td>
     <span class="time">{%hour}:{%min}</span>
     {%resultHTML}
+    <sup class="minor">(lengths {%vuri_len}, {%uri_len})</sup>
   </td>
-  <td>{%vuriHTML} &rarr;</td>
-  <td>{%uriHTML}</td>
+  <td>
+    {%vuriHTML} <b>&rarr;</b><br>
+    {%uriHTML}
+  </td>
 </tr>

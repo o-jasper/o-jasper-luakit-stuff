@@ -14,8 +14,23 @@ UriRequests.searchinfo.matchable = {
    "uri:", "urilike:",
    "before:", "after:", "limit:",
    -- TODO these currently do nothing/bug-out, add to `searchinfo.match_funs`
-   "domain:", "from_domain:",
+   "domain:", "from_domain:", "domainlike:", "from_domainlike:",
+   "result:", "resultlike"
 }
+
+local function dom_match_fun(sub_n, wrap) return function (self, state, m, v)
+   self:like(string.sub(m, 1, #m - sub_n), wrap .. v .. wrap, state.n)
+end end
+
+local dom_search = dom_match_fun(1, "%")
+UriRequests.searchinfo.match_funs["domain:"] = dom_search
+UriRequests.searchinfo.match_funs["from_domain:"] = dom_search
+UriRequests.searchinfo.match_funs["result:"] = dom_search
+
+local dom_like = dom_match_fun(5, "")
+UriRequests.searchinfo.match_funs["domainlike:"] = dom_like
+UriRequests.searchinfo.match_funs["from_domainlike:"] = dom_like
+UriRequests.searchinfo.match_funs["resultlike:"] = dom_like
 
 function UriRequests:config() return config end
 function UriRequests:initial_state() return {} end
@@ -51,11 +66,15 @@ function UriRequests.initial_state(self)
             [[<span class="redirect_ann">redirected:</span>
 <span class="redirect">{%result}</span]]
       end,
+      -- Might be a tad confusing..
       urlallowed = function(...) return [[<span class="allowed">allowed</span>]] end,
       urlblocked = function(...) return [[<span class="blocked">blocked</span>]] end,
 
       vuriHTML = function(entry, _) return fancy_uri(entry.vuri) end,
       uriHTML = function(entry, _) return fancy_uri(entry.uri) end,
+
+      vuri_len = function(entry, _) return #(entry.vuri or {}) end,
+      uri_len = function(entry, _)  return #entry.uri end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
