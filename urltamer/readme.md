@@ -9,19 +9,6 @@ too.
 
 TODO
 
-## `responder[domain].resource_request_starting = function(info, result) ... end`
-it overrides the above. The `result`/`info` is the same as the above system uses.
-
-The return value is a pair, the `allow, result`. It is not advised because it
-needs defining a lot of times. Besides the only advantage of this compared to
-doing it entirely DIY below is the`info` and `result` object helping you out,
-logging for you.
-
-    view:add_signal("resource-request-starting", function (v, uri) ..stuff.. end)
-
-## Disabling entirely
-`responder[domain].impervious` being non `false`/`nil` allows everything.
-
 ### The `info` object
 
 `info.uri`, `info.domain` are the uri, domain *of the request*.
@@ -53,29 +40,9 @@ lua-regex(list) match.
 You can do what you want with `result`, only `result.redirect` contains a string
 if you want to redirect. It has to be allowed to do that.
 
-`result.remarks` are used for logging. **TODO** Perhaps i should add a signal
-for the result.
-
 ## TODO
-
-* Log user-specify-edly with a good default, including time-limits on keeping
-  stuff.
-  
-  + Keep a list of stuff-blocked-for-this, and have a function where you can
-    allow just-those this times. A better way that `:UrlPermissive` to get
-    around overblocking.
-
-* How `parametered_matches.lua` works is a bit too much imperative really.
-  All i want is  for the data be storable in SQL in the future for easy
-  configuration, and `lua` does the actual work.
-  
-  NOTE: probably i will just interpret the string as lua.
-  (`loadstring()`)
   
 * Storing config in SQL and an interface to quickly configure.
-
-  + Allowing definition of bits-of-gui for setting parameters for
-    `urlcmd`(and possibly `urlfunc`)
 
 * Make stuff for this:
   + Adding rules based on user interaction with the pages.
@@ -84,3 +51,9 @@ for the result.
   + Addblock integration.
   + Handles Cookies? Javascript?
   + Proxying?
+
+* Have a system of reasons. I.e. `result.allow = {"blacklist", "late"}`,
+  and then later, something might "excuse" *particular* reasons.
+  (or fail to excuse)
+  
+  Or some other way to keep the overview.
