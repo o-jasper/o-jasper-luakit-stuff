@@ -32,9 +32,6 @@ UriRequests.searchinfo.match_funs["domainlike:"] = dom_like
 UriRequests.searchinfo.match_funs["from_domainlike:"] = dom_like
 UriRequests.searchinfo.match_funs["resultlike:"] = dom_like
 
-function UriRequests:config() return config end
-function UriRequests:initial_state() return {} end
-
 UriRequests.entry_meta = UriRequestsEntry
 
 local cur_time = require "o_jasper_common.cur_time"
