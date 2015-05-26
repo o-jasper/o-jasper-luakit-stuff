@@ -4,6 +4,7 @@ local paged_chrome = require("paged_chrome")
 local info = {
    chrome_name = "bareDirChrome",
    chrome_uri  = "luakit://{%chrome_name}",
+   title       = "{%chrome_name}",
 }
 
 local pages = {
@@ -16,22 +17,19 @@ Use this to view directories, by going to
       repl_list = function(_, _, _) return info end
    }, "nopage"),
    dir = paged_chrome.templated_page({
+      where = "paged_chrome/examples",
       to_js = {},
-      repl_pattern = [[<h1>Dir: {%directory}</h1>
-<table>{%list}</table>
-<hr>
-<p><a href="{%chrome_uri}">{%chrome_uri}</a></p>
-]],
+      --repl_pattern="{%dir.html}",
       repl_list = function(self, meta, _)
             local ret = {}
             for k,v in pairs(info) do ret[k] = v end
             ret.directory = string.sub(meta.path, 4)
-            ret.list = ""
             if ret.directory == "" then
                ret.directory = lfs.currentdir()
             end
+            ret.list = ""
             for k,v in lfs.dir(ret.directory) do
-               local attr = lfs.attributes(k)
+               local attr = lfs.attributes(ret.directory .. "/" .. k)
                local add = "<tr>"
                if attr and attr.mode == "directory" then
                   add = string.format(
@@ -45,8 +43,10 @@ Use this to view directories, by going to
                if attr then
                   add = string.format("%s<td>%d</td><td>%s</td>", 
                                       add, attr.size, os.date("%c", attr.modification))
+               else
+                  add = string.format("<td>Cant get attributes?? {%%directory}/%s </td>", k)
                end
-               ret.list = ret.list .. add .. "</tr>"
+               ret.list =  ret.list .. add .. "</tr>"
             end
             return ret
       end

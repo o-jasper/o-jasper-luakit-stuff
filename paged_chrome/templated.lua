@@ -62,7 +62,7 @@ function Public.templated_page(page, name)
       if page.asset then
          page.repl_pattern = page:asset(page.name, ".html")
       else
-         page.repl_pattern = Public.asset(page.name, ".html")
+         page.repl_pattern = Public.asset(page.where, page.name .. ".html")
       end
    end
    -- The page object contains the entire interface it is based on.(still available)
