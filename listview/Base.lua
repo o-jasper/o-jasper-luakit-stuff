@@ -18,7 +18,10 @@ return {
       repl_pattern = false, to_js = {},
 
       config = function(self) return config end,
--- TODO.. seems like something that might belong in `paged_chrome`.
+-- NOTE; might say it belongs to paged-chrome, but it provides the freedom to
+--  make it more convenient.
+-- Alternatively "derive-from" the paged-chrome, however, i dont want to,
+-- and that'd push my metatable approach onto others.
       asset = function(self, what, kind)
          return asset(self.where, what .. (kind or ".html"))
       end,

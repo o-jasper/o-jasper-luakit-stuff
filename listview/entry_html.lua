@@ -90,8 +90,7 @@ end
 function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
-      return c.full_gsub(listview:asset("parts/show_1"),
-                          Public.repl(msg, state))
+      return c.full_gsub(listview:asset("parts/show_1"), Public.repl(msg, state))
    end
 end
 
