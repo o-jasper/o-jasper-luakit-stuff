@@ -13,9 +13,10 @@ For instance, by symlinking the directories.
 Then just `paged_chrome = require "paged_chrome"`
 
 # Using
-`paged_chrome(chrome_name, table)` adds the chrome page to luakit.
+`paged_chrome(chrome_name, page_table)` adds the chrome page to luakit.
 
-The table is one of pages by directory names, except for `default_name`,
+The table is one of pages by directory names, except for
+`page_table.default_name`,
 which indicates where to redirect if the page does not exist.
 
 ## Defining by template
