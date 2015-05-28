@@ -15,6 +15,10 @@ local function paged_chrome(chrome_name, pages)
                     use_name = pages.default_name
                     page = pages[use_name]
                  end
+                 -- (in case each has state that doesnt otherwise work, generate a new page
+                 --  each time)
+                 if type(page) == "function" then page = page(meta, view) end
+
                  -- TODO.. just use meta.path as the path!?
                  local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
                  page.chrome_name = chrome_name
