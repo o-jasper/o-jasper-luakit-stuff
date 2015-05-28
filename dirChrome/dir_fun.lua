@@ -10,11 +10,9 @@ local lfs = require "lfs"
 
 local config = globals.dirChrome or {}
 
-return function(path)
-   
-   local db = config.db or sqlite3{filename=":memory:"}
+local db = config.db or sqlite3{filename=":memory:"}
 
-   db:exec [[
+db:exec [[
    CREATE TABLE IF NOT EXISTS files (
      id INTEGER PRIMARY KEY,
   
@@ -28,7 +26,9 @@ return function(path)
    );
 ]]
    
-   ret = setmetatable({ db = db }, Dir)
+return function(path)
+   
+   local ret = setmetatable({ db = db }, Dir)
 
    if not lfs.attributes(path) then
       path = "/home"  -- TODO

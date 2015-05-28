@@ -401,7 +401,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       delete_entry_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
 
       delete_tags_id  = "DELETE FROM {%taggings} WHERE to_{%idname} == ?",
-      get_id = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
+      get_id          = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
    },
 
    sql_compiled = {},
@@ -439,6 +439,17 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    enter = function(self, entry)
       assert(self.values.table_name and self.values.row_names)
       
+      if not entry.id then
+         local cur_time = require "o_jasper_common.cur_time"
+         self.cur_id = 1000*cur_time.ms()
+         local got = self:get_id(self.cur_id)
+         while got do
+            self.cur_id = self.cur_id + 1
+            got = self:get_id(self.cur_id)
+         end
+         entry.id = self.cur_id
+      end
+
       local ret = { add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
       -- And all the tags, if we do those.
       if entry.tags and #entry.tags > 0 and self.values.taggings then
@@ -456,15 +467,20 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       if not entry.id then return nil end
       local got = self:sqlcmd("selectid"):exec({entry.id})
       if #got == 1 then  -- It must exist, otherwise it isnt an update.
-         return self:force_update(entry) or self:get_id(entry.id)
+         return self:force_update(entry) or self:get_id(entry.id) or true
       end
    end,
    update_or_enter = function(self, entry)
       local got = self:update(entry)
-      if got then return got else return self:enter(entry) end
+      if got then
+         return got
+      else
+         return self:enter(entry)
+      end
    end,
    
    force_update = function(self, entry)
+      assert(entry.id)
       self:delete_id(entry.id)
       return self:enter(entry)
 --      local inp = self:args_in_order(entry) -- Does it matter?
@@ -482,7 +498,10 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    end,
 
    get_id = function(self, id)
-      return self:entry_fun(self:sqlcmd("get_id"):exec({id})[1])
+      local got = self:sqlcmd("get_id"):exec({id})[1]
+      if got then
+         return self:entry_fun(got)
+      end
    end,
 }
 

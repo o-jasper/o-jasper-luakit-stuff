@@ -1,7 +1,8 @@
 <tr id="id_{%identifier}" onclick="select_toggle('{%identifier}')">
   <td>
+    {%dateText}
     <span class="time">{%hour}:{%min}</span>&nbsp;
-    {%mode}
-    <a href="{%dirname}/{%filename}" class="it_title">{%dirname}/{%filename}</a>
+    <span class="minor">{%mode}</span>
+    <a href="search{%dirname}/{%filename}" class="it_title">{%dirname}/{%filename}</a>
   </td>
 </tr>
