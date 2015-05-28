@@ -28,21 +28,6 @@ local addfuns = {
 
    config = function(self) return config end,
    
-   enter = function(self, add)
-      if not add.id then
-         local t_ms = c.cur_time.ms()
-         if t_ms ~= self.last_t_ms then
-            self.cur_id_add = 0
-         else
-            self.cur_id_add = self.cur_id_add + 1
-         end
-         add.id = 1000*t_ms + self.cur_id_add  -- NOTE: obviously not foolproof.
-         self.last_t_ms = t_ms
-      end
-      -- Pass on the rest of the responsibility upstream.
-      return SqlHelp.enter(self, add)
-   end,
-
    -- State for the html writer.
    initial_state = function(self)
       local mod_html_calc = {
