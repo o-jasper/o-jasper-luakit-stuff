@@ -6,7 +6,8 @@ DirEntry.values = {
    table_name = "files",
 
    idname = "id",
-   row_names = {"id", "dirname", "filename", "size", "mode", "time_access", "time_modified"}.
+   row_names = {"id", "dirname", "filename", "mode",
+                "size", "time_access", "time_modified"},
 
    time = "time_modified", timemul = 1000,
    order_by = "time_modified",

@@ -18,32 +18,32 @@ config.page = config.page or {}
 local run = {}
 
 local function chrome_describe()
-   assert(log)
-   
    local where = config.assets or {}
    table.insert(where, "dirChrome")
    table.insert(where, "listview")
    local pages = {
       default_name = "search",
       search = function(args)
-         return listview.new_Search(config.db or dir_fun(string.sub(args.path, 7)),
-                                    where)
+         local search =  listview.new_Search(config.db or dir_fun(string.sub(args.path, 7)),
+                                             where)
+         search.limit_cnt = config.page.cnt or 20
+         search.limit_step = config.page.step or search.step_cnt
+         return paged_chrome.templated_page(search, "search")
       end,
       aboutChrome = function(args)
          -- NOTE: inefficient, it mostly doesnt care about the result of dir_fun.
-         return listview.new_AboutChrome(config.db or dir_fun(string.sub(args.path, 7)),
-                                         where)
+         return paged_chrome.templated_page(
+            listview.new_AboutChrome(config.db or dir_fun(string.sub(args.path, 7)),
+                                     where), "aboutChrome")
       end,
    }
 
-   pages.search.limit_cnt = config.page.cnt or 20
-   pages.search.limit_step = config.page.step or pages.search.step_cnt
    return pages
 end
 
 -- Make the chrome page.
 local dir_paged = chrome_describe()
-paged_chrome.paged_chrome("listviewDir", dir_paged)
+paged_chrome.paged_chrome("dirChrome", dir_paged)
 
 if config.take_dir_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("dir", dir_paged)
@@ -55,4 +55,4 @@ local function on_command(w, query)
    local v = w:new_tab("luakit://dirChrome/search")
 end
 
-add_cmds({ loudy.bind.cmd("dirChrome", on_command) })
+add_cmds({ lousy.bind.cmd("dirChrome", on_command) })

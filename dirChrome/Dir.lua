@@ -25,6 +25,20 @@ Dir.entry_meta = DirEntry
 
 Dir.cmd_dict.has_path = "SELECT id FROM files WHERE dirname == ? AND filename == ?"
 
+local cur_time = require "o_jasper_common.cur_time"
+
+local cur_id = 0
+function new_id() 
+   -- TODO external lib...
+   local t_ms = cur_time.ms()
+   if 1000*t_ms > cur_id then
+      cur_id = 1000*t_ms
+   else
+      cur_id = cur_id + 1
+   end
+   return cur_id
+end
+
 function Dir:update_or_enter(entry)
    local exist = self:sqlcmd("has_path"):exec({entry.dirname, entry.filename})
    if #exist > 0 then
@@ -32,6 +46,7 @@ function Dir:update_or_enter(entry)
       entry.id = exist[1].id
       return self:update(entry)
    else
+      entry.id = entry.id or new_id()
       return SqlHelp.update_or_enter(self, entry)
    end
 end
