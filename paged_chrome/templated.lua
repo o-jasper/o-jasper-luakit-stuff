@@ -54,7 +54,7 @@ function Public.templated_page(page, name)
    if page.name then  -- Ensure set name.
       assert( not name or page.name == name )
    else
-      assert(name)
+      assert(name, "Need a name argument")
       page.name = name
    end
 

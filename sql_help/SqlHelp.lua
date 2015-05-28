@@ -481,7 +481,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
    
    force_update = function(self, entry)
       assert(entry.id)
-      self:delete_id(entry.id)
+      self:delete_id(entry.id)  -- Delete previous
       return self:enter(entry)
 --      local inp = self:args_in_order(entry) -- Does it matter?
 --      table.insert(inp, entry.id)
