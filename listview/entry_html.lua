@@ -22,6 +22,14 @@ Public.default_html_calc = {
       end
    end,
 
+   dateText = function(self)
+      return os.date("%c", self:ms_t()/1000)
+   end,
+
+   dateHTML = function(self)  -- TODO tad primitive...
+      return "{%dateText}"
+   end,
+
    delta_dateHTML = function(self, state)
       return tt.delta_dateHTML(state, self:ms_t())
    end,
