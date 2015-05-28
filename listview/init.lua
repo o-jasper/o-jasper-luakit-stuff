@@ -108,8 +108,7 @@ local mod_Search = {
       return query
    end,
 
-   repl_list = function(self, args, _, _)
-      local query = self:total_query("")
+   repl_list = function(self, args)
       return { 
          title = string.format("%s:%s", self.chrome_name, self.name),
          latestQuery   = self.log.cmd_query or "",
@@ -161,7 +160,7 @@ local mod_Search = {
 Public.Search = c.copy_meta(Public.Base, mod_Search)
 
 local mod_AboutChrome = {
-   repl_list = function(self, args, _, _)
+   repl_list = function(self, args)
       return setmetatable(
          {   title = string.format("%s:%s", self.chrome_name, self.name),
          },

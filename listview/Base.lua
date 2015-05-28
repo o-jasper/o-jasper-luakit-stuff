@@ -5,13 +5,10 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
--- TODO this is a bit wonky..
-
 local c = require("o_jasper_common")
+local asset = require("paged_chrome").asset
 
 local config = globals.listview or {}
-
-local asset = require("paged_chrome").asset
 
 -- Base metatable of templated html page.
 return {
