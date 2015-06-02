@@ -12,6 +12,7 @@ function Public.copy_meta(of, mod)
    assert(not mod, "Dont do mod anymore, makes sub-tables too messy.")
    local ret = copy_table(of)
    ret.__index = dont_index
+   ret.new = nil
    return ret
 end
 
