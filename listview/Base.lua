@@ -12,27 +12,31 @@ local config = globals.listview or {}
 local ensure = require("o_jasper_common.ensure")
 
 -- Base metatable of templated html page.
-return c.metatable_of({
+local this = {
    new_remap = {log=1, where=2},
    new_prep = { where = ensure.table },
    new_assert_types = {log="table", where="table"},
    
    repl_pattern = false, to_js = {},
+}
+
+function this:config() return config end
+-- NOTE; might say it belongs to paged-chrome, but it provides the freedom to
+--  make it more convenient.
+-- Alternatively "derive-from" the paged-chrome, however, i dont want to,
+-- and that'd push my metatable approach onto others.
+function this:asset(what, kind)
+   return asset(self.where, what .. (kind or ".html"))
+end
    
-   config = function(self) return config end,
-   -- NOTE; might say it belongs to paged-chrome, but it provides the freedom to
-   --  make it more convenient.
-   -- Alternatively "derive-from" the paged-chrome, however, i dont want to,
-   -- and that'd push my metatable approach onto others.
-   asset = function(self, what, kind)
-      return asset(self.where, what .. (kind or ".html"))
-   end,
+function this:asset_getter(what, kind)
+   return function() return self:asset(what, kind) end
+end
    
-   asset_getter = function(self, what, kind)
-      return function() return self:asset(what, kind) end
-   end,
-   
-   repl_list = function(self, args, _, _)
-      return { title = string.format("%s:%s", self.chrome_name, self.name) }
-   end,
-})
+function this:repl_list(args)
+   error("Thou shalt not use the base repl list.")
+   --print("Base repl_list being used? how come?", args)
+   --return { title = string.format("%s:%s", self.chrome_name, self.name) }
+end
+
+return c.metatable_of(this)

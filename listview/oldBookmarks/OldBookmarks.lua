@@ -29,11 +29,6 @@ function this:initial_state()
    return { html_calc = html_calc }
 end
 
-function this:oldBookmarks_entry(entry)
-   entry.origin = self
-   return setmetatable(entry, OldBookmarksEntry)
-end
-
-this.entry_fun = OldBookmarks.oldBookmarks_entry
+this.entry_meta = OldBookmarksEntry
 
 return c.metatable_of(this)

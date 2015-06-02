@@ -1,7 +1,7 @@
 
-local c = require("o_jasper_common")
+local c = require "o_jasper_common"
 
-local this = c.copy_meta(listview.Base)
+local this = c.copy_meta(require "listview.Base")
 
 this.to_js = {
    manual_enter = function(self)

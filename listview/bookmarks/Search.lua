@@ -1,8 +1,11 @@
 
-local this = c.copy_meta(require "listview.Search")
+local c = require "o_jasper_common"
+local listview = require "listview"
+
+local this = c.copy_meta(listview.Search)
 
 -- Want the adding-entries js api too.
-this.to_js = c.copy_table(listview.Search.to_js, mod_Enter.to_js)
+this.to_js = c.copy_table(this.to_js, require("listview.bookmarks.Enter").to_js)
 
 local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 

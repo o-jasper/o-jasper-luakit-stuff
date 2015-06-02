@@ -11,12 +11,9 @@ local html_entry = require "listview.entry_html"
 local this = c.copy_meta(require "listview.Base")
 
 -- this.html_state = nil,
-this.search_cnt = 0
-
-this.limit_i=0
-this.limit_cnt=20
-this.limit_step=20
-
+for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
+   this[k] = v
+end
 this.to_js = require "listview.to_js"
 
 function this:total_query(search)
