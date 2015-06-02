@@ -5,7 +5,9 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-local listview = require "listview"
+local AboutChrome = require "listview.AboutChrome"
+local DirSearch = require "dirChrome.DirSearch"
+
 local dir_fun  = require "dirChrome.dir_fun"
 
 local paged_chrome = require("paged_chrome")
@@ -15,7 +17,8 @@ config.page = config.page or {}
 -- If you specify a config.db, it'll load everything into that,
 --  otherwise, a temporary db.
 
-local run = {}
+local function figure_path(args) return string.sub(args.path, 7) end
+local function figure_Dir(args)  return dir_fun(figure_path(args)) end
 
 local function chrome_describe()
    local where = config.assets or {}
@@ -24,17 +27,15 @@ local function chrome_describe()
    local pages = {
       default_name = "search",
       search = function(args)
-         local search =  listview.new_Search(config.db or dir_fun(string.sub(args.path, 7)),
-                                             where)
+         local search =  DirSearch.new{figure_Dir(args), where}
          search.limit_cnt = config.page.cnt or 20
          search.limit_step = config.page.step or search.step_cnt
          return paged_chrome.templated_page(search, "search")
       end,
       aboutChrome = function(args)
          -- NOTE: inefficient, it mostly doesnt care about the result of dir_fun.
-         return paged_chrome.templated_page(
-            listview.new_AboutChrome(config.db or dir_fun(string.sub(args.path, 7)),
-                                     where), "aboutChrome")
+         local page = AboutChrome.new{figure_Dir(args), where}
+         return paged_chrome.templated_page(page, "aboutChrome")
       end,
    }
 
@@ -51,8 +52,7 @@ end
 
 -- Add binding.
 local function on_command(w, query)
-   run.to_dir = query  -- Bit "global-value-ie.
-   local v = w:new_tab("luakit://dirChrome/search")
+   w:new_tab("luakit://dirChrome/search" .. (query or ""))
 end
 
 add_cmds({ lousy.bind.cmd("dirChrome", on_command) })

@@ -27,10 +27,11 @@ db:exec [[
 ]]
    
 return function(path)
-   
-   local ret = setmetatable({ db = db }, Dir)
+
+   local ret = setmetatable({ db = db, path=path }, Dir)
 
    if not lfs.attributes(path) then
+      print(path)
       path = "/home"  -- TODO
    end
 
