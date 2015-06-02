@@ -20,6 +20,37 @@ function Public.metatable_of(meta)
              and not meta.__metatable_of_override,
           "Did you use `copy_meta` properly?")
    local index = {}
+   if not meta.new then
+      meta.new = function(initial)
+         -- Set the whole thing.
+         for k,v in pairs(meta.new_remap) do
+            assert( not (initial[v] and initial[k]) )
+            initial[k] = initial[v]
+            initial[v] = nil
+         end
+         if meta.new_prep and meta.new_prep_whole then
+            initial = meta.new_prep_whole(initial)
+         end
+         assert(type(initial) == "table")
+         assert(getmetatable(initial) ~= meta, "Default `new` not to be called as member.")
+
+         -- Changers for particular inputs.
+         for k, fun in pairs(meta.new_prep or {}) do
+            initial[k] = fun(initial[k])
+         end
+         -- Assert stuff about it.
+         for k,tp in pairs(meta.new_assert_types or {}) do
+            if type(tp) == "function" then
+               assert(tp(initial[k]))
+            elseif tp == "exists" then
+               assert(initial[k])
+            else
+               assert(type(initial[k]) == tp)
+            end
+         end
+         return setmetatable(initial, meta)
+      end
+   end
    for k,v in pairs(meta) do index[k] = v end
    meta.__index = index
    return meta
