@@ -36,8 +36,9 @@ local function chrome_describe(log)
    local pages = {
       default_name = default_name or "search",
       search = paged_chrome.templated_page(search, "search"),
-      aboutChrome = paged_chrome.templated_page(listview.new_AboutChrome(log, where),
-                                                "aboutChrome"),
+      aboutChrome = paged_chrome.templated_page(
+         listview.AboutChrome.new{log, where},
+         "aboutChrome"),
    }
    pages.search.limit_cnt = config.page.cnt or 20
    pages.search.limit_step = config.page.step or pages.search.step_cnt

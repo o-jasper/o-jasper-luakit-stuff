@@ -1,4 +1,3 @@
-
 local c = require("o_jasper_common")
 
 local mod_AboutChrome = {

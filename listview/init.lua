@@ -24,27 +24,18 @@ local Public = {
    AboutChrome = require "listview.AboutChrome"
 }
 
--- TODO dunno if the below are good to have around.. What about a `SomeName.new` instead..
-local function tablize(x) if type(x) ~= "table" then return {x} else return x end end
-
-function Public.new_Search(log, where)
-   assert(log and where)
-   return setmetatable({log = log, where=tablize(where)}, Public.Search)
-end
-function Public.new_AboutChrome(log, where)
-   assert(log and where)
-   return setmetatable({log=log, where=tablize(where)}, Public.AboutChrome)
-end
-
 local paged_chrome = require("paged_chrome")
 
 -- Better not use.
 function Public.new_Chrome(log, where, default_name)
    assert(log and where)
    return { default_name = default_name or "search",
-            search = paged_chrome.templated_page(Public.new_Search(log, where), "search"),
-            aboutChrome = paged_chrome.templated_page(Public.new_AboutChrome(log, where),
-                                                      "aboutChrome"),
+            search = paged_chrome.templated_page(
+               Public.Search.new{log, where}, 
+               "search"),
+            aboutChrome = paged_chrome.templated_page(
+               Public.AboutChrome.new{log, where},
+               "aboutChrome"),
    }
 end
 
