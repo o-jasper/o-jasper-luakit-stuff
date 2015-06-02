@@ -3,7 +3,7 @@ function full_search_input() {
     return ge('addsearch_input').value + " " + ge('search_input').value
 }
 
-var sql_shown, addsearch_shown;
+var search_shown, sql_shown, addsearch_shown;
 var by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
     if( !by_search && !yes ){ return; }
@@ -17,6 +17,19 @@ function set_sql_shown(yes) {
     if( yes && !sql_locked ) { set_ids(show_sql(full_search_input())); }
 
     sql_shown = yes;
+}
+function set_search_shown(yes) {
+    ge("search_area").hidden = !yes;
+    ge('toggle_sql_shown').innerHTML =
+        yes ? (sql_shown ? "<strike>sql</strike>" : "sql") : "str";
+    search_shown = yes;
+}
+
+function rotate_search_shown() {
+    if( search_shown ){
+        set_sql_shown(!sql_shown);
+        if( !sql_shown ){ set_search_shown(false); }  //Order matters a bit,,
+    } else { set_search_shown(true); }
 }
 
 function set_addsearch_shown(yes) {
