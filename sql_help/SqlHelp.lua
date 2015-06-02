@@ -91,18 +91,20 @@ local SqlHelp = {
          end,
 
          ["after:"] = function(self, state, m, v)
-            if time_interpret(v) then
-               after_t = math.max(state.after_t or 0, time_interpret(v))
-            end
+            self:after(time_interpret(v))
+--            if time_interpret(v) then -- TODO what is this for, AFAICT just silly.
+--               state.after_t = math.max(state.after_t or 0, time_interpret(v))
+--            end
          end,
          ["before:"] = function(self, state, m, v)
-            if time_interpret(v) then  -- TODO why different from after?
-               if state.before_t then
-                  state.before_t = math.min(state.before_t, time_interpret(v))
-               else
-                  state.before_t = time_interpret(v)
-               end
-            end
+            self:before(time_interpret(v))
+--            if time_interpret(v) then  -- TODO why different from after?
+--               if state.before_t then
+--                  state.before_t = math.min(state.before_t, time_interpret(v))
+--               else
+--                  state.before_t = time_interpret(v)
+--               end
+--            end
          end,
          ["limit:"] = function(self, state, m, v)
             local list = string_split(v, ",")

@@ -3,6 +3,9 @@ local config = globals.listview_dir or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
+local string_split = require("lousy").util.string.split
+local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
+
 local SqlHelp = require("sql_help").SqlHelp
 local cur_time = require "o_jasper_common.cur_time"
 
@@ -18,9 +21,33 @@ this.searchinfo.matchable = {
    "mode:", "dir:", "file:", "dirlike:", "filelike:",
    "sizelt:", "sizegt:",
    "before:", "after:",
-    "access_before:", "access_after:",
-    "limit:"
+   "access_before:", "access_after:",
+   "limit:"
 }  -- TODO need the functions.
+
+local mod_match_funs = {
+   ["mode:"] = function(self, _, m, v)  -- Exact mode(s)
+      self:equal_one_or_list("mode", string_split(v))
+   end,
+   ["sizelt:"] = function(self, _, m, v)  -- TODO .. units and stuff.
+      self:lt("size", tonumber(v))
+   end,
+   ["sizegt:"] = function(self, _, m, v)
+      self:gt("size", tonumber(v))
+   end,
+   ["access_before:"] = function(self, _, m, v)
+      self:lt("size", tonumber(c.from_text.time_interpret(v)))
+   end,
+   ["access_after:"] = function(self, _, m, v)
+      self:gt("size", tonumber(c.from_text.time_interpret(v)))
+   end,
+}
+mod_match_funs["dir:"] = mod_match_funs["uri:"]
+mod_match_funs["dirlike:"] = mod_match_funs["urilike:"]
+mod_match_funs["file:"] = mod_match_funs["uri:"]
+mod_match_funs["filelike:"] = mod_match_funs["urilike:"]
+
+for k, v in pairs(mod_match_funs) do this.searchinfo.match_funs[k] = v end
 
 this.entry_meta = DirEntry
   
