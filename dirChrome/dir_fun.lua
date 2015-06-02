@@ -36,22 +36,25 @@ return function(path)
    end
 
    for file, _ in lfs.dir(path) do
-      local entry = lfs.attributes(path)
-      entry.dirname = path
-      entry.filename = file
-      entry.time_access = entry.access
-      entry.time_modified = entry.modification
-      
-      for n,_ in pairs(Dir.values.string_els) do
-         assert( type(entry[n]) == "string", 
-                 string.format("%s not string, but %s", n, entry[n]))
+      local entry = not ( {["."]=true, [".."]=true})[file] and 
+         lfs.attributes(path .. "/" .. file)
+      if entry then
+         entry.dirname = path
+         entry.filename = file
+         entry.time_access = entry.access
+         entry.time_modified = entry.modification
+         
+         for n,_ in pairs(Dir.values.string_els) do
+            assert( type(entry[n]) == "string", 
+                    string.format("%s not string, but %s", n, entry[n]))
+         end
+         for n,_ in pairs(Dir.values.int_els) do
+            assert( type(entry[n]) == "number" or n == "id", 
+                    string.format("%s not integer, but %s", n, entry[n]))
+         end
+         
+         ret:update_or_enter(entry)
       end
-      for n,_ in pairs(Dir.values.int_els) do
-         assert( type(entry[n]) == "number" or n == "id", 
-                 string.format("%s not integer, but %s", n, entry[n]))
-      end
-
-      ret:update_or_enter(entry)
    end
    return ret
 end

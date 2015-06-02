@@ -85,6 +85,12 @@ function this:initial_state()
       size_w_numcnt = function(entry, sub)
          return c.int_w_numcnt(entry.size, sub)
       end,
+      letter_mode  = function(entry)
+         return ({file="f", directory="d"})[entry.mode] or "u"
+      end,
+      shorter_mode = function(entry)
+         return ({directory="dir"})[entry.mode] or mode
+      end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
