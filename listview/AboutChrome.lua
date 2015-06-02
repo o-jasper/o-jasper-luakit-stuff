@@ -17,4 +17,4 @@ local mod_AboutChrome = {
          })
    end,
 }
-return metatable_of(c.copy_meta(Public.Base, mod_AboutChrome))
+return c.metatable_of(c.copy_meta(require "listview.Base", mod_AboutChrome))

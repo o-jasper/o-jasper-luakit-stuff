@@ -14,7 +14,7 @@ local mod_Search = {
 
    limit_i=0, limit_cnt=20,limit_step=20,
 
-   to_js = to_js,
+   to_js = require "listview.to_js",
 
    total_query = function(self, search)
       -- How we end up searching.
@@ -80,4 +80,4 @@ local mod_Search = {
    end,
 }
 
-return metatable_of(c.copy_meta(Public.Base, mod_Search))
+return c.metatable_of(c.copy_meta(require "listview.Base", mod_Search))
