@@ -76,6 +76,10 @@ local entry_html = require("listview.entry_html")
 
 function this:initial_state()
    local mod_html_calc = {
+      go_there_uri = function(entry)
+         return string.format(entry.mode == "directory" and "search%s/%s" or "file://%s/%s",
+                              entry.dirname, entry.filename)
+      end,
       rel_dirname = function(entry)
          return rel_pathname(self.path, entry.dirname)
       end,
