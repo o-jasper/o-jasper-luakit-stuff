@@ -1,5 +1,7 @@
 
-function ge(id) { return document.getElementById(id) }
+function ge(id) { 
+    return document.getElementById(id) || {}
+}
 
 function set_ids(idvals) {
     if(idvals) for( k in idvals ) {
