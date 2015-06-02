@@ -1,4 +1,4 @@
---  Copyright (C) 11-05-2015 Jasper den Ouden.
+--  Copyright (C) 02=-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -82,104 +82,13 @@ local to_js = {
 -- local pagedChrome = require "paged_chrome"
 
 -- Making the objects that do the pages.
-local Public = { Base = require "listview.Base" }
-
--- The search part.
-local mod_Search = {
-
-   -- html_state = nil,
-   search_cnt = 0,
-
-   limit_i=0, limit_cnt=20,limit_step=20,
-
-   to_js = to_js,
-
-   total_query = function(self, search)
-      -- How we end up searching.
-      assert(type(search) == "string", "Search not string; " .. tostring(search))
-      local query = self.log:new_SqlHelp()
-      if search ~= "" then query:search(search) end
-      query:order_by(self.log.values.order_by)
-      
-      self.got_limit = query.got_limit
-      if not query.got_limit then  -- Add a limit if dont have one yet.
-         query:limit(self.limit_i, self.limit_cnt)
-      end
-      return query
-   end,
-
-   repl_list = function(self, args)
-      return { 
-         title = string.format("%s:%s", self.chrome_name, self.name),
-         latestQuery   = self.log.cmd_query or "",
-         table_name    = self.log.values.table_name,
-         cycleCnt = self.limit_step,
-         sqlShown = self:config().sql_shown and "true" or "false",
-         
-         above_title = " ", below_title = " ", right_of_title = " ",
-         below_search = " ",
-         above_sql = " ", below_sql = " ",
-         below_acts = " ", after = " ",
-      }
-   end,
-
-   js_listupdate = function (self, list, as_msg)
-      self.search_cnt = self.search_cnt + 1
-      -- TODO bit fussy.. really getting the return value straight out would be handy..
-      local cnt = "BUG"
-      local gl = self.got_limit
-      if gl then
-         if #gl == 1 then
-            cnt = string.format("results 0 to %d", gl[1])
-         else
-            cnt = string.format("results %d to %d", gl[1], gl[1] + gl[2])
-         end
-      else
-         cnt = string.format("results %d to %d", self.limit_i,
-                             math.min(self.limit_i + self.limit_cnt,
-                                      self.limit_i + #list))
-      end
-      return { list=self:final_html_list(list, as_msg, reset_state),
-               cnt=cnt,
-               search_cnt=self.search_cnt,
-      }
-   end,
-   
-   final_html_list = function(self, list, as_msg)
-      local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-      if not as_msg then
-         return html_list.keyval(list)
-      else
-         assert(self.log.initial_state)
-         --print(self.log.initial_state, html_state, self.log:initial_state())
-         self.html_state = self.html_state or self.log:initial_state()
-         return html_entry.list(self, list, self.html_state)                             
-      end
-   end,
+local Public = {
+   Base = require "listview.Base",
+   Search = require "listview.Search",
+   AboutChrome = require "listview.AboutChrome"
 }
-Public.Search = c.copy_meta(Public.Base, mod_Search)
 
-local mod_AboutChrome = {
-   repl_list = function(self, args)
-      return setmetatable(
-         {   title = string.format("%s:%s", self.chrome_name, self.name),
-         },
-         {__index=function(kv, key)
-             if self.log.values[key] then
-                 return self.log.values[key]
-             elseif key == "raw_summary" then
-                return c.tableText(self.log.values,
-                                   "&nbsp;&nbsp;", "","<br>")
-             end
-         end
-         })
-   end,
-}
-Public.AboutChrome = c.copy_meta(Public.Base, mod_AboutChrome)
-
-local listview_metatables = {}  -- Prep metatables.
-for k,v in pairs(Public) do Public[k] = c.metatable_of(v) end
-
+-- TODO dunno if the below are good to have around.. What about a `SomeName.new` instead..
 local function tablize(x) if type(x) ~= "table" then return {x} else return x end end
 
 function Public.new_Search(log, where)
