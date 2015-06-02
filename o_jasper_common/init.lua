@@ -3,7 +3,7 @@ local this = {}
 
 this.cur_time = require "o_jasper_common.cur_time"
 this.ensure = require "o_jasper_common.ensure"
-this.from_text = require "o_jasper_common.from_text"
+this.fromtext = require "o_jasper_common.fromtext"
 
 for k,v in pairs(require "o_jasper_common.meta")   do this[k] = v end
 for k,v in pairs(require "o_jasper_common.other") do this[k] = v end
