@@ -32,11 +32,13 @@ end
 function this:asset_getter(what, kind)
    return function() return self:asset(what, kind) end
 end
-   
+
+function this:repl_list_suggest(args)
+   return { title = string.format("%s:%s", self.chrome_name, self.name) }
+end
 function this:repl_list(args)
-   error("Thou shalt not use the base repl list.")
-   --print("Base repl_list being used? how come?", args)
-   --return { title = string.format("%s:%s", self.chrome_name, self.name) }
+   error([[Thou shalt not use the base repl list.
+`repl_list_suggest` for some suggestions, like title]])
 end
 
 return c.metatable_of(this)
