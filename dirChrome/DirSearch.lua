@@ -6,7 +6,7 @@ local this = c.copy_meta(Search)
 
 function this:repl_list(args)
    local ret = Search.repl_list(self, args)
-   ret.path = self.log.path
+   ret.cur_dir = self.log.path
    -- TODO better..
    ret.above_title = "<b>DIR:" .. ret.path .. "</b><br>"
    ret.initial_query = "dirlike:" .. self.log.path

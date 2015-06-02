@@ -3,10 +3,15 @@
 <head>
     <meta charset="utf-8">
     <title>{%title}</title>
-    <style type="text/css">{%css/placing.css}</style>
-    <style type="text/css">{%css/style.css}</style>
-    <script type="text/javascript">{%common.js}</script>
-    <script type="text/javascript">{%search.js}</script>
+    <style type="text/css">
+      {%css/placing.css}
+      {%css/style.css}
+      {%css/more.css}
+    </style>
+    <script type="text/javascript">
+      {%common.js}
+      {%search.js}
+    </script>
 </head>
 <body>
 
@@ -24,6 +29,7 @@
 </div>
 
 <div id="top_panel">
+  <h3>Directory <span class="cur_dir">{%cur_dir}</span></h3>
   {%parts/search.html}
   {%parts/addsearch.html}
 </div>
