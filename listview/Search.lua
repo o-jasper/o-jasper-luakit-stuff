@@ -67,6 +67,8 @@ function this:js_listupdate(list, as_msg)
    }
 end
 
+local html_list = require "listview.html_list"
+
 function this:final_html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    if not as_msg then
