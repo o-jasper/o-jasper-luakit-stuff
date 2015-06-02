@@ -15,24 +15,14 @@ local paged_chrome = require("paged_chrome")
 local config = (globals.listview or {}).old_bookmarks or {}
 config.page = config.page or {}
 
-local OldBookmarksSearch = c.copy_meta(listview.Search)
-
-function OldBookmarksSearch:repl_list(args)
-   local ret = listview.Search.repl_list(self, args)
-   ret.above_title = [[<br><span class="warn">This is just thrown together quickly,
-the other bookmarks is the "serious" one.</span>]]
-   return ret
-end
-
-OldBookmarksSearch = c.metatable_of(OldBookmarksSearch)
-
 local function chrome_describe(log)
    assert(log)
    
    local where = config.assets or {}
    table.insert(where, "listview/oldBookmarks")
 
-   local search = setmetatable({log=log, where=where}, OldBookmarksSearch)
+   local search = setmetatable({log=log, where=where},
+      require "listview.oldBookmarks.OldBookmarksSearch")
 
    local pages = {
       default_name = default_name or "search",
