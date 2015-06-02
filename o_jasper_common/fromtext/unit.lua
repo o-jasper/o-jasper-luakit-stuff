@@ -4,7 +4,6 @@ return {
          local name = string.match(text, "[numkMGT]*$")
          local factor = ({p=1e-12, n=1e-9, u=1e-6, m=1e-3, 
                           k=1e3, M=1e6, G=1e9, T=1e12})[name] or 1
-         print( tonumber(string.match(text, "^[%d]+"))*factor, name )
          return tonumber(string.match(text, "^[%d]+"))*factor
       end
    end,
