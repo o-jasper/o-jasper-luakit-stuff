@@ -6,6 +6,7 @@
 --  (at your option) any later version.
 
 local c = require("o_jasper_common")
+local html_entry = require "listview.entry_html"
 
 local mod_Search = {
 

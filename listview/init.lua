@@ -13,7 +13,6 @@ local lousy = require("lousy")
 local c = require("o_jasper_common")
 
 local html_list = require "listview.html_list"
-local html_entry = require "listview.entry_html"
 
 -- Apparently we dont need to know in order to satisfy the interface.
 -- local pagedChrome = require "paged_chrome"
