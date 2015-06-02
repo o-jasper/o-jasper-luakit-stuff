@@ -65,11 +65,11 @@ local function rel_pathname(from_path, path)
    local flist, list = ensure_listpath(from_path), ensure_listpath(path)
    local len, i = path_matching(flist, list)
    local ret = ""
-   while i < #flist do
+   while i <= #flist do
       ret = ret .. "../"
       i = i + 1
    end
-   return ret .. string.sub(path, len + 1)
+   return string.sub(ret, 1, #ret - 1) .. string.sub(path, len)
 end
 
 local entry_html = require("listview.entry_html")
@@ -78,6 +78,12 @@ function this:initial_state()
    local mod_html_calc = {
       rel_dirname = function(entry)
          return rel_pathname(self.path, entry.dirname)
+      end,
+      size_gist = function(entry)
+         return c.int_gist(entry.size)
+      end,
+      size_w_numcnt = function(entry, sub)
+         return c.int_w_numcnt(entry.size, sub)
       end,
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
