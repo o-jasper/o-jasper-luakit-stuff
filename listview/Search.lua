@@ -42,7 +42,7 @@ local mod_Search = {
          above_title = " ", below_title = " ", right_of_title = " ",
          below_search = " ",
          above_sql = " ", below_sql = " ",
-         below_acts = " ", after = " ",
+         below_acts = " ", before = " ", after = " ",
       }
    end,
 
