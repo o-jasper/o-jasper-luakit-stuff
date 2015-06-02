@@ -7,8 +7,8 @@ local this = c.copy_meta(Search)
 function this:repl_list(args)
    local ret = Search.repl_list(self, args)
    ret.path = self.log.path
-   ret.before = "<b>DIR:" .. ret.path .. "</b><br>"
-   ret.above_title = ret.before
+   -- TODO better..
+   ret.above_title = "<b>DIR:" .. ret.path .. "</b><br>"
    return ret
 end
 

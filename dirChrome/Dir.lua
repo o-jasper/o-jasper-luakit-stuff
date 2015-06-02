@@ -58,7 +58,7 @@ local function path_matching(match_path, path)
    end
    --assert( len == #match_path and len == #path,
    --string.format("%s ~= %d or ~= %d", len, #match_path, #path))
-   return len, #mlist
+   return len, #mlist + 1
 end
 
 local function rel_pathname(from_path, path)
@@ -69,7 +69,8 @@ local function rel_pathname(from_path, path)
       ret = ret .. "../"
       i = i + 1
    end
-   return string.sub(ret, 1, #ret - 1) .. string.sub(path, len)
+   ret = string.sub(ret, 1, #ret - 1) .. string.sub(path, len)
+   return ret == "" and "" or ret .. "/"
 end
 
 local entry_html = require("listview.entry_html")
