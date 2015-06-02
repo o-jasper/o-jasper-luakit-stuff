@@ -33,7 +33,7 @@ end
 function this:repl_list(args)
    return { 
       title = string.format("%s:%s", self.chrome_name, self.name),
-      latestQuery   = self.log.cmd_query or "",
+      initial_query  = self.log.cmd_query or "",
       table_name    = self.log.values.table_name,
       cycleCnt = self.limit_step,
       sqlShown = self:config().sql_shown and "true" or "false",

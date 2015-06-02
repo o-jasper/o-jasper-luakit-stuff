@@ -16,8 +16,8 @@ db:exec [[
    CREATE TABLE IF NOT EXISTS files (
      id INTEGER PRIMARY KEY,
   
-     dirname TEXT NOT NULL,
-     filename TEXT NOT NULL,
+     dir TEXT NOT NULL,
+     file TEXT NOT NULL,
      mode TEXT NOT NULL,
 
      size INTEGER NOT NULL,  
@@ -39,8 +39,8 @@ return function(path)
       local entry = not ( {["."]=true, [".."]=true})[file] and 
          lfs.attributes(path .. "/" .. file)
       if entry then
-         entry.dirname = path
-         entry.filename = file
+         entry.dir = path
+         entry.file = file
          entry.time_access = entry.access
          entry.time_modified = entry.modification
          

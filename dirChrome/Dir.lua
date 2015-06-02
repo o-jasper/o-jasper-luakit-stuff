@@ -57,15 +57,15 @@ function this:initial_state() return {} end
 
 function this:update_or_enter(entry)
    -- Delete pre-existing.
-   self:sqlcmd("delete_path"):exec({entry.dirname, entry.filename})
+   self:sqlcmd("delete_path"):exec({entry.dir, entry.file})
    assert(not entry.id) -- Re enter.,
       return SqlHelp.update_or_enter(self, entry)
 end
 
 this.cmd_dict.select_path =
-   "SELECT id FROM {%table_name} WHERE dirname == ? AND filename == ?"
+   "SELECT id FROM {%table_name} WHERE dir == ? AND file == ?"
 this.cmd_dict.delete_path =
-   "DELETE FROM {%table_name} WHERE dirname == ? AND filename == ?"
+   "DELETE FROM {%table_name} WHERE dir == ? AND file == ?"
 
 -- TODO these two functions to common.
 local string_split = require("lousy").util.string.split
@@ -107,10 +107,10 @@ function this:initial_state()
    local mod_html_calc = {
       go_there_uri = function(entry)
          return string.format(entry.mode == "directory" and "search%s/%s" or "file://%s/%s",
-                              entry.dirname, entry.filename)
+                              entry.dir, entry.file)
       end,
-      rel_dirname = function(entry)
-         return rel_pathname(self.path, entry.dirname)
+      rel_dir = function(entry)
+         return rel_pathname(self.path, entry.dir)
       end,
       size_gist = function(entry)
          return c.int_gist(entry.size)

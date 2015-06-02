@@ -6,7 +6,7 @@ set_addsearch_shown(false);
 set_as_msg(true);
 set_continuous(true);
 set_safe_mode(true);
-ge('search_input').value = "{%latestQuery}"
+ge('search_input').value = "{%initial_query}"
 touch_addsearch_name();
 search();
 

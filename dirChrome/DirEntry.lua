@@ -6,14 +6,14 @@ this.values = {
    table_name = "files",
    
    idname = "id",
-   row_names = {"id", "dirname", "filename", "mode",
+   row_names = {"id", "dir", "file", "mode",
                 "size", "time_access", "time_modified"},
    
    time = "time_modified", timemul = 1000,
    order_by = "time_modified",
-   textlike = {"dirname", "filename"},
+   textlike = {"dir", "file"},
    
-   string_els = c.values_now_set({"dirname", "filename", "mode"}),
+   string_els = c.values_now_set({"dir", "file", "mode"}),
    int_els = c.values_now_set({"id", "size", "time_access", "time_modified"}),
 }
 
