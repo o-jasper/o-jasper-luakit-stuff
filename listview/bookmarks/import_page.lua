@@ -6,15 +6,13 @@
 --  (at your option) any later version.
 
 local c = require("o_jasper_common")
-local listview = require("listview")
+local this = c.copy_meta(require("listview.Base"))
 
-local mod_BookmarksImport = {
-   to_js = {
-      do_it = function(self) return function ()
-            require("listview.bookmarks.import")(require("bookmarks").db,
-                                                 require "listview.bookmarks.bookmarks")
-      end end,
-   },
+this.to_js = {
+   do_it = function(self) return function ()
+         require("listview.bookmarks.import")(require("bookmarks").db,
+                                              require "listview.bookmarks.bookmarks")
+   end end,
 }
 
-return c.metatable_of(c.copy_meta(listview.Base, mod_BookmarksImport))
+return c.metatable_of(this)

@@ -9,9 +9,9 @@ local function dont_index(_, _)
 end
 
 function Public.copy_meta(of, mod)
+   assert(not mod, "Dont do mod anymore, makes sub-tables too messy.")
    local ret = copy_table(of)
    ret.__index = dont_index
-   for k,v in pairs(mod or {}) do ret[k] = v end
    return ret
 end
 

@@ -15,15 +15,16 @@ local paged_chrome = require("paged_chrome")
 local config = (globals.listview or {}).old_bookmarks or {}
 config.page = config.page or {}
 
-local mod_OldBookmarksSearch = {
-   repl_list = function(self, args)
-      local ret = listview.Search.repl_list(self, args)
-      ret.above_title = [[<br><span class="warn">This is just thrown together quickly,
+local OldBookmarksSearch = c.copy_meta(listview.Search)
+
+function OldBookmarksSearch:repl_list(args)
+   local ret = listview.Search.repl_list(self, args)
+   ret.above_title = [[<br><span class="warn">This is just thrown together quickly,
 the other bookmarks is the "serious" one.</span>]]
-      return ret
-   end,
-}
-local OldBookmarksSearch = c.metatable_of(c.copy_meta(listview.Search, mod_OldBookmarksSearch))
+   return ret
+end
+
+OldBookmarksSearch = c.metatable_of(OldBookmarksSearch)
 
 local function chrome_describe(log)
    assert(log)

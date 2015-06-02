@@ -12,7 +12,7 @@ local config = globals.listview or {}
 local ensure = require("o_jasper_common.ensure")
 
 -- Base metatable of templated html page.
-return {
+return c.metatable_of({
    new_remap = {log=1, where=2},
    new_prep = { where = ensure.table },
    new_assert_types = {log="table", where="table"},
@@ -35,4 +35,4 @@ return {
    repl_list = function(self, args, _, _)
       return { title = string.format("%s:%s", self.chrome_name, self.name) }
    end,
-}
+})

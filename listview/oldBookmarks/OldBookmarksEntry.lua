@@ -1,8 +1,8 @@
 local c = require "o_jasper_common"
 
-local OldBookmarksEntry = c.copy_meta(require("sql_help").SqlEntry)
+local this = c.copy_meta(require("sql_help").SqlEntry)
 
-OldBookmarksEntry.values = {
+this.values = {
    table_name = "bookmarks",
 
    idname = "id",
@@ -16,4 +16,4 @@ OldBookmarksEntry.values = {
    int_els = c.values_now_set({"id", "created", "modified"}),
 }
 
-return c.metatable_of(OldBookmarksEntry)
+return c.metatable_of(this)

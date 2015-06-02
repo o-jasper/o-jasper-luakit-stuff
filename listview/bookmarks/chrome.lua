@@ -36,68 +36,8 @@ end
 
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
-local function plus_cmd_add(ret, log)
-   local cmd_add = log.cmd_add or {}
-   for _,k in pairs({"uri", "title", "desc"}) do  -- Ill conceived but harmless.
-      ret["cmd_add_" .. k] = cmd_add[k] or ""
-   end
-   ret.cmd_add_gui = log.cmd_add and "true" or "false"
-   log.cmd_add = nil
-end
-
-local mod_Enter = {
-   to_js = {
-      manual_enter = function(self)
-         return function(inp)
-            if not inp.data_uri or inp.data_uri == "" then
-               inp.data_uri = default_data_uri_fun(self)
-            end
-            add = {
-               id = inp.id,  -- Potentially not provided.
-               created = c.cur_time.s(),
-               to_uri = inp.uri or "",
-               title = inp.title or "",
-               desc = inp.desc or "",
-               data_uri = inp.data_uri or "",  -- Empty strings are can be auto-reinterpreted.
-               --(these are not done directly)
-               tags = lousy.util.string.split(inp.tags, "[,; ]+")
-            }
-            self.log:update_or_enter(add)
-         end
-      end,
-
-      -- TODO show what the default data_uri would be.
-   },
-   repl_list = function(self, args, _,_)
-      local ret = { title = "Add bookmark", }
-      plus_cmd_add(ret, self.log)
-      return ret
-   end,
-}
-local Enter = c.metatable_of(c.copy_meta(listview.Base, mod_Enter))
-
-local mod_BookmarksSearch = {
-   -- Want the adding-entries js api too.
-   to_js = c.copy_table(listview.Search.to_js, mod_Enter.to_js),
-   
-   repl_list = function(self, args, view, meta)
-      local got = listview.Search.repl_list(self, args, view, meta)
-      got.above_title = self:asset("parts/enter_span")
-      got.right_of_title = [[&nbsp;&nbsp;
-<button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
-]]
-      got.after = [[<script type="text/javascript">{%bookmarks.js}</script>
-<script type="text/javascript">{%bookmarks_init.js}</script>
-]]
-
-      plus_cmd_add(got, self.log)
-      return got
-   end,
-}
-
-local BookmarksSearch = c.metatable_of(c.copy_meta(listview.Search, mod_BookmarksSearch))
-
-assert(mod_BookmarksSearch.to_js.manual_enter)
+local Enter = require "listview.bookmarks.Enter"
+local BookmarksSearch = require "listview.bookmarks.Search"
 
 local function mk_page(meta, name)
    local page = setmetatable({where=assets_where, log=bookmarks}, meta)

@@ -6,6 +6,7 @@ local c = require "o_jasper_common"
 local HistoryEntry = require "listview.history.HistoryEntry"
 
 local History = c.copy_meta(require("sql_help").SqlHelp)
+
 History.values = HistoryEntry.values
 
 -- Scratch some search matchabled that arent allowed.
