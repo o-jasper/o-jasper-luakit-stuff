@@ -35,11 +35,20 @@ Public.default_html_calc = {
    end,
    
    timemarks = function(self, state)
-      return tt.timemarks(state, self:ms_t())
+      return tt.time(state, self:ms_t())
    end,
 
-   resay_timemarks = function(self, state)
-      return tt.resay_timemarks(state, self:ms_t())
+   resay_time = function(self, state)
+      return tt.resay_time(state, self:ms_t(), (state.config.resay or {}).long)
+   end,
+   
+   short_resay_time = function(self, state)
+      local config = (state.config.resay or {}).short or {
+         {"year", "Year {%year}"},
+         {"yday", "{%month}/{%day} {%short_dayname}"},
+         init = " ", nochange = " ",
+      }
+      return tt.resay_time(state, self:ms_t(), config)
    end,
 
    identifier = function(self, _)

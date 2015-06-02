@@ -63,19 +63,25 @@ end
 
 Public.day_names = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
                     "Saturday"}
+Public.short_day_names = {"Sun", "Mon", "Tue", "Wed", "Th", "Fri",
+                          "Sat"}
 Public.month_names = {"Januari", "Februari", "March", "April", "May",
                       "June", "Juli", "Augustus", "September", "Oktober",
                       "November", "December"}
+Public.short_month_names = {"Jan", "Feb", "Mar", "Apr", "May",
+                            "June", "Juli", "Aug", "Sep", "Okt",
+                            "Nov", "Dec"}
 
 function Public.additional_time_strings(d)
    d.dayname = Public.day_names[d.wday]
-   d.monthname = Public.month_names[d.month]
+   d.short_dayname = Public.short_day_names[d.wday]
+   d.short_monthname = Public.short_month_names[d.month]
    return d
 end
 
-function Public.resay_timemarks(state, ms_t)
+function Public.resay_time(state, ms_t, config)
    local tm = state.resay_timemarks
-   local timemarks = state.config.resay_timemarks or
+   local timemarks = config or
       { {"year", [[<<tr><td colspan="2"><span class="year_change">Newyear {%year}<br><hr></span></td></tr>]]},
         {"yday", [[<tr><tr><td colspan="2"><span class="day_change">{%dayname} {%day}
 {%monthname}<br><hr></span></td></tr>]]},
