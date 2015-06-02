@@ -1,6 +1,6 @@
 set_by_search(true);
 set_sql_locked(false);
-set_search_shown(true);
+set_search_shown({%search_shown});
 set_sql_shown({%sqlShown});
 set_addsearch_shown(false);
 set_as_msg(true);

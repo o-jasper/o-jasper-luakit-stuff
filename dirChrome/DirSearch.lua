@@ -10,6 +10,7 @@ function this:repl_list(args)
    -- TODO better..
    ret.above_title = "<b>DIR:" .. ret.path .. "</b><br>"
    ret.initial_query = "dirlike:" .. self.log.path
+   ret.search_shown = "false"
    return ret
 end
 
