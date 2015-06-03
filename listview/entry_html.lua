@@ -21,9 +21,9 @@ Public.default_priority_funs = {
          -- local discount = require("discount") --package.loaded("discount")
          local markdown = require "markdown"
          if markdown then
-            return markdown(entry.desc or ""), 1
+            return markdown(entry.desc or ""), 2
          else
-            return entry.desc, 0
+            return entry.desc, 1
          end
       end,
    },
@@ -129,7 +129,7 @@ function Public.repl(entry, state)
          local got = state.config.priority_funs[key]
          if got then
             local cur, best_priority = nil, 0
-            for k,fun in pairs(got) do
+            for _,fun in pairs(got) do
                local result, priority = fun(entry, best_priority, state.config)
                if result and priority > best_priority then
                   best_priority = priority

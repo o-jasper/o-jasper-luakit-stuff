@@ -124,17 +124,17 @@ function this:initial_state()
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
 
-   local mod_priority_funs = {
+   local priority_funs = {
       go_there_uri = {
          function(entry)
             return string.format(entry.mode == "directory" and
                                     "search%s/%s" or "file://%s/%s",
-                                 entry.dir, entry.file), 0
+                                 entry.dir, entry.file), 1
          end,
       },
    }
 
-   for k,v in pairs(config.priority_funs) do
+   for k,v in pairs(config.priority_funs or {}) do
       if priority_funs[k] then
          table.insert(priority_funs[k], v)
       else
