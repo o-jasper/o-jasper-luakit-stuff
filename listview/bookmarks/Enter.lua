@@ -1,13 +1,32 @@
 
 local c = require "o_jasper_common"
 
+local config = (globals.listview or {}).bookmarks or {}
+
+local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")   -- TODO
+local topics    = config.topics or {"entity", "idea", "project", "data_source", "vacancy"}
+
+local bookmarks  = require "listview.bookmarks.bookmarks"
+
+local function default_data_uri_fun(entry)
+   for _,name in pairs(topics) do
+      if bookmarks:has_tag(entry.id, name) then
+         -- TODO file-appropriatize the title.
+         local dir = string.format("%s/%s/%s", topicsdir, name, entry.title)
+         return dir
+      end
+   end
+end
+
+local default_data_uri = config.default_data_uri or default_data_uri_fun
+
 local this = c.copy_meta(require "listview.Base")
 
 this.to_js = {
    manual_enter = function(self)
       return function(inp)
          if not inp.data_uri or inp.data_uri == "" then
-            inp.data_uri = default_data_uri_fun(self)
+            inp.data_uri = default_data_uri(self)
             end
          add = {
             id = inp.id,  -- Potentially not provided.
