@@ -11,8 +11,6 @@
   + Size.
   + Alphabetically.
 
-* Better time display. Current is hard to parse and takes a lot of space.
-
 * Way to indicate types of files as special.
 
   For instance `readme.md` as "text of the directory", and taking other
@@ -20,4 +18,4 @@
   
 * Deal with it when files/directories may not be accessed.
 
-
+* (optionally, defaultly)Hide dot files

@@ -7,7 +7,7 @@ var search_shown, sql_shown, addsearch_shown;
 var by_search, sql_locked, as_msg, continuous, actions_panel, safe_mode;
 function set_sql_shown(yes) {
     if( !by_search && !yes ){ return; }
-    ge('sql_input_area').hidden = !yes;
+    ge('sql_input_area').hidden = !yes;  // TODO Why does it seem to only work once?
     ge('toggle_sql_shown').innerHTML = yes ? "<strike>sql</strike>" : "sql";
     hide_button('toggle_by_search', !yes);
     hide_button('toggle_sql_locked', !yes);
