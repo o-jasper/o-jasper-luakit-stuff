@@ -13,6 +13,22 @@ local SqlEntry = require("sql_help").SqlEntry
 
 local Public = {}
 
+Public.default_priority_funs = {
+   markdown_desc = {
+      function(entry)
+         -- TODO.. ... discount isnt co-operating..
+         --  strange, luajit works, but luakit compiled with it doesnt.
+         -- local discount = require("discount") --package.loaded("discount")
+         local markdown = require "markdown"
+         if markdown then
+            return markdown(entry.desc or ""), 1
+         else
+            return entry.desc, 0
+         end
+      end,
+   },
+}
+
 Public.default_html_calc = {
    tagsHTML = function (self, state)
       if self.values.taggings then
@@ -30,6 +46,8 @@ Public.default_html_calc = {
       return "{%dateText}"
    end,
 
+   -- NOTE: the delta/resay cases only make sense when sorting by time.
+   -- TODO: perhaps the state/state.config should tell this and have proper behavior.
    delta_dateHTML = function(self, state)
       return tt.delta_dateHTML(state, self:ms_t())
    end,
@@ -51,6 +69,7 @@ Public.default_html_calc = {
       return tt.resay_time(state, self:ms_t(), config)
    end,
 
+   -- Writes it out properly.
    identifier = function(self, _)
       return c.int_to_string(self[self.values.idname])
    end,
@@ -73,6 +92,13 @@ end
 function Public.default_html_calc.monthname(self, _)
    return Public.day_names[datetab(self:ms_t()).wday]
 end
+
+--local function cap_priority(fun, to_priority)
+--   return function(entry, priority)
+--      local result, ret_priority = fun(entry, priority)
+--      return result, math.max(ret_priority, to_priority)
+--   end
+--end
 
 -- Replacement list.
 function Public.repl(entry, state)
@@ -98,6 +124,20 @@ function Public.repl(entry, state)
          else
             return os.date("%" .. string.sub(key, 6), math.floor(entry:ms_t()/1000))
          end
+      elseif not fun and state.config.priority_funs then
+         -- Things in the configuration can give their own priority.
+         local got = state.config.priority_funs[key]
+         if got then
+            local cur, best_priority = nil, 0
+            for k,fun in pairs(got) do
+               local result, priority = fun(entry, best_priority, state.config)
+               if result and priority > best_priority then
+                  best_priority = priority
+                  cur = result
+               end
+            end
+            return cur
+         end
       end
    end
    return setmetatable(pass, {__index=calc})
@@ -115,6 +155,8 @@ function Public.list(listview, data, state)
    assert(state) --state = state or {}
    state.last_time = state.last_time or c.cur_time.ms()
    state.config = state.config or {}
+   state.config.priority_funs = state.config.priority_funs or Public.default_priority_funs
+
    state.html_calc = state.html_calc or Public.default_html_calc
    local str = "<table>"
    for i, el in pairs(data) do 

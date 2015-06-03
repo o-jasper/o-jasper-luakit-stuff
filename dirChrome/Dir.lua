@@ -1,5 +1,5 @@
 
-local config = globals.listview_dir or globals.listview or {}
+local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
@@ -105,10 +105,6 @@ local entry_html = require("listview.entry_html")
 
 function this:initial_state()
    local mod_html_calc = {
-      go_there_uri = function(entry)
-         return string.format(entry.mode == "directory" and "search%s/%s" or "file://%s/%s",
-                              entry.dir, entry.file)
-      end,
       rel_dir = function(entry)
          return rel_pathname(self.path, entry.dir)
       end,
@@ -127,7 +123,30 @@ function this:initial_state()
    }
    local html_calc = c.copy_table(entry_html.default_html_calc)
    for k,v in pairs(mod_html_calc) do html_calc[k] = v end
-   return { html_calc=html_calc }
+
+   local mod_priority_funs = {
+      go_there_uri = {
+         function(entry)
+            return string.format(entry.mode == "directory" and
+                                    "search%s/%s" or "file://%s/%s",
+                                 entry.dir, entry.file), 0
+         end,
+      },
+   }
+
+   for k,v in pairs(config.priority_funs) do
+      if priority_funs[k] then
+         table.insert(priority_funs[k], v)
+      else
+         priority_funs[k] = {v}
+      end
+   end
+
+   return { html_calc= html_calc, config = { priority_funs = priority_funs } }
+end
+
+function this:incorporate_info(entry)
+   -- TODO
 end
 
 return c.metatable_of(this)
