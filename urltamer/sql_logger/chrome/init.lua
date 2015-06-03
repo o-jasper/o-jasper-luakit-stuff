@@ -27,7 +27,7 @@ paged_chrome.paged_chrome("listviewURLs", chrome_describe(sql_logger))
 local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
 
 local function on_command(w, query)
-   history.cmd_query = query or "from_domain:" .. domain_of_uri(w.view.uri)
+   sql_logger.cmd_query = query or "from_domain:" .. domain_of_uri(w.view.uri)
    local v = w:new_tab("luakit://listviewURLs/search")
 end
 

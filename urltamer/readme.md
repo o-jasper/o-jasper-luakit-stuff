@@ -3,7 +3,12 @@ Blocks, redirect, logs by random functions you define based on information
 available.
 
 **Status** seems to work.. okey, but over-blocks, and probably under-blocks
-too.
+too. Now that i have a listview, i can more easily look into the things
+(not)blocked.
+
+It does not do anything about javascript, other than blocking the requests
+it. Which is quite a lot, because it stops "calling home". Although i need
+a better grasp of cookies.
 
 ## Specifying how to treat uris
 
@@ -37,23 +42,28 @@ originating page. `info:uri_match(match)` returns true if any from a
 lua-regex(list) match.
 
 ### The result `result`
-You can do what you want with `result`, only `result.redirect` contains a string
-if you want to redirect. It has to be allowed to do that.
+if `result.allow and not result.disallow`, then it is allowed.
+
+`result.redirect` contains a string if you want to redirect. 
+It has to be allowed to do that.
 
 ## TODO
-  
+
 * Storing config in SQL and an interface to quickly configure.
 
 * Make stuff for this:
-  + Adding rules based on user interaction with the pages.
-    
-    Regex golf?
-  + Addblock integration.
   + Handles Cookies? Javascript?
   + Proxying?
+  + Caching files, resorting to cache if file not expected to change.
+  + Adding rules based on user interaction with the pages? ("Regex golf?")
+  + Adblock integration.
 
 * Have a system of reasons. I.e. `result.allow = {"blacklist", "late"}`,
   and then later, something might "excuse" *particular* reasons.
   (or fail to excuse)
   
   Or some other way to keep the overview.
+
+* Make it a proper package.
+
+* When it is an image, can we get it only when we reach it?

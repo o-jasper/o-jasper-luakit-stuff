@@ -5,6 +5,8 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+-- TODO make it a proper package..
+
 local domain_status = require "urltamer.domain_status"
 
 local ensure = require "o_jasper_common.ensure"
@@ -25,13 +27,13 @@ handler = {}
 function handler.base(info, result, also_allow)
    if info.uri == "about:blank" or info.by_userevent then
       result.allow = true
-   elseif also_allow and info:uri_match(also_allow) then
-      result.specific_allow = true
-      result.allow = true
    elseif info.dt > config.late_dt or
         info:uri_match({"^.+[.][fF][lL][vV]$", "^.+[.][sS][wW][fF]$"}) then
       result.was_late = true
       result.allow = false
+   elseif also_allow and info:uri_match(also_allow) then  -- (Doesnt excuse tardiness)
+      result.specific_allow = true
+      result.allow = true
    else
       result.allow = true
    end
