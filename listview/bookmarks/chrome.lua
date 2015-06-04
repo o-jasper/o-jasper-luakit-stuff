@@ -17,7 +17,7 @@ local config = (globals.listview or {}).bookmarks or {}
 config.page = config.page or {}
 
 local assets_where = config.assets or {}
-table.insert(assets_where, "listview/bookmarks")
+table.insert(assets_where, "*listview/bookmarks")
 
 -- Make the chrome page.
 
