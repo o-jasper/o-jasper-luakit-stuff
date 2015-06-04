@@ -1,5 +1,28 @@
 # Directory viewer
 
+## Info functions
+It is possible to return "info functions" in `globals.dirChrome.infofuns`
+these take the path and `Dir` object as input and return an info object, or
+`nil`.(indicating that the info function is not about that.
+
+Info objects have;
+
+`InfoMeta.maybe_new(path, dirobject)` creates a new one, *if*
+the infofun applies.
+
+`.path` gets you the path back.
+
+`info:priority()` returning how important it is.
+It may be sorted by importance. `> 0` is defaultly shown.
+`config.infofun.priority_override` can override it.
+
+Anything main selection shows ontop.
+
+`info:html()` return the html to be shown. Returning `nil`,
+it will not show anything. (you might want to indicate a reason.)
+
+(TODO) `info:to_js()` export functions to js.
+
 # TODO
 
 * Currently aware of current directory, *but* doesnt use it enough to show it.
