@@ -114,22 +114,14 @@ local SqlHelp = {
          ["title:"] = matchfun.search,
          ["title="] = matchfun.equal,
          ["titlelike:"] = matchfun.like,
-
+         
          ["after:"] = function(self, state, m, v)
-            self:after(time_interpret(v))
---            if time_interpret(v) then -- TODO what is this for, AFAICT just silly.
---               state.after_t = math.max(state.after_t or 0, time_interpret(v))
---            end
+            local t = time_interpret(v)
+            if t then self:after(t) end
          end,
          ["before:"] = function(self, state, m, v)
-            self:before(time_interpret(v))
---            if time_interpret(v) then  -- TODO why different from after?
---               if state.before_t then
---                  state.before_t = math.min(state.before_t, time_interpret(v))
---               else
---                  state.before_t = time_interpret(v)
---               end
---            end
+            local t = time_interpret(v)
+            if t then self:before(t) end
          end,
          ["limit:"] = function(self, state, m, v)
             local list = string_split(v, ",")
@@ -250,7 +242,7 @@ local SqlHelp = {
       self:gt(self.values.time, time)
    end,
    before = function(self, time)
-      self:gt(self.values.time, time)
+      self:lt(self.values.time, time)
    end,
    
    -- Add a like command.

@@ -37,10 +37,12 @@ local mod_match_funs = {
       self:gt("size", c.fromtext.w_magnitude_interpret(v))
    end,
    ["access_before:"] = function(self, _, m, v)
-      self:lt("size", c.fromtext.time_interpret(v))
+      local t = c.fromtext.time_interpret(v)
+      if t then self:lt("access", t) end
    end,
    ["access_after:"] = function(self, _, m, v)
-      self:gt("size", c.fromtext.time_interpret(v))
+      local t = c.fromtext.time_interpret(v)
+      if t then self:gt("access", t) end
    end,
    ["dir:"] = cur_match_funs["uri:"],
    ["dirlike:"] = cur_match_funs["urilike:"],
