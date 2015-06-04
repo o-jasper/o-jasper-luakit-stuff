@@ -14,6 +14,9 @@ local DirEntry = require "dirChrome.DirEntry"
 
 local this = c.copy_meta(SqlHelp)
 
+this.values = DirEntry.values
+
+
 local function entry_from_file(path, file)
    local entry =  lfs.attributes(path .. "/" .. file)
    if not ( {["."]=true, [".."]=true})[file] and entry then
@@ -21,11 +24,17 @@ local function entry_from_file(path, file)
       entry.file = file
       entry.time_access = entry.access
       entry.time_modified = entry.modification
+      return entry
+   end
+end
 
+function this:entry_from_file(file, path) 
+   local entry = entry_from_file(path or self.path, file) 
+   if entry then
       for n,_ in pairs(getmetatable(self).values.string_els) do  -- Checking a bunch.
          assert( type(entry[n]) == "string",
-                 string.format("%s not string, but %s", n, entry[n]))
-         end
+              string.format("%s not string, but %s", n, entry[n]))
+      end
       for n,_ in pairs(getmetatable(self).values.int_els) do
          assert( type(entry[n]) == "number" or n == "id",
                  string.format("%s not integer, but %s", n, entry[n]))
@@ -33,8 +42,6 @@ local function entry_from_file(path, file)
       return entry
    end
 end
-
-function this:entry_from_file(file, path) return entry_from_file(path or self.path, file) end
 function this:update_file(file)
    local entry = self:entry_from_file(file)
    return entry and self:update_or_enter(entry)
@@ -43,16 +50,17 @@ function this:update_whole_directory()
    for file, _ in lfs.dir(self.path) do self:update_file(file) end
 end
 
-local infofuns_funs = require "dirChrome.infofuns"
+local infofuns_funs = require "dirChrome.infofun"
 
-local function info_from_files(path)
+function this:info_from_files()
    local ret = {}
-   if config.infofuns and #config.infofuns > 0 then
+   if config.infofuns then
       for file, _ in lfs.dir(self.path) do
          for key, fun in pairs(config.infofuns) do
             if fun == true then fun = key end
-            if type(fun) == "string" then fun = infofuns[fun] end
-            table.insert(ret, fun.maybe_new(self.path .. "/" .. file, self))
+            if type(fun) == "string" then fun = infofuns_funs[fun] end
+            local info = fun.maybe_new(self.path, file, self)
+            if info then table.insert(ret, info) end
          end
       end
    end
@@ -66,9 +74,17 @@ local function info_from_files(path)
    return ret
 end
 
-function this:info_from_files() return info_from_files(self.path) end
-
-this.values = DirEntry.values
+function this:info_immediate_html()
+   local html = " "
+   for _, info in pairs(self:info_from_files()) do
+      if (config.priority_override or info.priority)(info) > 0 then
+         html = html .. info:html()
+      else
+         return html
+      end
+   end
+   return html
+end
 
 -- Scratch some search matchabled that arent allowed.
 this.searchinfo.matchable = {
