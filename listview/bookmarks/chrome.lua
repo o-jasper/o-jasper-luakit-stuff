@@ -37,7 +37,7 @@ end
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
 local Enter = require "listview.bookmarks.Enter"
-local BookmarksSearch = require "listview.bookmarks.Search"
+local BookmarksSearch = require "listview.bookmarks.BookmarksSearch"
 
 local function mk_page(meta, name)
    local page = setmetatable({where=assets_where, log=bookmarks}, meta)
