@@ -54,7 +54,7 @@ pattern_shortlist = {}
 function respond_to(info, result)
    local domain_way = nil
    for k,v in pairs(pattern_shortlist) do
-      if string.match(info.vuri or info.uri, k) then domain_way = v end
+      if string.match(info.vuri, k) then domain_way = v end
    end
    if not domain_way then
       domain_way = shortlist[info.from_domain] or not_listed

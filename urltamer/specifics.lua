@@ -97,6 +97,8 @@ shortlist["xkcd.com"] = function(info, result)
    handler.everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
 end
 
+shortlist["about:blank"] = permissive
+pattern_shortlist[""] = permissive
 pattern_shortlist["^luakit://.+"] = permissive
 
 shortlist["stackoverflow.com"] = function(info, result)
