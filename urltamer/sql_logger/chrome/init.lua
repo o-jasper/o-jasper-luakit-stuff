@@ -1,9 +1,9 @@
-require "urltamer.common"
-
 local listview = require "listview"
 local sql_logger = require "urltamer.sql_logger"
 
 local paged_chrome = require("paged_chrome")
+
+local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
 local config = (globals.urltamer or {}).sql_logger or {}
 
