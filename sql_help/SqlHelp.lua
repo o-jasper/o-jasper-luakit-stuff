@@ -37,6 +37,33 @@ end
 --   return function(...) return string.format(str, inputfun(...)) end
 -- end
 
+local matchfun = {
+   text_like = function(self, state, m, v)
+      self:text_like(v, nil, string.sub(m, 1, 2) == "-")
+   end,
+   tags = function()
+      for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.tags, t) end
+   end,
+   not_tags = function(self, state, m, v)
+      for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.not_tags, t) end
+   end,
+   ["not"] = function(self, state, m, v)
+      state.n = state.n or (m == "not:")
+      self:text_sw(v, true)
+   end,
+
+   search = function(self, state, m, v)
+      self:like(string.sub(m, 1, #m - 1), '%' .. v .. '%', state.n)
+   end,
+   equal = function(self, state, m, v)  -- TODO no negation..
+      -- TODO make a just `self:equal` function.
+      self:equal_one_or_list(string.sub(m, 1, #m - 1), v)
+   end,
+   like = function(self, state, m, v)
+      self:like(string.sub(m, 1, #m-5), v, state.n)
+   end,
+}
+
 local SqlHelp = {
    values = {
       textlike = {"title", "uri", "desc"},
@@ -52,24 +79,18 @@ local SqlHelp = {
       matchable = {"like:", "-like:", "tag:", "tags:", "-tag:", "-tags:",
                    "-", "not:", "\\-", "or:",
                    "uri:", "desc:", "title:",
+                   "uri=", "desc=", "title=",
                    "urilike:", "desclike:", "titlelike:",
                    "before:", "after:", "limit:"
       },
       match_funs = {
-         ["like:"]  = function(self, state, m, v)
-            self:text_like(v, nil, string.sub(m, 1, 2) == "-")
-         end,
-         ["tags:"] = function(self, state, m, v)
-            for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.tags, t) end
-         end,
-         ["-tags:"] = function(self, state, m, v)
-            for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.not_tags, t) end
-         end,
+         ["like:"] = matchfun.text_like, ["-like:"] = matchfun.text_like,
+         ["lk:"]   = matchfun.text_like, ["-lk:"]   = matchfun.text_like,
 
-         ["not:"] = function(self, state, m, v)
-            state.n = state.n or (m == "not:")
-            self:text_sw(v, true)
-         end,
+         ["tags:"]  = matchfun.tags,     ["tag:"]  = matchfun.tags,
+         ["-tags:"] = matchfun.not_tags, ["-tag:"] = matchfun.tags,
+
+         ["not:"] = matchfun["not"], ["-:"] = matchfun["not"],
          ["\\-"] = function(self, state, m, v)  -- Should escape it.
             self:text_sw("-" .. v, state.n)
          end,
@@ -82,13 +103,17 @@ local SqlHelp = {
                state.reset = true
             end
          end,
-         ["uri:"] = function(self, state, m, v)
-            self:like(string.sub(m, 1, #m - 1), '%' .. v .. '%', state.n)
-         end,
-         
-         ["urilike:"] = function(self, state, m, v)
-            self:like(string.sub(m, 1, #m-5), v, state.n)
-         end,
+         ["uri:"] = matchfun.search,
+         ["uri="] = matchfun.equal,
+         ["urilike:"] = matchfun.like,
+
+         ["desc:"] = matchfun.search,
+         ["desc="] = matchfun.equal,
+         ["desclike:"] = matchfun.like,
+
+         ["title:"] = matchfun.search,
+         ["title="] = matchfun.equal,
+         ["titlelike:"] = matchfun.like,
 
          ["after:"] = function(self, state, m, v)
             self:after(time_interpret(v))
@@ -506,23 +531,5 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       end
    end,
 }
-
-local mf = SqlHelp.searchinfo.match_funs
-mf["tag:"] = mf["tags:"]
-mf["-tag:"] = mf["-tags:"]
-
-local function copy_matchfun(fr, to)
-   if type(to) ~= "table" then to = {to} end
-   for _, m in pairs(to) do 
-      SqlHelp.searchinfo.match_funs[m] = SqlHelp.searchinfo.match_funs[fr]
-   end
-end
-
-copy_matchfun("like:", {"-like:", "-lk:", "lk:"})
-copy_matchfun("tags:", "tag")
-copy_matchfun("-tags:", "-tag")
-copy_matchfun("not:", "-")
-copy_matchfun("uri:", {"desc:", "title:" })
-copy_matchfun("urilike:", {"desclike:", "titlelike:"})
 
 return metatable_of(SqlHelp)

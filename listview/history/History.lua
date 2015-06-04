@@ -12,6 +12,7 @@ History.values = HistoryEntry.values
 -- Scratch some search matchabled that arent allowed.
 History.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:",
                                 "uri:", "title:",
+                                "uri=", "title=",
                                 "urilike:", "titlelike:",
                                 "before:", "after:", "limit:"}
 
