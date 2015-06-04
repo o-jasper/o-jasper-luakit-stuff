@@ -8,23 +8,23 @@ local function paged_chrome(chrome_name, pages)
    paged_chrome_dict[chrome_name] = pages
    chrome.add(chrome_name,
               function (view, meta)
-                 local use_name = string_split(meta.path, "/")[1]
+                 local use_path = meta.path
+                 local use_name = string_split(use_path, "/")[1]
                  local pages = paged_chrome_dict[chrome_name]
                  local page = pages[use_name]
                  if not page then
                     use_name = pages.default_name
+                    use_path = chrome_name .. "/" .. use_name
                     page = pages[use_name]
                  end
                  -- (in case each has state that doesnt otherwise work, generate a new page
                  --  each time)
                  if type(page) == "function" then page = page(meta, view) end
-
-                 -- TODO.. just use meta.path as the path!?
-                 local use_uri = string.format("luakit://%s/%s", chrome_name, use_name)
                  page.chrome_name = chrome_name
                  page.page_list = pages
+                 local use_uri = "luakit://" .. chrome_name .. "/" .. use_path
                  view:load_string(page.html(meta, view), use_uri)
-                 
+
                  if page.init ~= false then
                     -- Performance much less important that quickly troubleshooting.
                     assert(page.init ~= nil,

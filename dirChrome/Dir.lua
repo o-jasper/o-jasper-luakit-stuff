@@ -202,7 +202,7 @@ function this:initial_state()
       go_there_uri = {
          function(entry)
             return string.format(entry.mode == "directory" and
-                                    "search%s/%s" or "file://%s/%s",
+                                    "luakit://dirChrome/search%s/%s" or "file://%s/%s",
                                  entry.dir, entry.file), 1
          end,
       },
