@@ -20,7 +20,8 @@ Note that except for `or:`, tags dont apply to other tags.
 * `-like:`, `-lk:`, `like:`, `lk:` (doesnt) match a raw SQL LIKE term.
 * `or:` ors previous and next term. **TODO** probably does *not* work properly.
 * `uri:`, `desc:`, `title:` searches those terms specifically.
-* `urilike:`, 
+* `uri=`, `desc=`, `title=` exact equalities.
+* `urilike:`, `desclike:` `titlelike:` raw SQL LIKE< on the things.
 * `before:`, `after:` after/before some time. Has a time notation. Starting
   with `a`, uses an absolute time, otherwise relative, has units `ms`, `s`, `ks`,
   `min`, `h`, `d`(=`D`), `week`(=`wk`), `M`, `Y`.
@@ -40,7 +41,7 @@ actually do something.
 
 ## TODO
 
-* Combine multiple tables?
+* Combine multiple tables? (`sql_help` stuff)
 
 * Document better.
 

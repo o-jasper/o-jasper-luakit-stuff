@@ -24,3 +24,7 @@ otherwise, in `~/.config/luakit/rc.lua`, do
 
 * Add [sessman](https://github.com/IsoLinearCHiP/luakit-sessman) things
   stored-in-bookmarks with `sess_{%name}` tags indicating them.
+
+* Add "go to uri" keyword support.. *Easiest* is to just stuff it onto
+  the tags.. having a tag `gn_google` takes `:open google ...` to
+  the `uri`, where `{%1}`, `{%2}`etcetera map arguments.

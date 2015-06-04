@@ -54,7 +54,7 @@ One way is to firejail it using `private` to give the browser its entire home
 directory.
 
 ### Other
-Heavily inspired on Matthias Beyers
+*Heavily* inspired on Matthias Beyers
 [pass2luakit](https://github.com/matthiasbeyer/pass2luakit).
 
 Released under the GPLv3.
