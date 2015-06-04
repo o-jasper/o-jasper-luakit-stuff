@@ -10,7 +10,7 @@ Info objects have;
 `InfoMeta.maybe_new(path, dirobject)` creates a new one, *if*
 the infofun applies.
 
-`.path` gets you the path back.
+`.path`, `.file` gets the path, file back.
 
 `info:priority()` returning how important it is.
 It may be sorted by importance. `> 0` is defaultly shown.
@@ -25,19 +25,13 @@ it will not show anything. (you might want to indicate a reason.)
 
 # TODO
 
-* Currently aware of current directory, *but* doesnt use it enough to show it.
-
-  + Defaultly search for current directory exactly, and hide the search bar.
-
 * Have more order-by options. Probably want:(at least)
   + Modify date (current)
   + Size.
   + Alphabetically.
 
-* Way to indicate types of files as special.
-
-  For instance `readme.md` as "text of the directory", and taking other
-  `.md` files as showable.
+* More infofuns, and a way to have a "mode" of viewing and different
+  infofuns apply depending on the mode.
   
 * Deal with it when files/directories may not be accessed.
 
