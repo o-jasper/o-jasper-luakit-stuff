@@ -41,7 +41,7 @@ local matchfun = {
    text_like = function(self, state, m, v)
       self:text_like(v, nil, string.sub(m, 1, 2) == "-")
    end,
-   tags = function()
+   tags = function(self, state, m, v)
       for _, t in pairs(string_split(v, "[,;]")) do table.insert(state.tags, t) end
    end,
    not_tags = function(self, state, m, v)
@@ -57,7 +57,7 @@ local matchfun = {
    end,
    equal = function(self, state, m, v)  -- TODO no negation..
       -- TODO make a just `self:equal` function.
-      self:equal_one_or_list(string.sub(m, 1, #m - 1), v)
+      self:equal_1(string.sub(m, 1, #m - 1), v)
    end,
    like = function(self, state, m, v)
       self:like(string.sub(m, 1, #m-5), v, state.n)
@@ -212,22 +212,28 @@ local SqlHelp = {
    end,
    
    -- Lots of stuff to build searches from.
-   equal_one_or_list = function(self, which, input)
-      if type(input) == "table" then
-         if #input > 1 then
-            local str = {string.format("%s IN (?", which)}
-            for i, f in pairs(input) do
-               self:inp(f)
-               if i ~= 1 then table.insert(str, "?") end
-            end
-            self:extcmd(table.concat(str, ", ") .. ")")
-            return
-         end
-         input = input[1]
-      end
+   equal_1 = function(self, which, input)
       assert(type(input) == "string")
       self:extcmd("%s == ?", which)
       self:inp(input)
+   end,
+
+   equal_list = function(self, which, input)
+      assert(type(input) == "table")
+      local str = {string.format("%s IN (?", which)}
+      for i, f in pairs(input) do
+         self:inp(f)
+         if i ~= 1 then table.insert(str, "?") end
+            end
+      self:extcmd(table.concat(str, ", ") .. ")")
+   end,
+   
+   equal = function(self, which, input)
+      if type(input) == "table" then
+         if #input > 1 then return self:equal_list(which, input) end
+         input = input[1]
+      end
+      return self:equal_1(which, input)
    end,
    
    -- Value less/greater then ..
@@ -288,7 +294,7 @@ local SqlHelp = {
       --         local fw, cw = self.first, self.c
       --         self.first = false
       --         self.c = ""
-      --         self.equal_one_or_list("t." .. (tagname or self.values.tagname), tags)
+      --         self.equal("t." .. (tagname or self.values.tagname), tags)
       --         self.addstr(")")
       --         self.first, self.c = fw, cw
       
@@ -296,7 +302,7 @@ local SqlHelp = {
 SELECT * FROM %s
 WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       self:comb("AND")
-      self:equal_one_or_list(tagname or self.values.tagname, tags)
+      self:equal(tagname or self.values.tagname, tags)
       self:addstr(")")
    end,
    not_tags = function(self, tags, taggingsname, tagname)

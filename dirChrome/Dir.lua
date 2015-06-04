@@ -28,7 +28,7 @@ local cur_match_funs = this.searchinfo.match_funs
 
 local mod_match_funs = {
    ["mode:"] = function(self, _, m, v)  -- Exact mode(s)
-      self:equal_one_or_list("mode", string_split(v))
+      self:equal("mode", string_split(v))
    end,
    ["sizelt:"] = function(self, _, m, v)  -- TODO .. units and stuff.
       self:lt("size", c.fromtext.w_magnitude_interpret(v))
