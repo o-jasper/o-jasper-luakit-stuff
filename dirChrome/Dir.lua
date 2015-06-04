@@ -12,6 +12,35 @@ local DirEntry = require "dirChrome.DirEntry"
 
 local this = c.copy_meta(SqlHelp)
 
+local function entry_from_file(path, file)
+   local entry =  lfs.attributes(path .. "/" .. file)
+   if not ( {["."]=true, [".."]=true})[file] and entry then
+      entry.dir = path
+      entry.file = file
+      entry.time_access = entry.access
+      entry.time_modified = entry.modification
+
+      for n,_ in pairs(this.values.string_els) do  -- Checking a bunch.
+         assert( type(entry[n]) == "string",
+                 string.format("%s not string, but %s", n, entry[n]))
+         end
+      for n,_ in pairs(this.values.int_els) do
+         assert( type(entry[n]) == "number" or n == "id",
+                 string.format("%s not integer, but %s", n, entry[n]))
+      end
+      return entry
+   end
+end
+
+function this:entry_from_file(file) return entry_from_file(self.path, file) end
+function this:update_file(file)
+   local entry = self:entry_from_file(file)
+   return entry and self:update_or_enter(entry)
+end
+function this:update_whole_directory()
+   for file, _ in lfs.dir(self.path) do self:update_file(file) end
+end
+
 this.values = DirEntry.values
 
 -- Scratch some search matchabled that arent allowed.
