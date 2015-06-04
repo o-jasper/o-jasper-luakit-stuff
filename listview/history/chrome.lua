@@ -17,7 +17,7 @@ local function chrome_describe(log)
    assert(log)
    
    local where = config.assets or {}
-   table.insert(where, "listview/history")
+   table.insert(where, "*listview/history")
    local pages = listview.new_Chrome(log, where)
 
    pages.search.limit_cnt = config.page.cnt or 20

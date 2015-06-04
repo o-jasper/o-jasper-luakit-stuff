@@ -87,10 +87,10 @@ local function datetab(ms_t)
 end
 
 function Public.default_html_calc.dayname(self, _)
-   return Public.day_names[datetab(self:ms_t()).wday]
+   return tt.day_names[datetab(self:ms_t()).wday]
 end
 function Public.default_html_calc.monthname(self, _)
-   return Public.day_names[datetab(self:ms_t()).wday]
+   return tt.day_names[datetab(self:ms_t()).wday]
 end
 
 --local function cap_priority(fun, to_priority)

@@ -2,6 +2,8 @@
 local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
+config.infofuns = config.infofuns or {markdown=true}
+
 local c = require "o_jasper_common"
 local string_split = require("lousy").util.string.split
 
@@ -13,6 +15,76 @@ local DirEntry = require "dirChrome.DirEntry"
 local this = c.copy_meta(SqlHelp)
 
 this.values = DirEntry.values
+
+
+local function entry_from_file(path, file)
+   local entry =  lfs.attributes(path .. "/" .. file)
+   if not ( {["."]=true, [".."]=true})[file] and entry then
+      entry.dir = path
+      entry.file = file
+      entry.time_access = entry.access
+      entry.time_modified = entry.modification
+      return entry
+   end
+end
+
+function this:entry_from_file(file, path) 
+   local entry = entry_from_file(path or self.path, file) 
+   if entry then
+      for n,_ in pairs(getmetatable(self).values.string_els) do  -- Checking a bunch.
+         assert( type(entry[n]) == "string",
+              string.format("%s not string, but %s", n, entry[n]))
+      end
+      for n,_ in pairs(getmetatable(self).values.int_els) do
+         assert( type(entry[n]) == "number" or n == "id",
+                 string.format("%s not integer, but %s", n, entry[n]))
+      end
+      return entry
+   end
+end
+function this:update_file(file)
+   local entry = self:entry_from_file(file)
+   return entry and self:update_or_enter(entry)
+end
+function this:update_whole_directory()
+   for file, _ in lfs.dir(self.path) do self:update_file(file) end
+end
+
+local infofuns_funs = require "dirChrome.infofun"
+
+function this:info_from_files()
+   local ret = {}
+   if config.infofuns then
+      for file, _ in lfs.dir(self.path) do
+         for key, fun in pairs(config.infofuns) do
+            if fun == true then fun = key end
+            if type(fun) == "string" then fun = infofuns_funs[fun] end
+            local info = fun.maybe_new(self.path, file, self)
+            if info then table.insert(ret, info) end
+         end
+      end
+   end
+   if not config.dont_sort then
+      local function default_compare(a, b)
+         return (config.priority_override or a.priority)(a) > 
+                (config.priority_override or b.priority)(b)
+      end
+      table.sort(ret, config.priority_compare or default_compare)
+   end
+   return ret
+end
+
+function this:info_immediate_html()
+   local html = " "
+   for _, info in pairs(self:info_from_files()) do
+      if (config.priority_override or info.priority)(info) > 0 then
+         html = html .. info:html()
+      else
+         return html
+      end
+   end
+   return html
+end
 
 -- Scratch some search matchabled that arent allowed.
 this.searchinfo.matchable = {

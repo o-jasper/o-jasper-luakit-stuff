@@ -15,8 +15,8 @@ function this:repl_list(args, view, meta)
    got.right_of_title = [[&nbsp;&nbsp;
 <button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
 ]]
-   got.after = [[<script type="text/javascript">{%bookmarks.js}</script>
-<script type="text/javascript">{%bookmarks_init.js}</script>
+   got.after = [[<script type="text/javascript">{%js/bookmarks.js}</script>
+<script type="text/javascript">{%js/bookmarks_init.js}</script>
 ]]
       
    plus_cmd_add(got, self.log)

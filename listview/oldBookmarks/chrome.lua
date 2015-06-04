@@ -19,7 +19,7 @@ local function chrome_describe(log)
    assert(log)
    
    local where = config.assets or {}
-   table.insert(where, "listview/oldBookmarks")
+   table.insert(where, "*listview/oldBookmarks")
 
    local search = setmetatable({log=log, where=where},
       require "listview.oldBookmarks.OldBookmarksSearch")

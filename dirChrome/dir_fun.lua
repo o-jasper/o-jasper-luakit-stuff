@@ -27,34 +27,8 @@ db:exec [[
 ]]
    
 return function(path)
-
-   local ret = setmetatable({ db = db, path=path }, Dir)
-
-   if not lfs.attributes(path) then
-      print(path)
-      path = "/home"  -- TODO
-   end
-
-   for file, _ in lfs.dir(path) do
-      local entry = not ( {["."]=true, [".."]=true})[file] and 
-         lfs.attributes(path .. "/" .. file)
-      if entry then
-         entry.dir = path
-         entry.file = file
-         entry.time_access = entry.access
-         entry.time_modified = entry.modification
-         
-         for n,_ in pairs(Dir.values.string_els) do
-            assert( type(entry[n]) == "string", 
-                    string.format("%s not string, but %s", n, entry[n]))
-         end
-         for n,_ in pairs(Dir.values.int_els) do
-            assert( type(entry[n]) == "number" or n == "id", 
-                    string.format("%s not integer, but %s", n, entry[n]))
-         end
-         
-         ret:update_or_enter(entry)
-      end
-   end
-   return ret
+    -- TODO ... what did lua use again?
+   return setmetatable({ db = db, 
+                         path=lfs.attributes(path) and path or "/home/"  },
+      Dir)
 end
