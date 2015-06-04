@@ -1,0 +1,13 @@
+#side_panel {
+    padding:0.5em;
+    vertical-align:text-top;
+}
+#top_panel {
+    padding-left:0.5em;
+}
+#list_area {
+    overflow-y:auto;
+/*    width:50%;*/
+    height:600px;
+    max-height:600px;
+}
