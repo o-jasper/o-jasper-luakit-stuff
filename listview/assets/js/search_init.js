@@ -12,4 +12,4 @@ search();
 
 ge('search_input').onkeydown = function(event){ if(event.keyCode == 13){ search(); } }
 
-{%search_more_init.js}
+{%js/search_more_init.js}
