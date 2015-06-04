@@ -103,6 +103,8 @@ listview.oldBookmarks, which do fairly simple modifications.
 
 # Todo
 
+* Search multiple tables at the same time.
+
 * Make it usable separately aswel
   (as a user-search thing, not for programmatic use you expect to be stable)
   + standalone lua + sql + thislib
@@ -113,3 +115,6 @@ listview.oldBookmarks, which do fairly simple modifications.
 
 * Take some stuff out from the above text and put in an API text instead.
   (here will be an introductionary/most-important-aspects text.
+
+* Perhaps `SqlHelp` is starting to do a lot. Split off the search and
+  "builtins" portions?
