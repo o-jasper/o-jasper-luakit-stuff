@@ -25,10 +25,12 @@ db:exec [[
      time_modified INTEGER NOT NULL
    );
 ]]
-   
+
+local capi = { xdg = xdg }
+
 return function(path)
-    -- TODO ... what did lua use again?
-   return setmetatable({ db = db, 
-                         path=lfs.attributes(path) and path or "/home/"  },
-      Dir)
+   local path = lfs.attributes(path) and path or
+      config.default_initial_path or
+      capi.xdg.download_dir or os.getenv("HOME")
+   return setmetatable({ db = db, path= path }, Dir)
 end
