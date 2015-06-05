@@ -11,7 +11,7 @@ function this.maybe_new(path, file, dir)
 end
 
 function this:priority()
-   return string.match(string.lower(self.file), "readme[.]md$") and 1 or -1
+   return string.match(string.lower(self.file), "readme[.]md$") and 2 or -1
 end
 
 function this:html()
