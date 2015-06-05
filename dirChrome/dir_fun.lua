@@ -26,11 +26,9 @@ db:exec [[
    );
 ]]
 
-local capi = { xdg = xdg }
-
 return function(path)
    local path = lfs.attributes(path) and path or
       config.default_initial_path or
-      capi.xdg.download_dir or os.getenv("HOME")
+      os.getenv("HOME") or
    return setmetatable({ db = db, path= path }, Dir)
 end
