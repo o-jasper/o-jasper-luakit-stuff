@@ -25,10 +25,10 @@ db:exec [[
      time_modified INTEGER NOT NULL
    );
 ]]
-   
+
 return function(path)
-    -- TODO ... what did lua use again?
-   return setmetatable({ db = db, 
-                         path=lfs.attributes(path) and path or "/home/"  },
-      Dir)
+   path = lfs.attributes(path) and path or
+      config.default_initial_path or
+      os.getenv("HOME")
+   return setmetatable({ db = db, path= path }, Dir)
 end

@@ -56,9 +56,8 @@ function respond_to(info, result)
    for k,v in pairs(pattern_shortlist) do
       if string.match(info.vuri, k) then domain_way = v end
    end
-   if not domain_way then
-      domain_way = shortlist[info.from_domain] or not_listed
-   end
+   domain_way = domain_way or shortlist[info.from_domain] or not_listed
+
    -- TODO sql table. (possibly via metatable)
    if type(domain_way) == "string" then
       -- TODO use the environment argument.
