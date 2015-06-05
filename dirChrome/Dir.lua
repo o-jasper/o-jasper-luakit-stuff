@@ -89,19 +89,13 @@ end
 -- Scratch some search matchabled that arent allowed.
 this.searchinfo.matchable = {
    "like:", "-like:", "-", "not:", "\\-", "or:",
-   "mode:", "dir:", "file:", "dirlike:", "filelike:",
    "sizelt:", "sizegt:",
    "before:", "after:",
    "access_before:", "access_after:",
    "limit:"
 }  -- TODO need the functions.
 
-local cur_match_funs = this.searchinfo.match_funs
-
 local mod_match_funs = {
-   ["mode:"] = function(self, _, m, v)  -- Exact mode(s)
-      self:equal("mode", string_split(v))
-   end,
    ["sizelt:"] = function(self, _, m, v)  -- TODO .. units and stuff.
       self:lt("size", c.fromtext.w_magnitude_interpret(v))
    end,
@@ -116,11 +110,14 @@ local mod_match_funs = {
       local t = c.fromtext.time_interpret(v)
       if t then self:gt("access", t) end
    end,
-   ["dir:"] = cur_match_funs["uri:"],
-   ["dirlike:"] = cur_match_funs["urilike:"],
-   ["file:"] = cur_match_funs["uri:"],
-   ["filelike:"] = cur_match_funs["urilike:"],
 }
+
+for _, el in pairs{"mode", "dir", "file"} do
+   for _, kind in pairs{"=", "like:", ":"} do
+      mod_match_funs[el .. kind] = this.searchinfo.match_funs["uri" .. kind]
+      table.insert(this.searchinfo.matchable, el .. kind)
+   end
+end
 
 for k, v in pairs(mod_match_funs) do this.searchinfo.match_funs[k] = v end
 

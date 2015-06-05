@@ -27,8 +27,8 @@ db:exec [[
 ]]
 
 return function(path)
-   local path = lfs.attributes(path) and path or
+   path = lfs.attributes(path) and path or
       config.default_initial_path or
-      os.getenv("HOME") or
+      os.getenv("HOME")
    return setmetatable({ db = db, path= path }, Dir)
 end

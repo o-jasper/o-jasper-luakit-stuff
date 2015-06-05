@@ -5,7 +5,6 @@ local c = require "o_jasper_common"
 local this = {}
 
 function this.maybe_new(path, file, dir)
-   print(file)
    for _, pat in pairs({"[.]jpg", "[.]jpeg",
                         "[.]gif", "[.]bmp", "[.].png", "[.]svg" }) do
       if string.match(string.lower(file), pat) then

@@ -9,7 +9,7 @@ function this:repl_list(args)
    local ret = Search.repl_list(self, args)
    ret.cur_dir = self.log.path
    -- TODO better..
-   ret.initial_query = "dirlike:" .. self.log.path
+   ret.initial_query = "dir=" .. self.log.path
    ret.search_shown = "false"
 
    ret.infofuns_immediate = self.log:info_immediate_html()
