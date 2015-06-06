@@ -16,19 +16,17 @@ end
 
 local function info_html(list, asset_fun, thresh)
    thresh = thresh or 0
-   local html = " "
+   local html = ""
    for _, info in pairs(list) do
       if (config.priority_override or info.priority)(info) > thresh then
          html = html .. info:html(asset_fun)
-      else
-         return html
       end
    end
    return html
 end
 
 function this:info_html(list, thresh)
-   return info_html(list, self:asset_fun(), tresh)
+   return info_html(list, self:asset_fun(), thresh)
 end
 
 function this:info_html_of_file(file, thresh)
