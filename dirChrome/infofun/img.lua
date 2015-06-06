@@ -14,7 +14,7 @@ function this.maybe_new(path, file, dir)
 end
 
 function this:priority()
-   return 1 -- TODO For now.. should be context-dependent.. and need see-what-you-select.
+   return 0 -- TODO context-dependence?
 end
 
 function this:html()  -- TODO not allowed to touch local shit..

@@ -15,7 +15,13 @@ local DirEntry = require "dirChrome.DirEntry"
 local this = c.copy_meta(SqlHelp)
 
 this.values = DirEntry.values
+function this:config() return config end
 
+this.cmd_dict.file_of_id = "SELECT file FROM files WHERE id == ?"
+function this:file_of_id(id)
+   local got = self:sqlcmd("file_of_id"):exec({id})[1]
+   if got then return got.file end
+end
 
 local function entry_from_file(path, file)
    local entry =  lfs.attributes(path .. "/" .. file)
@@ -50,34 +56,47 @@ function this:update_whole_directory()
    for file, _ in lfs.dir(self.path) do self:update_file(file) end
 end
 
+-- TODO factor out the info list part?
 local infofuns_funs = require "dirChrome.infofun"
 
-function this:info_from_files()
-   local ret = {}
-   if config.infofuns then
-      for file, _ in lfs.dir(self.path) do
-         for key, fun in pairs(config.infofuns) do
-            if fun == true then fun = key end
-            if type(fun) == "string" then fun = infofuns_funs[fun] end
-            local info = fun.maybe_new(self.path, file, self)
-            if info then table.insert(ret, info) end
-         end
-      end
-   end
-   if not config.dont_sort then
-      local function default_compare(a, b)
-         return (config.priority_override or a.priority)(a) > 
-                (config.priority_override or b.priority)(b)
-      end
-      table.sort(ret, config.priority_compare or default_compare)
-   end
-   return ret
+local function default_compare(a, b)
+   return (config.priority_override or a.priority)(a) > 
+      (config.priority_override or b.priority)(b)
 end
 
-function this:info_immediate_html()
+function this:info_priority_sort(list)
+   if not self:config().dont_sort then
+      table.sort(list, self:config().priority_compare or default_compare)
+   end
+   return list
+end
+
+function this:info_from_file(file, into_list, dont_sort, infofuns)
+   into_list = into_list or {}
+   for key, fun in pairs(infofuns or self:config().infofuns) do
+      if fun == true then fun = key end
+      if type(fun) == "string" then fun = infofuns_funs[fun] end
+      local info = fun.maybe_new(self.path, file, self)
+      if info then table.insert(into_list, info) end
+   end
+   if not dont_sort then self:info_priority_sort(into_list) end
+   return into_list
+end
+
+function this:info_from_dir(into_list, dont_sort)
+   into_list = into_list or {}
+   for file in lfs.dir(self.path) do
+      self:info_from_file(file, into_list, true, self:config().infofuns)
+   end
+   if not dont_sort then self:info_priority_sort(into_list) end
+   return into_list
+end
+
+function this:info_html(list, thresh)
+   thresh = thresh or 0
    local html = " "
-   for _, info in pairs(self:info_from_files()) do
-      if (config.priority_override or info.priority)(info) > 0 then
+   for _, info in pairs(list) do
+      if (config.priority_override or info.priority)(info) > thresh then
          html = html .. info:html()
       else
          return html
@@ -214,10 +233,6 @@ function this:initial_state()
    end
 
    return { html_calc= html_calc, config = { priority_funs = priority_funs } }
-end
-
-function this:incorporate_info(entry)
-   -- TODO
 end
 
 return c.metatable_of(this)
