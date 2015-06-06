@@ -2,7 +2,7 @@
 local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
-config.infofuns = config.infofuns or {"markdown", "img"}
+config.infofuns = config.infofuns or {"markdown", "basic_img"}
 
 local c = require "o_jasper_common"
 local string_split = require("lousy").util.string.split
