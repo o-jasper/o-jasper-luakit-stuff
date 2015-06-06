@@ -48,7 +48,7 @@ function this:repl(asset_fun)
    return c.repl(attrs, nil, attrs, funs, pattern_funs)
 end
 
-self.asset_file = "parts/show_elaborate.html"
+this.asset_file = "parts/show_elaborate.html"
 function this:repl_pattern(asset_fun)
    return config.html or asset_fun(self.asset_file)
 end

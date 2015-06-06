@@ -4,7 +4,7 @@ local c = require "o_jasper_common"
 
 local this = {}
 
-function this.maybe_new(path, file, dir)
+function this.maybe_new(path, file)
    for _, pat in pairs({"[.]jpg$", "[.]jpeg$",
                         "[.]gif$", "[.]bmp$", "[.]png$", "[.]svg$" }) do
       if string.match(string.lower(file), pat) then
@@ -17,11 +17,13 @@ function this:priority()
    return 0 -- TODO context-dependence?
 end
 
-function this:html()  -- TODO not allowed to touch local shit..
+function this:html()
    local fp = self.path .. "/" .. self.file
    local got = c.base64.enc_file(fp)
    local format = string.match(self.file, "[.][%a]+")
    if got and format then
+      -- TODO have a function defined somewhere so when i dont need to
+      -- base54-encode anymore, i only need to change it there.
       return string.format([[%s<img src="data:image/%s;base64,%s", alt="%s">]],
          fp, string.sub(format, 2), got, fp)
    end
