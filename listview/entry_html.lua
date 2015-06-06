@@ -13,7 +13,51 @@ local SqlEntry = require("sql_help").SqlEntry
 
 local Public = {}
 
-Public.default_priority_funs = {
+Public.default_html_calc = {
+   tagsHTML = function (entry, state)
+      if entry.values.taggings then
+         return ot.tagsHTML(entry:tags(), state.tagsclass)
+      else
+         return " "
+      end
+   end,
+
+   dateText = function(entry)
+      return os.date("%c", entry:ms_t()/1000)
+   end,
+
+   dateHTML = function(entry)  -- TODO tad primitive...
+      return "{%dateText}"
+   end,
+
+   -- NOTE: the delta/resay cases only make sense when sorting by time.
+   -- TODO: perhaps the state/state.config should tell this and have proper behavior.
+   delta_dateHTML = function(entry, state)
+      return tt.delta_dateHTML(state, entry:ms_t())
+   end,
+   
+   timemarks = function(entry, state)
+      return tt.time(state, entry:ms_t())
+   end,
+
+   resay_time = function(entry, state)
+      return tt.resay_time(state, entry:ms_t(), (state.config.resay or {}).long)
+   end,
+   
+   short_resay_time = function(entry, state)
+      local config = (state.config.resay or {}).short or {
+         {"year", "Year {%year}"},
+         {"yday", "{%month}/{%day} {%short_dayname}"},
+         init = " ", nochange = " ",
+      }
+      return tt.resay_time(state, entry:ms_t(), config)
+   end,
+
+   -- Writes it out properly.
+   identifier = function(entry, _)
+      return c.int_to_string(entry[entry.values.idname])
+   end,
+
    markdown_desc = {
       function(entry)
          -- TODO.. ... discount isnt co-operating..
@@ -28,52 +72,6 @@ Public.default_priority_funs = {
       end,
    },
 }
-
-Public.default_html_calc = {
-   tagsHTML = function (self, state)
-      if self.values.taggings then
-         return ot.tagsHTML(self:tags(), state.tagsclass)
-      else
-         return " "
-      end
-   end,
-
-   dateText = function(self)
-      return os.date("%c", self:ms_t()/1000)
-   end,
-
-   dateHTML = function(self)  -- TODO tad primitive...
-      return "{%dateText}"
-   end,
-
-   -- NOTE: the delta/resay cases only make sense when sorting by time.
-   -- TODO: perhaps the state/state.config should tell this and have proper behavior.
-   delta_dateHTML = function(self, state)
-      return tt.delta_dateHTML(state, self:ms_t())
-   end,
-   
-   timemarks = function(self, state)
-      return tt.time(state, self:ms_t())
-   end,
-
-   resay_time = function(self, state)
-      return tt.resay_time(state, self:ms_t(), (state.config.resay or {}).long)
-   end,
-   
-   short_resay_time = function(self, state)
-      local config = (state.config.resay or {}).short or {
-         {"year", "Year {%year}"},
-         {"yday", "{%month}/{%day} {%short_dayname}"},
-         init = " ", nochange = " ",
-      }
-      return tt.resay_time(state, self:ms_t(), config)
-   end,
-
-   -- Writes it out properly.
-   identifier = function(self, _)
-      return c.int_to_string(self[self.values.idname])
-   end,
-}
 for k,v in pairs(os.date("*t", 0)) do
    Public.default_html_calc[k] = "{%time_" .. k .. "}"
 end
@@ -86,11 +84,22 @@ local function datetab(ms_t)
    return os.date("*t", math.floor(ms_t/1000))
 end
 
-function Public.default_html_calc.dayname(self, _)
-   return tt.day_names[datetab(self:ms_t()).wday]
+Public.default_html_pattern_calc = {
+   ["time_.+"] = function(entry, state, key)
+      local got = datetab(entry:ms_t())[string.sub(key, 6)]
+      if got then
+         return got
+      else
+         return os.date("%" .. string.sub(key, 6), math.floor(entry:ms_t()/1000))
+      end
+   end,
+}
+
+function Public.default_html_calc.dayname(entry)
+   return tt.day_names[datetab(entry:ms_t()).wday]
 end
-function Public.default_html_calc.monthname(self, _)
-   return tt.day_names[datetab(self:ms_t()).wday]
+function Public.default_html_calc.monthname(entry)
+   return tt.day_names[datetab(entry:ms_t()).wday]
 end
 
 --local function cap_priority(fun, to_priority)
@@ -100,8 +109,8 @@ end
 --   end
 --end
 
--- Replacement list. -- TODO better... more re-usable, and in common.
-function Public.repl(entry, state)
+-- Replacement list. -- TODO use `c.repl`?
+local function replacement(entry, state)
    assert(entry)
    local pass = {}
    for _,name in pairs(entry.values.row_names) do  -- Grab the data.
@@ -111,43 +120,15 @@ function Public.repl(entry, state)
          pass[name] = entry[name]
       end
    end
-   local function calc(_, key)
-      local fun = state.html_calc[key]
-      if type(fun) == "function" then
-         return fun(entry, state)
-      elseif type(fun) == "string" then
-         return fun
-      elseif string.match(key, "time_.+") then
-         local got = datetab(entry:ms_t())[string.sub(key, 6)]
-         if got then
-            return got
-         else
-            return os.date("%" .. string.sub(key, 6), math.floor(entry:ms_t()/1000))
-         end
-      elseif not fun and state.config.priority_funs then
-         -- Things in the configuration can give their own priority.
-         local got = state.config.priority_funs[key]
-         if got then
-            local cur, best_priority = nil, 0
-            for _,fun in pairs(got) do
-               local result, priority = fun(entry, best_priority, state.config)
-               if result and priority > best_priority then
-                  best_priority = priority
-                  cur = result
-               end
-            end
-            return cur
-         end
-      end
-   end
-   return setmetatable(pass, {__index=calc})
+   return c.repl(entry, state,
+                 pass, state.html_calc, state.html_pattern_calc)
 end
 
 -- Single entry.
 function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
-      return c.apply_subst(listview:asset("parts/show_1"), Public.repl(msg, state))
+      return c.apply_subst(listview:asset("parts/show_1"), replacement(msg, state))
    end
 end
 
@@ -158,6 +139,7 @@ function Public.list(listview, data, state)
    state.config.priority_funs = state.config.priority_funs or Public.default_priority_funs
 
    state.html_calc = state.html_calc or Public.default_html_calc
+   state.html_pattern_calc = state.html_pattern_calc or Public.default_html_pattern_calc
    local str = "<table>"
    for i, el in pairs(data) do 
       str = str .. Public.msg(listview, state)(i, el)
