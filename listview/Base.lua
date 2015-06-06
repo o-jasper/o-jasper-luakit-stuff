@@ -21,13 +21,8 @@ local this = {
 }
 
 function this:config() return config end
--- NOTE; might say it belongs to paged-chrome, but it provides the freedom to
---  make it more convenient.
--- Alternatively "derive-from" the paged-chrome, however, i dont want to,
--- and that'd push my metatable approach onto others.
-function this:asset(what, kind)  -- TODO.. lets not have the `kind` anymore.
-   return asset(self.where, what .. (kind or ".html"))
-end
+
+function this:asset(file) return asset(self.where, file) end
 
 function this:asset_fun()
    return function(file) return asset(self.where, file) end

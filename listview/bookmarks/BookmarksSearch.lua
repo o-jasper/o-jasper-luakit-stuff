@@ -11,7 +11,7 @@ local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 
 function this:repl_list(args, view, meta)
    local got = listview.Search.repl_list(self, args, view, meta)
-   got.above_title = self:asset("parts/enter_span")
+   got.above_title = self:asset("parts/enter_span.html")
    got.right_of_title = [[&nbsp;&nbsp;
 <button id="toggle_add_gui" style="width:13em;"onclick="set_add_gui(!add_gui)">BUG</button><br>
 ]]

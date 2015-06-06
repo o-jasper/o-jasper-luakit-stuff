@@ -21,7 +21,7 @@ local templated_page_metatable = {
                   local got = obj.rl[key]
                   if got then
                      return got
-                  elseif string.match(key, "[/_%w]") then
+                  elseif string.match(key, "^[/_.%w]+$") then
                      return Public.asset(self.page.where, key)
                   end
                end
@@ -60,7 +60,7 @@ function Public.templated_page(page, name)
 
    if not page.repl_pattern then  -- Ensure pattern.
       if page.asset then
-         page.repl_pattern = page:asset(page.name, ".html")
+         page.repl_pattern = page:asset(page.name .. ".html")
       else
          page.repl_pattern = Public.asset(page.where, page.name .. ".html")
       end

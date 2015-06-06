@@ -128,7 +128,7 @@ end
 function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
-      return c.apply_subst(listview:asset("parts/show_1"), replacement(msg, state))
+      return c.apply_subst(listview:asset("parts/show_1.html"), replacement(msg, state))
    end
 end
 
