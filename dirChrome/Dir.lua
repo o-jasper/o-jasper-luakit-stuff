@@ -2,7 +2,7 @@
 local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
-config.infofuns = config.infofuns or {"markdown", "basic_img"}
+config.infofuns = config.infofuns or {"markdown", "basic_img", "basic_file"}
 
 local c = require "o_jasper_common"
 local string_split = require("lousy").util.string.split
@@ -76,7 +76,7 @@ function this:info_from_file(file, into_list, dont_sort, infofuns)
    for key, fun in pairs(infofuns or self:config().infofuns) do
       if fun == true then fun = key end
       if type(fun) == "string" then fun = infofuns_funs[fun] end
-      local info = fun.maybe_new(self.path, file, self)
+      local info = fun.maybe_new(self.path, file)
       if info then table.insert(into_list, info) end
    end
    if not dont_sort then self:info_priority_sort(into_list) end
@@ -90,19 +90,6 @@ function this:info_from_dir(into_list, dont_sort)
    end
    if not dont_sort then self:info_priority_sort(into_list) end
    return into_list
-end
-
-function this:info_html(list, thresh)
-   thresh = thresh or 0
-   local html = " "
-   for _, info in pairs(list) do
-      if (config.priority_override or info.priority)(info) > thresh then
-         html = html .. info:html()
-      else
-         return html
-      end
-   end
-   return html
 end
 
 -- Scratch some search matchabled that arent allowed.
@@ -210,11 +197,6 @@ function this:initial_state()
       shorter_mode = function(entry)
          return ({directory="dir"})[entry.mode] or mode
       end,
-   }
-   local html_calc = c.copy_table(entry_html.default_html_calc)
-   for k,v in pairs(mod_html_calc) do html_calc[k] = v end
-
-   local priority_funs = {
       go_there_uri = {
          function(entry)
             return string.format(entry.mode == "directory" and
@@ -223,16 +205,19 @@ function this:initial_state()
          end,
       },
    }
+   local html_calc = c.copy_table(entry_html.default_html_calc)
+   for k,v in pairs(mod_html_calc) do html_calc[k] = v end
 
    for k,v in pairs(config.priority_funs or {}) do
-      if priority_funs[k] then
-         table.insert(priority_funs[k], v)
-      else
-         priority_funs[k] = {v}
+      local got = mod_html_calc[k]
+      if not got then
+         mod_html_calc[k] = {v}
+      elseif type(got) == "table" then
+         table.insert(got, v)
       end
    end
 
-   return { html_calc= html_calc, config = { priority_funs = priority_funs } }
+   return { html_calc= html_calc }
 end
 
 return c.metatable_of(this)

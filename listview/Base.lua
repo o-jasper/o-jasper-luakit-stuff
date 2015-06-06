@@ -25,12 +25,12 @@ function this:config() return config end
 --  make it more convenient.
 -- Alternatively "derive-from" the paged-chrome, however, i dont want to,
 -- and that'd push my metatable approach onto others.
-function this:asset(what, kind)
+function this:asset(what, kind)  -- TODO.. lets not have the `kind` anymore.
    return asset(self.where, what .. (kind or ".html"))
 end
-   
-function this:asset_getter(what, kind)
-   return function() return self:asset(what, kind) end
+
+function this:asset_fun()
+   return function(file) return asset(self.where, file) end
 end
 
 function this:repl_list_suggest(args)

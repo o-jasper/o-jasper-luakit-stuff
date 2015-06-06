@@ -10,7 +10,7 @@ return function(info, state, direct, fun_table, pattern_table)
    end
    local meta = {
       __index = function(_, key)
-         local got = fun_table[key] or find_in_patterns(key)
+         local got = fun_table[key] or find_in_patterns(key) or fun_table.default
          if got then
             if type(got) == "function" then
                return got(info, state, key)

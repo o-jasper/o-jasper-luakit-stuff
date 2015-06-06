@@ -85,7 +85,7 @@ local function datetab(ms_t)
 end
 
 Public.default_html_pattern_calc = {
-   ["time_.+"] = function(entry, state, key)
+   ["^time_"] = function(entry, state, key)
       local got = datetab(entry:ms_t())[string.sub(key, 6)]
       if got then
          return got

@@ -31,3 +31,8 @@
     width:40%;
     left:50%; 
 }
+
+#infofuns_select_area {
+    position:absolute;
+    background-color:white;  /* Otherwise you see straight through */
+}
