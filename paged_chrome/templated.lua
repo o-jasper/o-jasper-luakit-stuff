@@ -7,7 +7,7 @@ local c = require "o_jasper_common"
 
 function Public.asset(where, key)
    return c.load_search_asset(where, "/assets/" .. key) or
-      string.format("ASSET NOT FOUND %s", key)
+      string.format([[alert("ASSET NOT FOUND %s");]], key)
 end
 
 local templated_page_metatable = {
