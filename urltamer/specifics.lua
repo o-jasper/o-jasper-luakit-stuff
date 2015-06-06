@@ -57,7 +57,7 @@ end
 --}
 -- Exceptions instead?
 function permissive(info, result)
-   print("permissive", info.uri, info.vuri)
+   --print("permissive", info.uri, info.vuri)
    result.allow = true
 end
 
