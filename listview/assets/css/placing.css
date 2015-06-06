@@ -1,7 +1,8 @@
 #side_panel {
     position:fixed;
     top:0%;
-    width:6.6em;
+    float:left;
+    /*width:6.6em;*/
     padding:0.5em;
 
     vertical-align:text-top;
