@@ -27,7 +27,7 @@ local templated_page_metatable = {
                end
                repl_list = setmetatable({rl=repl_list}, {__index = asset_too })
             end
-            return c.full_gsub(self.page.repl_pattern, repl_list)
+            return c.apply_subst(self.page.repl_pattern, repl_list)
          end,
          init = function(_, view, _, _)
             if not self.done then  -- Just attach javascript as soon as possible.

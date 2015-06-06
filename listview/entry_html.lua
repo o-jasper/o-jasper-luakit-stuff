@@ -100,7 +100,7 @@ end
 --   end
 --end
 
--- Replacement list.
+-- Replacement list. -- TODO better... more re-usable, and in common.
 function Public.repl(entry, state)
    assert(entry)
    local pass = {}
@@ -147,7 +147,7 @@ end
 function Public.msg(listview, state)
    return function (index, msg)
       state.index = index
-      return c.full_gsub(listview:asset("parts/show_1"), Public.repl(msg, state))
+      return c.apply_subst(listview:asset("parts/show_1"), Public.repl(msg, state))
    end
 end
 
