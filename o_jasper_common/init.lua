@@ -4,12 +4,11 @@ local function index(d, key)
    return require("o_jasper_common." .. key)
 end
 
-local this = setmetatable({}, {__index = index})
+local Public = setmetatable({}, {__index = index})
 
-for k,v in pairs(require "o_jasper_common.meta")   do this[k] = v end
-for k,v in pairs(require "o_jasper_common.other") do this[k] = v end
-for k,v in pairs(require "o_jasper_common.load_asset") do this[k] = v end
+for k,v in pairs(require "o_jasper_common.meta")   do Public[k] = v end
+for k,v in pairs(require "o_jasper_common.other") do Public[k] = v end
+for k,v in pairs(require "o_jasper_common.load_asset") do Public[k] = v end
+for k,v in pairs(require "o_jasper_common.text") do Public[k] = v end
 
-for k,v in pairs(require "o_jasper_common.text") do this[k] = v end
-
-return this
+return Public
