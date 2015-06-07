@@ -112,9 +112,7 @@ function This:repl(state, asset_fun)
 end
 
 This.asset_file = "parts/show_1.html"
-function This:repl_pattern(asset_fun)
-   return asset_fun(self.asset_file)
-end
+function This:repl_pattern(asset_fun) return asset_fun(self.asset_file) end
 
 function This:html(state, asset_fun)
    state.config = state.config or {}

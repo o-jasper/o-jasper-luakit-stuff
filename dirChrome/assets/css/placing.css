@@ -35,4 +35,8 @@
 #infofuns_select_area {
     position:absolute;
     background-color:white;  /* Otherwise you see straight through */
+
+    padding:0.5em;
+    border-style:solid;
+    border-width:2px;    
 }
