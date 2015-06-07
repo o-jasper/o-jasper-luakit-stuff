@@ -18,8 +18,6 @@ History.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:",
 
 
 function History:config() return config end
-function History:initial_state() return {} end
-
 History.entry_meta = HistoryEntry
 
 return c.metatable_of(History)

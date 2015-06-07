@@ -5,13 +5,13 @@ local html = c.html
 
 local lfs = require "lfs"
 
-local this = {}
+local This = {}
 
-function this.maybe_new(entry)
-   return setmetatable({ e=entry }, this)
+function This.maybe_new(entry)
+   return setmetatable({ e=entry }, This)
 end
 
-function this:priority()
+function This:priority()
    return 1
 end
 
@@ -19,7 +19,7 @@ local function datetab(ms_t)
    return os.date("*t", math.floor(ms_t/1000))
 end
 
-this.tab_repl = {
+This.tab_repl = {
    tagsHTML = function (self, state)
       if self.e.values.taggings then
          return html.tagsHTML(self.e:tags(), state.tagsclass)
@@ -28,19 +28,15 @@ this.tab_repl = {
       end
    end,
    
-   dateText = function(self)
-      return os.date("%c", self.e:ms_t()/1000)
-   end,
-   
-   dateHTML = function(self)  -- TODO tad primitive...
-      return "{%dateText}"
-   end,
+   dateText = function(self) return os.date("%c", self.e:ms_t()/1000) end,
+   -- TODO tad primitive...
+   dateHTML = "{%dateText}",
    
    dayname = function(self) return html.day_names[datetab(self.e:ms_t()).wday] end,
    monthname = function(self) return html.day_names[datetab(self.e:ms_t()).wday] end,
    
    -- NOTE: the delta/resay cases only make sense when sorting by time.
-   -- TODO: perhaps the state/state.config should tell this and have proper behavior.
+   -- TODO: perhaps the state/state.config should tell This and have proper behavior.
    delta_dateHTML = function(self, state)
       return html.delta_dateHTML(state, self.e:ms_t())
    end,
@@ -58,9 +54,7 @@ this.tab_repl = {
          {"year", "Year {%year}"},
          {"yday", "{%month}/{%day} {%short_dayname}"},
          init = " ", nochange = " ", }
-      local ret = html.resay_time(state, self.e:ms_t(), state.config)
-      print("short_resay_time", ret)
-      return ret
+      return html.resay_time(state, self.e:ms_t(), config)
    end,
 
    identifier = function(self, _)
@@ -87,9 +81,9 @@ this.tab_repl = {
    end,
 }
 
-for k in pairs(os.date("*t", 0)) do this.tab_repl[k] = "{%time_" .. k .. "}" end
+for k in pairs(os.date("*t", 0)) do This.tab_repl[k] = "{%time_" .. k .. "}" end
 
-this.tab_pat = {
+This.tab_pat = {
    ["^date_"] = function(attrs, _, key)
       local inside = string.match(key, "_[%w]+")
       local time = attrs[string.sub(inside, 2)]
@@ -113,19 +107,19 @@ this.tab_pat = {
    end,
 }
 
-function this:repl(state, asset_fun)
+function This:repl(state, asset_fun)
    return c.repl(self, state, {}, self.tab_repl, self.tab_pat)
 end
 
-this.asset_file = "parts/show_1.html"
-function this:repl_pattern(asset_fun)
+This.asset_file = "parts/show_1.html"
+function This:repl_pattern(asset_fun)
    return asset_fun(self.asset_file)
 end
 
-function this:html(state, asset_fun)
+function This:html(state, asset_fun)
    state.config = state.config or {}
    self.asset_fun = asset_fun
    return c.apply_subst(self:repl_pattern(asset_fun), self:repl(state, asset_fun))
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)
