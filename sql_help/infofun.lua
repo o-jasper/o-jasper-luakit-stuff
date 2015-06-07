@@ -21,7 +21,7 @@ function Public.entry_highest_priority(creator, entry, infofuns)
    return Public.infofun_highest_priority(list)
 end
 
-function Public.thresh_priority(creator, entry, infofuns, thresh)
+function Public.entry_thresh_priority(creator, entry, infofuns, thresh)
    local ret = {}
    for key, fun in pairs(infofuns or creator:config().infofuns) do
       local got = fun.maybe_new(creator, entry)
@@ -31,10 +31,10 @@ function Public.thresh_priority(creator, entry, infofuns, thresh)
 end
 
 local function fun_on_each(fun)
-   return function (creator, list, infofuns)
+   return function (creator, list, infofuns, ...)
       local ret = {}
       for _, entry in pairs(list) do
-         for _, el in pairs(fun(creator, entry, infofuns)) do
+         for _, el in pairs(fun(creator, entry, infofuns, ...)) do
             table.insert(ret, el)
          end
       end
@@ -43,6 +43,14 @@ local function fun_on_each(fun)
 end
 
 Public.list_highest_priority_each = fun_on_each(Public.entry_highest_priority)
-Public.list_thresh_priority = fun_on_each(Public.entry_highest_priority)
+Public.list_thresh_priority = fun_on_each(Public.entry_thresh_priority)
+
+function Public.priority_sort(list, priority_override)
+   local function default_compare(a, b)
+      return (priority_override or a.priority)(a) > (priority_override or b.priority)(b)
+   end
+   table.sort(list, default_compare)
+   return list
+end
 
 return Public

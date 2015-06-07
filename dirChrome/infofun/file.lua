@@ -7,11 +7,12 @@ local config = config_from.file or config_from.basic_file or {}
 local c = require "o_jasper_common"
 local lfs = require "lfs"
 
+-- TODO derive from show_1
 local this = {}
 
-function this.maybe_new(path, file)
-   if not string.match(file, "^[.]#.+") then
-      return setmetatable({ path=path, file=file }, this)
+function this.maybe_new(creator, entry)
+   if not string.match(entry.file, "^[.]#.+") then
+      return setmetatable({ from_dir=creator.from_dir, e=entry }, this)
    end
 end
 
@@ -19,7 +20,7 @@ function this:priority()
    return 0
 end
 
-function this:repl(asset_fun)
+function this:repl(state, asset_fun)
 
    local function dates(attrs, format)
       local have = {}
@@ -82,10 +83,12 @@ function this:repl(asset_fun)
          return dates(attrs, string.sub(key, 7))
       end,
    }
-   local attrs = lfs.attributes(self.path .. "/" .. self.file)
-   assert(attrs, "Couldnt get attributes of(?):" .. self.path .. "/" .. self.file)
-   attrs.file = self.file
-   attrs.path = self.path
+   local dir, file = self.e.dir, self.e.file
+   local attrs = lfs.attributes(dir .. "/" .. file)
+   assert(attrs, "Couldnt get attributes of(?):" .. dir .. "/" .. file)
+   attrs.file = file
+   attrs.path = dir
+   attrs.dir = dir
    attrs["_and"] = [[<span class="minor">&</span>]]
    attrs._minor_same = [[<span class="minor">(same)</span>]]
    return c.repl(attrs, nil, attrs, funs, pattern_funs)
@@ -96,8 +99,8 @@ function this:repl_pattern(asset_fun)
    return config.html or asset_fun(self.asset_file)
 end
 
-function this:html(asset_fun)
-   return c.apply_subst(self:repl_pattern(asset_fun), self:repl(asset_fun))
+function this:html(state, asset_fun)
+   return c.apply_subst(self:repl_pattern(asset_fun), self:repl(state, asset_fun))
 end
 
 return c.metatable_of(this)

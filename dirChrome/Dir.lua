@@ -2,8 +2,6 @@
 local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
-config.infofuns = config.infofuns or {"markdown", "basic_img", "file"}
-
 local c = require "o_jasper_common"
 local string_split = require("lousy").util.string.split
 
@@ -17,11 +15,18 @@ local This = c.copy_meta(SqlHelp)
 This.values = DirEntry.values
 function This:config() return config end
 
-This.cmd_dict.file_of_id = "SELECT file FROM files WHERE id == ?"
-function This:file_of_id(id)
-   local got = self:sqlcmd("file_of_id"):exec({id})[1]
-   if got then return got.file end
-end
+This.cmd_dict.select_dir =
+   "SELECT * FROM {%table_name} WHERE dir == ?"
+This.cmd_dict.select_path =
+   "SELECT id FROM {%table_name} WHERE dir == ? AND file == ?"
+This.cmd_dict.delete_path =
+   "DELETE FROM {%table_name} WHERE dir == ? AND file == ?"
+
+--This.cmd_dict.file_of_id = "SELECT file FROM files WHERE id == ?"
+--function This:file_of_id(id)
+--   local got = self:sqlcmd("file_of_id"):exec({id})[1]
+--   if got then return got.file end
+--end
 
 local function entry_from_file(path, file)
    local entry =  lfs.attributes(path .. "/" .. file)
@@ -59,37 +64,31 @@ end
 -- TODO factor out the info list part?
 local infofuns_funs = require "dirChrome.infofun"
 
-local function default_compare(a, b)
-   return (config.priority_override or a.priority)(a) > 
-      (config.priority_override or b.priority)(b)
+local infofun_lib = require "sql_help.infofun"
+
+function This:dir_infofun()
+   return config.dir_infofun or {
+      require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
+      require "dirChrome.infofun.file"}
 end
 
-function This:info_priority_sort(list)
-   if not self:config().dont_sort then
-      table.sort(list, self:config().priority_compare or default_compare)
+This.entry_meta = DirEntry
+function This:entry_fun(data)
+   assert(type(data) == "table")
+   data.origin = self
+   setmetatable(data, self.entry_meta)
+   -- Incorporate info
+   local list = infofun_lib.entry_thresh_priority(self, data, self:dir_infofun(), 0)
+   infofun_lib.priority_sort(list, self:config().priority_override)
+   self.info_from_dir_list = self.info_from_dir_list or {}
+   for _, el in pairs(list) do
+      table.insert(self.info_from_dir_list, el)
    end
-   return list
+   return data
 end
 
-function This:info_from_file(file, into_list, dont_sort, infofuns)
-   into_list = into_list or {}
-   for key, fun in pairs(infofuns or self:config().infofuns) do
-      if fun == true then fun = key end
-      if type(fun) == "string" then fun = infofuns_funs[fun] end
-      local info = fun.maybe_new(self.path, file)
-      if info then table.insert(into_list, info) end
-   end
-   if not dont_sort then self:info_priority_sort(into_list) end
-   return into_list
-end
-
-function This:info_from_dir(into_list, dont_sort)
-   into_list = into_list or {}
-   for file in lfs.dir(self.path) do
-      self:info_from_file(file, into_list, true, self:config().infofuns)
-   end
-   if not dont_sort then self:info_priority_sort(into_list) end
-   return into_list
+function This:info_from_dir()
+   return self.info_from_dir_list
 end
 
 -- Scratch some search matchabled that arent allowed.
@@ -127,8 +126,6 @@ end
 
 for k, v in pairs(mod_match_funs) do This.searchinfo.match_funs[k] = v end
 
-This.entry_meta = DirEntry
-  
 function This:config() return config end
 
 function This:update_or_enter(entry)
@@ -137,10 +134,5 @@ function This:update_or_enter(entry)
    assert(not entry.id) -- Re enter.,
       return SqlHelp.update_or_enter(self, entry)
 end
-
-This.cmd_dict.select_path =
-   "SELECT id FROM {%table_name} WHERE dir == ? AND file == ?"
-This.cmd_dict.delete_path =
-   "DELETE FROM {%table_name} WHERE dir == ? AND file == ?"
 
 return c.metatable_of(This)

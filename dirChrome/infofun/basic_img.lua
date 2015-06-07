@@ -4,11 +4,11 @@ local c = require "o_jasper_common"
 
 local this = {}
 
-function this.maybe_new(path, file)
+function this.maybe_new(creator, entry)
    for _, pat in pairs({"[.]jpg$", "[.]jpeg$",
                         "[.]gif$", "[.]bmp$", "[.]png$", "[.]svg$" }) do
-      if string.match(string.lower(file), pat) then
-         return setmetatable({ path=path, file=file }, this)
+      if string.match(string.lower(entry.file), pat) then
+         return setmetatable({ dir=entry.dir, file=entry.file }, this)
       end
    end
 end
@@ -18,7 +18,7 @@ function this:priority()
 end
 
 function this:html()
-   local fp = self.path .. "/" .. self.file
+   local fp = self.dir .. "/" .. self.file
    local got = c.base64.enc_file(fp)
    local format = string.match(self.file, "[.][%a]+")
    if got and format then

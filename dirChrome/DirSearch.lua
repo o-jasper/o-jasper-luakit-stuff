@@ -12,31 +12,17 @@ function This:infofun()
    return self:config().infofun or {require "dirChrome.infofun.show_1"}
 end
 
+local infofun_lib = require "sql_help.infofun"
+
 function This.to_js:html_of_id()
    return function(id)
-      local file = self.log:file_of_id(id)
-      local html = file and self:info_html_of_file(file)
+      local entry = self.log:get_id(id)
+      local list = infofun_lib.entry_thresh_priority(self.log, entry, 
+                                                     self.log:dir_infofun(), -1)
+      infofun_lib.priority_sort(list, self.config().priority_override)
+      local html = self:list_to_html(list, {})
       return html and #html > 0 and html  -- Makes sense.
    end
-end
-
-local function info_html(list, asset_fun, thresh)
-   thresh = thresh or 0
-   local html = ""
-   for _, info in pairs(list) do
-      if (config.priority_override or info.priority)(info) > thresh then
-         html = html .. info:html(asset_fun)
-      end
-   end
-   return html
-end
-
-function This:info_html(list, thresh)
-   return info_html(list, self:asset_fun(), thresh)
-end
-
-function This:info_html_of_file(file, thresh)
-   return self:info_html(self.log:info_from_file(file), thresh or -1)
 end
 
 function This:repl_list(args)
@@ -47,7 +33,8 @@ function This:repl_list(args)
    ret.initial_query = "dir=" .. self.log.path
    ret.search_shown = "false"
 
-   ret.infofuns_immediate = self:info_html(self.log:info_from_dir())
+   --local list = infofun_lib.list_highest_priority_each(self,  
+   ret.infofuns_immediate = self:list_to_html(self.log:info_from_dir(), {})
    --ret.main_file = self.log:main_file()
    return ret
 end

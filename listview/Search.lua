@@ -53,7 +53,7 @@ end
 local infofun_lib = require "sql_help.infofun"
 
 function This:js_listupdate(list, as_msg)
-   list = infofun_lib.list_highest_priority_each(self, list, self:infofun())
+   list = infofun_lib.list_highest_priority_each(self.log, list, self:infofun())
 
    self.search_cnt = self.search_cnt + 1
    -- TODO bit fussy.. really getting the return value straight out would be handy..
@@ -76,9 +76,9 @@ function This:js_listupdate(list, as_msg)
    }
 end
 
-local function list_to_html(list, state, asset_fun)
+function This:list_to_html(list, state)
    local html = "<table>"
-   for _, info in pairs(list) do html = html .. info:html(state, asset_fun) end
+   for _, info in pairs(list) do html = html .. info:html(state, self:asset_fun()) end
    return html .. "</table>"
 end
 
@@ -92,7 +92,7 @@ function This:html_list(list, as_msg)
       return ret
    else
       self.html_state = self.html_state or self:initial_state()
-      return list_to_html(list, self.html_state, self:asset_fun())
+      return self:list_to_html(list, self.html_state)
    end
 end
 
