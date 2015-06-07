@@ -7,18 +7,18 @@
 
 local c = require("o_jasper_common")
 
-local this = c.copy_meta(require "listview.Base")
+local This = c.copy_meta(require "listview.Base")
 
--- this.html_state = nil,
+-- This.html_state = nil,
 for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
-   this[k] = v
+   This[k] = v
 end
-this.to_js = require "listview.to_js"
+This.to_js = require "listview.Search_to_js"
 
-function this:initial_state() return {} end
-function this:infofun() return self:config().infofun or require "listview.infofun" end
+function This:initial_state() return {} end
+function This:infofun() return self:config().infofun or require "listview.infofun" end
 
-function this:total_query(search)
+function This:total_query(search)
    -- How we end up searching.
    assert(type(search) == "string", "Search not string; " .. tostring(search))
    local query = self.log:new_SqlHelp()
@@ -32,7 +32,7 @@ function this:total_query(search)
    return query
 end
 
-function this:repl_list(args)
+function This:repl_list(args)
    return { 
       title = string.format("%s:%s", self.chrome_name, self.name),
       initial_query  = self.log.cmd_query or "",
@@ -49,7 +49,7 @@ end
 
 local infofun_lib = require "sql_help.infofun"
 
-function this:js_listupdate(list, as_msg)
+function This:js_listupdate(list, as_msg)
    list = infofun_lib.list_highest_priority_each(list, self:infofun())
 
    self.search_cnt = self.search_cnt + 1
@@ -79,7 +79,7 @@ local function list_to_html(list, state, asset_fun)
    return html .. "</table>"
 end
 
-function this:html_list(list, as_msg)
+function This:html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
    if not as_msg then  -- Plain table.
       local ret = ""
@@ -93,4 +93,4 @@ function this:html_list(list, as_msg)
    end
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)
