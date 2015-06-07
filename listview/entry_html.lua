@@ -6,8 +6,7 @@
 --  (at your option) any later version.
 
 local c = require "o_jasper_common"
-local ot = require "o_jasper_common.html.other"
-local tt = require "o_jasper_common.html.time"
+local html = require "o_jasper_common.html"
 
 local SqlEntry = require("sql_help").SqlEntry
 
@@ -16,7 +15,7 @@ local Public = {}
 Public.default_html_calc = {
    tagsHTML = function (entry, state)
       if entry.values.taggings then
-         return ot.tagsHTML(entry:tags(), state.tagsclass)
+         return html.tagsHTML(entry:tags(), state.tagsclass)
       else
          return " "
       end
@@ -33,15 +32,15 @@ Public.default_html_calc = {
    -- NOTE: the delta/resay cases only make sense when sorting by time.
    -- TODO: perhaps the state/state.config should tell this and have proper behavior.
    delta_dateHTML = function(entry, state)
-      return tt.delta_dateHTML(state, entry:ms_t())
+      return html.delta_dateHTML(state, entry:ms_t())
    end,
    
    timemarks = function(entry, state)
-      return tt.time(state, entry:ms_t())
+      return html.time(state, entry:ms_t())
    end,
 
    resay_time = function(entry, state)
-      return tt.resay_time(state, entry:ms_t(), (state.config.resay or {}).long)
+      return html.resay_time(state, entry:ms_t(), (state.config.resay or {}).long)
    end,
    
    short_resay_time = function(entry, state)
@@ -50,7 +49,7 @@ Public.default_html_calc = {
          {"yday", "{%month}/{%day} {%short_dayname}"},
          init = " ", nochange = " ",
       }
-      return tt.resay_time(state, entry:ms_t(), config)
+      return html.resay_time(state, entry:ms_t(), config)
    end,
 
    -- Writes it out properly.
@@ -96,10 +95,10 @@ Public.default_html_pattern_calc = {
 }
 
 function Public.default_html_calc.dayname(entry)
-   return tt.day_names[datetab(entry:ms_t()).wday]
+   return html.day_names[datetab(entry:ms_t()).wday]
 end
 function Public.default_html_calc.monthname(entry)
-   return tt.day_names[datetab(entry:ms_t()).wday]
+   return html.day_names[datetab(entry:ms_t()).wday]
 end
 
 --local function cap_priority(fun, to_priority)

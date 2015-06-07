@@ -6,7 +6,6 @@
 --  (at your option) any later version.
 
 local c = require("o_jasper_common")
-local html_entry = require "listview.entry_html"
 
 local this = c.copy_meta(require "listview.Base")
 
@@ -61,18 +60,22 @@ function this:js_listupdate(list, as_msg)
                           math.min(self.limit_i + self.limit_cnt,
                                    self.limit_i + #list))
    end
-   return { list=self:final_html_list(list, as_msg, reset_state),
+   return { list=self:html_list(list, as_msg, reset_state),
             cnt=cnt,
             search_cnt=self.search_cnt,
    }
 end
 
-local html_list = require "listview.html_list"
+local html_entry = require "listview.entry_html"
 
-function this:final_html_list(list, as_msg)
+function this:html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
-   if not as_msg then
-      return html_list.keyval(list)
+   if not as_msg then  -- Plain table.
+      local ret = ""
+      for _, el in pairs(list) do
+         ret = ret .. [[<table class="plain_table">]] .. c.html.table(el) .. "</table><hr>"
+      end
+      return ret
    else
       assert(self.log.initial_state)
       --print(self.log.initial_state, html_state, self.log:initial_state())

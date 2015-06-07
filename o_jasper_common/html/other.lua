@@ -11,4 +11,12 @@ function Public.tagsHTML(tags, class)
    return table.concat(ret, ", ")
 end
 
+function Public.table(tab, format)
+   local row = (format or {}).row or
+      [[%s<tr><td class="table_key">%s</td><td class="table_val">%s</td></tr>]]
+   local ret = ""
+   for k, v in pairs(tab) do ret = string.format(row, ret, k, v) end
+   return ret
+end
+
 return Public
