@@ -50,7 +50,7 @@ end
 local infofun_lib = require "sql_help.infofun"
 
 function This:js_listupdate(list, as_msg)
-   list = infofun_lib.list_highest_priority_each(list, self:infofun())
+   list = infofun_lib.list_highest_priority_each(self, list, self:infofun())
 
    self.search_cnt = self.search_cnt + 1
    -- TODO bit fussy.. really getting the return value straight out would be handy..

@@ -2,7 +2,7 @@ local c = require "o_jasper_common"
 
 local This = c.copy_meta(require "listview.infofun.show_1")
 
-function This.maybe_new(entry)
+function This.maybe_new(_, entry)
    return setmetatable({ e=entry }, This)
 end
 
@@ -16,11 +16,6 @@ end
 
 function This.tab_repl:title()  -- TODO history should have This too.
    return self.e.title or self.e.uri or "(no title)"
-end
-
-function This.tab_repl:default(_, key)
-   return self.e[key] or 
-      string.match(key, "^[/_.%w]+$") and self.asset_fun(key)
 end
 
 return c.metatable_of(This)

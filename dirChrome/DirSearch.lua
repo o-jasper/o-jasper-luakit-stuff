@@ -4,9 +4,18 @@ local c = require "o_jasper_common"
 
 local Search = require("listview.Search")
 
-local this = c.copy_meta(Search)
+local This = c.copy_meta(Search)
 
-function this.to_js:html_of_id()
+function This:config() return config end
+
+-- TODO.. get an actual list..
+function This:infofun()
+   --for k,v in pairs(require "listview.infofun")  do ret[k] = v end
+   --for k,v in pairs(require "dirChrome.infofun") do ret[k] = v end
+   return {require "dirChrome.infofun.show_1"}
+end
+
+function This.to_js:html_of_id()
    return function(id)
       local file = self.log:file_of_id(id)
       local html = file and self:info_html_of_file(file)
@@ -25,15 +34,15 @@ local function info_html(list, asset_fun, thresh)
    return html
 end
 
-function this:info_html(list, thresh)
+function This:info_html(list, thresh)
    return info_html(list, self:asset_fun(), thresh)
 end
 
-function this:info_html_of_file(file, thresh)
+function This:info_html_of_file(file, thresh)
    return self:info_html(self.log:info_from_file(file), thresh or -1)
 end
 
-function this:repl_list(args)
+function This:repl_list(args)
    self.log:update_whole_directory()  -- Ensure in the sql table.
    local ret = Search.repl_list(self, args)
    ret.cur_dir = self.log.path
@@ -46,4 +55,4 @@ function this:repl_list(args)
    return ret
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)

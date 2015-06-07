@@ -7,7 +7,7 @@ local lfs = require "lfs"
 
 local This = {}
 
-function This.maybe_new(entry)
+function This.maybe_new(_, entry)
    return setmetatable({ e=entry }, This)
 end
 
