@@ -32,7 +32,7 @@ return function(info, state, direct, fun_table, pattern_table)
       -- Dont do this, if people use it this way, it obscures the fact that is is just
       -- a table externally. (their source shouldnt "know" about this.)
       -- __call = function(self, str) 
-      --   return require("o_jasper_common.apply_repl")(str, self)
+      --   return require("o_jasper_common.apply_subst")(str, self)
       -- end
    }
    return setmetatable(direct, meta)
