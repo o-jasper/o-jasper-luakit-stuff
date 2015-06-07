@@ -8,11 +8,8 @@ local This = c.copy_meta(Search)
 
 function This:config() return config end
 
--- TODO.. get an actual list..
 function This:infofun()
-   --for k,v in pairs(require "listview.infofun")  do ret[k] = v end
-   --for k,v in pairs(require "dirChrome.infofun") do ret[k] = v end
-   return {require "dirChrome.infofun.show_1"}
+   return self:config().infofun or {require "dirChrome.infofun.show_1"}
 end
 
 function This.to_js:html_of_id()

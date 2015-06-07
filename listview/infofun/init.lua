@@ -1,5 +1,4 @@
-local Public = {}
-for _,file in pairs{"show_1"} do
-   Public[file] = require("listview.infofun." .. file)
+local function index(_, key)
+   return require("listview.infofun." .. key)
 end
-return Public
+return setmetatable({}, { __index = index })

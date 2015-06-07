@@ -2,21 +2,20 @@
 local c = require "o_jasper_common"
 local listview = require "listview"
 
-local this = c.copy_meta(listview.Search)
+local This = c.copy_meta(listview.Search)
 
-function this:config() return (globals.listview or {}).bookmarks or globals.listview or {} end
-function this:infofun()
-   local ret = {}
-   for k,v in pairs(require "listview.infofun")           do ret[k] = v end
-   for k,v in pairs(require "listview.bookmarks.infofun") do ret[k] = v end
-   return ret
+function This:config() return (globals.listview or {}).bookmarks or globals.listview or {} end
+
+function This:infofun()
+   return self:config().infofun or {require "listview.bookmarks.infofun.show_1"}
 end
+
 -- Want the adding-entries js api too.
-this.to_js = c.copy_table(this.to_js, require("listview.bookmarks.Enter").to_js)
+This.to_js = c.copy_table(This.to_js, require("listview.bookmarks.Enter").to_js)
 
 local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 
-function this:repl_list(args, view, meta)
+function This:repl_list(args, view, meta)
    local got = listview.Search.repl_list(self, args, view, meta)
    
    got.above_title = self:asset("parts/enter_span.html")
@@ -31,4 +30,4 @@ function this:repl_list(args, view, meta)
    return got
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)

@@ -16,7 +16,10 @@ end
 This.to_js = require "listview.Search_to_js"
 
 function This:initial_state() return {} end
-function This:infofun() return self:config().infofun or require "listview.infofun" end
+
+function This:infofun()
+   return self:config().infofun or {require "listview.infofun.show_1"}
+end
 
 function This:total_query(search)
    -- How we end up searching.
