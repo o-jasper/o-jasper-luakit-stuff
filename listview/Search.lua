@@ -1,4 +1,4 @@
---  Copyright (C) 02-06-2015 Jasper den Ouden.
+--  Copyright (C) 07-06-2015 Jasper den Ouden.
 --
 --  This is free software: you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published
@@ -15,7 +15,7 @@ for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
 end
 this.to_js = require "listview.to_js"
 
-function this:initial_state() return self.log:initial_state() end
+function this:initial_state() return {} end
 function this:infofun() return self:config().infofun or require "listview.infofun" end
 
 function this:total_query(search)
@@ -50,7 +50,7 @@ end
 local infofun_lib = require "sql_help.infofun"
 
 function this:js_listupdate(list, as_msg)
-   list = infofun_lib.list_highest_priority_each(list, this:infofun())
+   list = infofun_lib.list_highest_priority_each(list, self:infofun())
 
    self.search_cnt = self.search_cnt + 1
    -- TODO bit fussy.. really getting the return value straight out would be handy..
@@ -88,7 +88,6 @@ function this:html_list(list, as_msg)
       end
       return ret
    else
-      assert(self.log.initial_state)
       self.html_state = self.html_state or self:initial_state()
       return list_to_html(list, self.html_state, self:asset_fun())
    end
