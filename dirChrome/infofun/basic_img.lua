@@ -14,7 +14,7 @@ function this.maybe_new(path, file)
 end
 
 function this:priority()
-   return 0 -- TODO context-dependence?
+   return -0.5 -- TODO context-dependence?
 end
 
 function this:html()
@@ -24,8 +24,9 @@ function this:html()
    if got and format then
       -- TODO have a function defined somewhere so when i dont need to
       -- base54-encode anymore, i only need to change it there.
-      return string.format([[%s<img src="data:image/%s;base64,%s", alt="%s">]],
-         fp, string.sub(format, 2), got, fp)
+      -- TODO, also, this can take a little while..
+      return string.format([[<img src="data:image/%s;base64,%s", alt="%s">]],
+         string.sub(format, 2), got, fp)
    end
 end
 

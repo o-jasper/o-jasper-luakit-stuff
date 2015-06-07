@@ -4,7 +4,7 @@ local c = require "o_jasper_common"
 
 local this = {}
 
-function this.maybe_new(path, file, dir)
+function this.maybe_new(path, file)
    if string.match(string.lower(file), "[.]md$") then
       return setmetatable({ path=path, file=file }, this)
    end
