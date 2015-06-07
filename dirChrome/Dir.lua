@@ -28,6 +28,8 @@ This.cmd_dict.delete_path =
 --   if got then return got.file end
 --end
 
+This.entry_meta = DirEntry
+
 local function entry_from_file(path, file)
    local entry =  lfs.attributes(path .. "/" .. file)
    if not ( {["."]=true, [".."]=true})[file] and entry then
@@ -53,42 +55,39 @@ function This:entry_from_file(file, path)
       return entry
    end
 end
+
 function This:update_file(file)
    local entry = self:entry_from_file(file)
-   return entry and self:update_or_enter(entry)
+   if entry then
+      self:update_or_enter(entry)
+      return This:entry_fun(entry)
+   end
 end
-function This:update_whole_directory()
-   for file, _ in lfs.dir(self.path) do self:update_file(file) end
-end
-
--- TODO factor out the info list part?
-local infofuns_funs = require "dirChrome.infofun"
 
 local infofun_lib = require "sql_help.infofun"
+
+function This:update_whole_directory()
+   self.info_from_dir_list = {}
+   for file, _ in lfs.dir(self.path) do
+      local entry = self:update_file(file)
+      if entry then
+         local list = infofun_lib.entry_thresh_priority(self, entry, self:dir_infofun(), 0)
+         infofun_lib.priority_sort(list, self:config().priority_override)
+         for _, el in pairs(list) do
+            table.insert(self.info_from_dir_list, el)
+         end
+      end
+   end
+end
+
+function This:info_from_dir()
+   return self.info_from_dir_list
+end
 
 function This:dir_infofun()
    return config.dir_infofun or {
       require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
       require "dirChrome.infofun.file"}
-end
-
-This.entry_meta = DirEntry
-function This:entry_fun(data)
-   assert(type(data) == "table")
-   data.origin = self
-   setmetatable(data, self.entry_meta)
-   -- Incorporate info
-   local list = infofun_lib.entry_thresh_priority(self, data, self:dir_infofun(), 0)
-   infofun_lib.priority_sort(list, self:config().priority_override)
-   self.info_from_dir_list = self.info_from_dir_list or {}
-   for _, el in pairs(list) do
-      table.insert(self.info_from_dir_list, el)
-   end
-   return data
-end
-
-function This:info_from_dir()
-   return self.info_from_dir_list
 end
 
 -- Scratch some search matchabled that arent allowed.
