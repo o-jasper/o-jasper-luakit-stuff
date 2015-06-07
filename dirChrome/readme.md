@@ -1,13 +1,16 @@
 # Directory viewer
 
 ## Info functions
+Info functions are what makes list entries in listview. They are
+also used here to show extra info next to the list,
+
 It is possible to return "info functions" in `globals.dirChrome.infofuns`
 these take the path and `Dir` object as input and return an info object, or
 `nil`.(indicating that the info function is not about that.
 
 Info objects have;
 
-`InfoMeta.maybe_new(path, file)` creates a new one, *if*
+`InfoMeta.maybe_new(creator, instance)` creates a new one, *if*
 the infofun applies.
 
 `.path`, `.file` gets the path, file back.
@@ -18,7 +21,7 @@ It may be sorted by importance. `> 0` is defaultly shown.
 
 Anything main selection shows ontop.
 
-`info:html(asset_function)` return the html to be shown. Returning `nil`,
+`info:html(state, asset_function)` return the html to be shown. Returning `nil`,
 it will not show anything. (you might want to indicate a reason.)
 `asset_function` is a function to which you feed files, and it'll
 return that asset as normally.
@@ -31,11 +34,6 @@ return that asset as normally.
   + Modify date (current)
   + Size.
   + Alphabetically.
-
-* Infofuns get the same object at the list-thingy does..
-  
-  + `html_calc` has to go on the entry object, and unify the file
-    infoview with that.
 
 * More infofuns, and a way to have a "mode" of viewing and different
   infofuns apply depending on the mode.
