@@ -15,6 +15,9 @@ for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
 end
 this.to_js = require "listview.to_js"
 
+function this:initial_state() return self.log:initial_state() end
+function this:infofun() return self:config().infofun or require "listview.infofun" end
+
 function this:total_query(search)
    -- How we end up searching.
    assert(type(search) == "string", "Search not string; " .. tostring(search))
@@ -44,7 +47,11 @@ function this:repl_list(args)
    }
 end
 
+local infofun_lib = require "sql_help.infofun"
+
 function this:js_listupdate(list, as_msg)
+   list = infofun_lib.list_highest_priority_each(list, this:infofun())
+
    self.search_cnt = self.search_cnt + 1
    -- TODO bit fussy.. really getting the return value straight out would be handy..
    local cnt = "BUG"
@@ -66,7 +73,11 @@ function this:js_listupdate(list, as_msg)
    }
 end
 
-local html_entry = require "listview.entry_html"
+local function list_to_html(list, state, asset_fun)
+   local html = "<table>"
+   for _, info in pairs(list) do html = html .. info:html(state, asset_fun) end
+   return html .. "</table>"
+end
 
 function this:html_list(list, as_msg)
    local config = { date={pre="<span class=\"timeunit\">", aft="</span>"} }
@@ -78,9 +89,8 @@ function this:html_list(list, as_msg)
       return ret
    else
       assert(self.log.initial_state)
-      --print(self.log.initial_state, html_state, self.log:initial_state())
-      self.html_state = self.html_state or self.log:initial_state()
-      return html_entry.list(self, list, self.html_state)                             
+      self.html_state = self.html_state or self:initial_state()
+      return list_to_html(list, self.html_state, self:asset_fun())
    end
 end
 
