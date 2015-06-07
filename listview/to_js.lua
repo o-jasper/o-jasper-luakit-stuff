@@ -1,7 +1,7 @@
 return {
 
    addsearch = function(self) return function(name)
-         return self:config().addsearch[name]
+         return (self:config().addsearch or {})[name] or ""
    end end,
 
    get_id = function(self) return function(id)
