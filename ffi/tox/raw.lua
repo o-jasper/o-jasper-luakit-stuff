@@ -12,7 +12,7 @@ assert(ffi, [[Need `require "ffi"` to work, luajit has it inbuild, lua afaik not
 
 -- NOTE: how it works seems bad style. Something in the _global_ state from
 -- ffi.cdef goes into the lib somehow.
-ffi.cdef(require "tox_api")
+ffi.cdef(require "ffi.tox.tox_api")
 local lib = ffi.load(libfile)
 
 return lib
