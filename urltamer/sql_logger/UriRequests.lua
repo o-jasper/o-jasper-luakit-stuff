@@ -45,6 +45,7 @@ local entry_html = require "listview.entry_html"
 
 local fancy_uri = require("o_jasper_common.html.uri").fancy_uri
 
+-- TODO replace with new approach..
 function this:initial_state()
    local mod_html_calc = {
       resultHTML = function(entry, _)

@@ -5,6 +5,8 @@ local paged_chrome = require("paged_chrome")
 
 local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
+local UriRequestsSearch = require "urltamer.sql_logger.UriRequestsSearch"
+
 local config = (globals.urltamer or {}).sql_logger or {}
 
 local function chrome_describe(log)
@@ -13,7 +15,12 @@ local function chrome_describe(log)
    local where = config.assets or {}
    table.insert(where, "urltamer/sql_logger/chrome")
    table.insert(where, "listview")
-   local pages = listview.new_Chrome(log, where)
+   local pages = {
+      default_name = "search",
+      search      = paged_chrome.templated_page(UriRequestsSearch.new{log, where}, "search"),
+      aboutChrome = paged_chrome.templated_page(listview.AboutChrome.new{log, where},
+                                                "aboutChrome"),
+   }
 
    config.page = config.page or {}
    pages.search.limit_cnt = config.page.cnt or 20
