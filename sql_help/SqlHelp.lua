@@ -323,6 +323,10 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       self:not_tags(state.not_tags)
       if before_t then self:comb() self:before(state.before_t) end
       if after_t then self:comb() self:after(state.after_t) end
+      if state.order_by then
+         self.dont_auto_order = true
+         self:order_by(state.order_by, state.order_by_way)
+      end
    end,
    
    -- Sorting it.
@@ -330,6 +334,12 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       if type(what) == "table" then what = table.concat(what, ", ") end
       self.c = ""
       self:extcmd("ORDER BY %s %s", what, way or "DESC")
+   end,
+
+   auto_order_by = function(self)
+      if not self.dont_auto_order and self.values.order_by then
+         self:order_by(self.values.order_by, self.values.order_way)
+      end
    end,
    
    -- Limiting the number of results.

@@ -21,13 +21,16 @@ function This:infofun()
    return self:config().infofun or {require "listview.infofun.show_1"}
 end
 
+function This:order_by() end
+
 function This:total_query(search)
    -- How we end up searching.
    assert(type(search) == "string", "Search not string; " .. tostring(search))
    local query = self.log:new_SqlHelp()
    if search ~= "" then query:search(search) end
-   query:order_by(self.log.values.order_by)
-   
+
+   query:auto_order_by()
+
    self.got_limit = query.got_limit
    if not query.got_limit then  -- Add a limit if dont have one yet.
       query:limit(self.limit_i, self.limit_cnt)
