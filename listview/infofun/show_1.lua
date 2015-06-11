@@ -76,8 +76,12 @@ This.tab_repl = {
    },
    
    default = function(self, _, key)
-      return self.e[key] or 
-         string.match(key, "^[/_.%w]+$") and self.asset_fun(key)
+      local got = self.e[key]
+      if got then  -- Gsub does not do zero-length output.
+         return got == "" and " " or got
+      else
+         return string.match(key, "^[/_.%w]+$") and self.asset_fun(key)
+      end
    end,
 }
 
