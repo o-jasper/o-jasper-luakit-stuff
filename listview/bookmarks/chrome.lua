@@ -14,10 +14,6 @@ local listview = require "listview"
 local bookmarks  = require "listview.bookmarks.bookmarks"
 
 local config = (globals.listview or {}).bookmarks or {}
-config.page = config.page or {}
-
-local assets_where = config.assets or {}
-table.insert(assets_where, "*listview/bookmarks")
 
 -- Make the chrome page.
 
@@ -34,14 +30,14 @@ local function default_data_uri_fun(entry)
    end
 end
 
+-- TODO doesnt seem to be used.
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
 local Enter = require "listview.bookmarks.Enter"
 local BookmarksSearch = require "listview.bookmarks.BookmarksSearch"
 
 local function mk_page(meta, name)
-   local page = setmetatable({where=assets_where, log=bookmarks}, meta)
-   return paged_chrome.templated_page(page, name)
+   return paged_chrome.templated_page(meta.new{bookmarks, "*listview/bookmarks"}, name)
 end
 
 local bookmarks_paged = {
@@ -49,7 +45,7 @@ local bookmarks_paged = {
    enter  = mk_page(Enter, "enter"),
    import  = mk_page(require "listview.bookmarks.import_page", "import"),
    search = mk_page(BookmarksSearch, "search"),
-   aboutChrome = listview.AboutChrome.new{bookmarks, assets_where},
+   aboutChrome = mk_page(listview.AboutChrome, "aboutChrome"),
 }
 
 paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)

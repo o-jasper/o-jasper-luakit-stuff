@@ -12,24 +12,15 @@ local dir_fun  = require "dirChrome.dir_fun"
 
 local paged_chrome = require("paged_chrome")
 
-local config = globals.dirChrome or {}
-config.page = config.page or {}
--- If you specify a config.db, it'll load everything into that,
---  otherwise, a temporary db.
-
 local function figure_path(args) return string.sub(args.path, 7) end
 local function figure_Dir(args)  return dir_fun(figure_path(args)) end
 
 local function chrome_describe()
-   local where = config.assets or {}
-   table.insert(where, "dirChrome")
-   table.insert(where, "listview")
-   local pages = {
+   local where = {"dirChrome", "listview"}
+   return {
       default_name = "search",
       search = function(args)
          local search =  DirSearch.new{figure_Dir(args), where}
-         search.limit_cnt = config.page.cnt or 20
-         search.limit_step = config.page.step or search.step_cnt
          return paged_chrome.templated_page(search, "search")
       end,
       aboutChrome = function(args)
@@ -38,13 +29,14 @@ local function chrome_describe()
          return paged_chrome.templated_page(page, "aboutChrome")
       end,
    }
-
-   return pages
 end
 
 -- Make the chrome page.
 local dir_paged = chrome_describe()
 paged_chrome.paged_chrome("dirChrome", dir_paged)
+
+-- Grabbing another `luakit://` name.
+local config = globals.dirChrome or {}
 
 if config.take_dir_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("dir", dir_paged)

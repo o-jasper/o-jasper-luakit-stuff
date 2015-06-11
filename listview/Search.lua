@@ -7,7 +7,8 @@
 
 local c = require("o_jasper_common")
 
-local This = c.copy_meta(require "listview.Base")
+local Base = require "listview.Base"
+local This = c.copy_meta(Base)
 
 -- This.html_state = nil,
 for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
@@ -21,7 +22,12 @@ function This:infofun()
    return self:config().infofun or {require "listview.infofun.show_1"}
 end
 
-function This:order_by() end
+function This:init()
+   Base.init(self)
+   local page = self:config().page or {}
+   self.limit_cnt  = page.cnt
+   self.limit_step = page.step
+end
 
 function This:total_query(search)
    -- How we end up searching.

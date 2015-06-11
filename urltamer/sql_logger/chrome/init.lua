@@ -7,25 +7,16 @@ local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
 local UriRequestsSearch = require "urltamer.sql_logger.UriRequestsSearch"
 
-local config = (globals.urltamer or {}).sql_logger or {}
-
 local function chrome_describe(log)
    assert(log)
    
-   local where = config.assets or {}
-   table.insert(where, "urltamer/sql_logger/chrome")
-   table.insert(where, "listview")
-   local pages = {
+   local where = {"urltamer/sql_logger/chrome", "listview"}
+   return {
       default_name = "search",
       search      = paged_chrome.templated_page(UriRequestsSearch.new{log, where}, "search"),
       aboutChrome = paged_chrome.templated_page(listview.AboutChrome.new{log, where},
                                                 "aboutChrome"),
    }
-
-   config.page = config.page or {}
-   pages.search.limit_cnt = config.page.cnt or 20
-   pages.search.limit_step = config.page.step or pages.search.step_cnt
-   return pages
 end
 
 paged_chrome.paged_chrome("listviewURLs", chrome_describe(sql_logger))

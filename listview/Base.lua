@@ -13,19 +13,33 @@ local ensure = require("o_jasper_common.ensure")
 
 -- Base metatable of templated html page.
 local this = {
-   new_remap = {log=1, where=2},
-   new_prep = { where = ensure.table },
-   new_assert_types = {log="table", where="table"},
+   new_remap = {log=1, append_where=2},
+   new_prep = { append_where = ensure.table },
+   new_assert_types = {log="table", append_where="table"},
    
    repl_pattern = false, to_js = {},
 }
 
 function this:config() return config end
 
-function this:asset(file) return asset(self.where, file) end
+function this:init()
+   local config = self:config()
+
+   self.where = self.where or config.assets_where or {}
+   if self.append_where then
+      for _, w in pairs(self.append_where) do
+         table.insert(self.where, w)
+      end
+      self.append_where = nil
+   end
+end
+
+function this:asset(file)
+   return asset(self.where, file)
+end
 
 function this:asset_fun()
-   return function(file) return asset(self.where, file) end
+   return function(file) return self:asset(file) end
 end
 
 function this:repl_list_suggest(args)

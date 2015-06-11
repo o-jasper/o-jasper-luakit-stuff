@@ -10,24 +10,11 @@ local history  = require "listview.history.history"
 
 local paged_chrome = require("paged_chrome")
 
-local config = (globals.listview or {}).history or {}
-config.page = config.page or {}
-
-local function chrome_describe(log)
-   assert(log)
-   
-   local where = config.assets or {}
-   table.insert(where, "*listview/history")
-   local pages = listview.new_Chrome(log, where)
-
-   pages.search.limit_cnt = config.page.cnt or 20
-   pages.search.limit_step = config.page.step or pages.search.step_cnt
-   return pages
-end
-
 -- Make the chrome page.
-local history_paged = chrome_describe(history)
+local history_paged = listview.new_Chrome(history, "*listview/history")
 paged_chrome.paged_chrome("listviewHistory", history_paged)
+
+local config = (globals.listview or {}).history or {}
 
 if config.take_history_chrome then  -- Take over the 'plain name'. (default:no)
    paged_chrome.paged_chrome("history", history_paged)
