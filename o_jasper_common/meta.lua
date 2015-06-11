@@ -17,6 +17,8 @@ function Public.copy_meta(of, mod)
 end
 
 function Public.metatable_of(meta)
+   assert(meta ~= nil, "Dont have a value, perhaps accidentally using global value.")
+   assert(meta, "meta == false??")
    assert(not meta.__index or type(meta.__index) == "function" 
              and not meta.__metatable_of_override,
           "Did you use `copy_meta` properly?")
@@ -46,7 +48,9 @@ function Public.metatable_of(meta)
             elseif tp == "exists" then
                assert(initial[k])
             else
-               assert(type(initial[k]) == tp)
+               assert(type(initial[k]) == tp,
+                      string.format("Type mismatch, expected %s to have type %s but had %s", 
+                                    k, tp, type(initial[k])))
             end
          end
          return setmetatable(initial, meta)
