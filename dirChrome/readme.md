@@ -11,7 +11,7 @@ these take the path and `Dir` object as input and return an info object, or
 Info objects have;
 
 `InfoMeta.maybe_new(creator, instance)` creates a new one, *if*
-the infofun applies.
+the infofun applies. (do not forget it, or it wont get the right metatable)
 
 `.path`, `.file` gets the path, file back.
 

@@ -56,6 +56,22 @@ local tox_funlist = {
    file_send_chunk = false,
    self_get_udp_port = false,
    self_get_tcp_port = false,
+
+   callback_self_connection_status = false,
+   callback_friend_name = false,
+   callback_friend_status_message = false,
+   callback_friend_status = false,
+   callback_friend_connection_status = false,
+   callback_friend_typing = false,
+   callback_friend_read_receipt = false,
+   callback_friend_request = false,
+   callback_friend_message = false,
+   callback_file_recv_control = false,
+   callback_file_chunk_request = false,
+   callback_file_recv = false,
+   callback_file_recv_chunk = false,
+   callback_friend_lossy_packet = false,
+   callback_friend_lossless_packet = false,
 }
 
 local Public = { raw=raw, Tox={}, Opts={} }
@@ -79,7 +95,7 @@ local ffi = require "ffi"
 local function ret_via_arg(name, ctp, rawname, szname)
    local rawname = rawname or "_" .. name
    local szname  = szname  or name .. "_size"
-   local ctp = tp or "char[?]"
+   local ctp = ctp or "char[?]"
    return function(self)
       local sz = self[szname](self)
       local ret = ffi.new(ctp, sz)
@@ -99,7 +115,7 @@ Tox_ret_via_arg("get_savedata", "uint8_t[?]")
 
 local function Tox_ret_via_arg_no_size(name, ctp, rawname)
    local rawname = rawname or "_" .. name
-   local ctp = tp or "uint8_t[32]"
+   local ctp = ctp or "uint8_t[32]"
    Public.Tox[name] = function(self)
       local ret = ffi.new(ctp)
       self[rawname](self, ret)
@@ -107,8 +123,8 @@ local function Tox_ret_via_arg_no_size(name, ctp, rawname)
    end
 end
 Tox_ret_via_arg_no_size("self_get_public_key")
-Tox_ret_via_arg_no_size("self_get_secret_key"
-)Tox_ret_via_arg_no_size("self_get_address")
+Tox_ret_via_arg_no_size("self_get_secret_key")
+Tox_ret_via_arg_no_size("self_get_address", "uint8_t[38]")
 
 Public.Tox.__index  = Public.Tox
 Public.Opts.__index = Public.Opts
