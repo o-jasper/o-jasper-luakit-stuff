@@ -53,7 +53,11 @@ function Public.metatable_of(meta)
                                     k, tp, type(initial[k])))
             end
          end
-         return setmetatable(initial, meta)
+         local ret = setmetatable(initial, meta)
+         if meta.init then
+            ret:init()
+         end
+         return ret
       end
    end
    for k,v in pairs(meta) do index[k] = v end
