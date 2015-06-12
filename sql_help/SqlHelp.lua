@@ -62,7 +62,21 @@ local matchfun = {
    like = function(self, state, m, v)
       self:like(string.sub(m, 1, #m-5), v, state.n)
    end,
+
+   order_by = function(self, state, m, v)
+      for k in pairs(self.values.int_els) do
+         if string.match(k, "^" .. v) then
+            state.order_by = k
+            return
+         end
+      end
+   end,
 }
+
+function matchfun:order_by_desc(state, m, v)
+   matchfun.order_by(state, m, v)
+   state.order_by_way = "DESC"
+end
 
 local SqlHelp = {
    values = {
@@ -134,6 +148,15 @@ local SqlHelp = {
                table.insert(self.got_limit, tonumber(el))
             end
          end,
+
+         ["order:"]   = matchfun.order_by,
+         ["orderby:"] = matchfun.order_by,
+         ["sort:"]    = matchfun.order_by,
+
+         ["orderdesc:"]   = matchfun.order_by_desc,
+         ["orderbydesc:"] = matchfun.order_by_desc,
+         ["sortdesc:"]    = matchfun.order_by_desc,
+         
          default = function(self, state, m, v)
             self:text_sw(v, state.n)
          end
