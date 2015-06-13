@@ -11,7 +11,7 @@ local Base = require "listview.Base"
 local This = c.copy_meta(Base)
 
 -- This.html_state = nil,
-for k,v in pairs({search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
+for k,v in pairs({__name= "listview.Search", search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
    This[k] = v
 end
 This.to_js = require "listview.Search_to_js"

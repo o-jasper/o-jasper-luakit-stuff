@@ -5,6 +5,7 @@ local c = require "o_jasper_common"
 local Search = require("listview.Search")
 
 local This = c.copy_meta(Search)
+This.__name = "dirChrome.DirSearch"
 
 function This:config() return config end
 

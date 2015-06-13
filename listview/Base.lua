@@ -12,17 +12,19 @@ local config = globals.listview or {}
 local ensure = require("o_jasper_common.ensure")
 
 -- Base metatable of templated html page.
-local this = {
-   new_remap = {log=1, append_where=2},
+local This = {
+   __name = "listview.Base",
+
+   new_remap = {"log", "append_where"},
    new_prep = { append_where = ensure.table },
    new_assert_types = {log="table", append_where="table"},
    
    repl_pattern = false, to_js = {},
 }
 
-function this:config() return config end
+function This:config() return config end
 
-function this:init()
+function This:init()
    local config = self:config()
 
    self.where = self.where or config.assets_where or {}
@@ -34,20 +36,20 @@ function this:init()
    end
 end
 
-function this:asset(file)
+function This:asset(file)
    return asset(self.where, file)
 end
 
-function this:asset_fun()
+function This:asset_fun()
    return function(file) return self:asset(file) end
 end
 
-function this:repl_list_suggest(args)
+function This:repl_list_suggest(args)
    return { title = string.format("%s:%s", self.chrome_name, self.name) }
 end
-function this:repl_list(args)
+function This:repl_list(args)
    error([[Thou shalt not use the base repl list.
 `repl_list_suggest` for some suggestions, like title]])
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)
