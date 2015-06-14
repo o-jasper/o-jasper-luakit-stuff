@@ -1,19 +1,19 @@
 
-local req_print = require("alt_require.ah.SimplePrintLog").new()
+local tab = require("alt_require.ah.Table").new()
 
-req_print:require("alt_require.test.reqme")
+tab:require("alt_require.test.reqme")
 
-print("-----------")
-local req_table = require("alt_require.ah.SimpleTableLog").new()
-
-req_table:require("alt_require.test.reqme")
-
-print(#req_table.recorded_require, #req_table.recorded)
-for k,v in pairs(req_table.recorded_require) do
-   print("req", k, v)
-end
-for k,v in pairs(req_table.recorded) do
-   for k2, v in pairs(v) do
-      print(k, k2, v)
+local function str_tab(tab, prep)
+   local ret, prep = "", prep or "  "
+   for k, v in pairs(tab) do
+      if type(v) == "table" then
+         ret = ret .. prep .. tostring(k) .. ":\n" .. str_tab(v, "  " .. prep)
+      else 
+         ret = ret .. prep .. string.format("%s: %s\n", k, v)
+      end
    end
+   return ret
 end
+
+print(str_tab(tab.cnts))
+print(str_tab(tab.vals))
