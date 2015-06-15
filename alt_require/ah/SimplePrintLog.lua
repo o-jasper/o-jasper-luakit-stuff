@@ -1,7 +1,6 @@
 -- Record by printing.
 -- (here just for example.)
 
-local ar = require "alt_require"
 local c  = require "o_jasper_common.meta"
 
 local This = c.copy_meta(require "alt_require.ah.SimpleBase")
@@ -20,20 +19,6 @@ function This:record_require(str)
 end
 function This:record(where, key)
    print(where, key)
-end
-
-function This:init()
-   if self.recurse then
-      self.env.require = ar.alt_require(self)
-   end
-   if self.record_require_file then
-      -- Otherwise it will just access the existing one.
-      local oldrequire = self.env.require
-      self.env.require = function(str)
-         self:record_require(str)
-         return oldrequire(str)
-      end
-   end
 end
 
 function This:meta(where)

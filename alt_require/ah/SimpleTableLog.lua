@@ -1,7 +1,6 @@
 -- Record into tables.
 -- (here just for example.)
 
-local ar = require "alt_require"
 local c  = require "o_jasper_common.meta"
 
 local SimplePrintLog = require "alt_require.ah.SimplePrintLog"

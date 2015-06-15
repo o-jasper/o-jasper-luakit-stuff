@@ -43,16 +43,4 @@ function Public.alt_require_plain(meta)
    end
 end
 
-function Public.alt_require(obj)
-   return function(str)
-      local got = obj.loaded and obj:loaded(str)
-      if got then
-         return got
-      else
-         local file = Public.alt_findfile(str)
-         return file and loadfile(file, nil, setmetatable({}, obj:meta(str)))()
-      end   
-   end
-end
-
 return Public
