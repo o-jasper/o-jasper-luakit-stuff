@@ -1,7 +1,6 @@
 -- Messy: not sure of direction at this point.
 -- Figuring trying restrictive.
 
-local ar = require "alt_require"
 local c  = require "o_jasper_common.meta"
 
 local SimpleBase = require "alt_require.ah.SimpleBase"
@@ -14,13 +13,15 @@ This.new_defaults = {
    env = SimpleBase.new_defaults.env,
    cnts = {},
    vals = {}, 
-   cnts_require = {}
+   cnts_require = {},
+   loaded = {},
 }
 
 --This.allow_global = false
 This.record_require_file = true
 This.record_any = true
 This.recurse = true
+This.mode = "record"
 
 function This:record_require(str)
    self.cnts_require[str] = (self.cnts_require[str] or 0) + 1
@@ -29,7 +30,7 @@ end
 function This:init()
    if self.recurse then
       self.env = self.env or {}
-      self.env.require = ar.alt_require(self)
+      self.env.require = self:require_fun()
    end
    if self.record_require_file then
       -- Otherwise it will just access the existing one.
@@ -64,32 +65,55 @@ function This:indexat(from, vals, cnts)
    end
 end
 
-function This:meta(where)
-   local cnts, vals = self.cnts[where] or {}, self.vals[where] or {}
-   self.cnts[where] = cnts
-   self.vals[where] = vals
+function This:_ensure_tablestarts(file)
+   local cnts, vals = self.cnts[file] or {}, self.vals[file] or {}
+   self.cnts[file] = cnts
+   self.vals[file] = vals
+   return cnts, vals
+end
+
+function This:meta(file)
+   local cnts, vals = self:_ensure_tablestarts(file)
    return {
       __index = self:indexat(self.env, vals, cnts),
       __newindex = self.allow_global and function(self, to, key)
-         error("Trying to set %s from %q, but setting global disabled. ", key, where)
-                                         end,
+         error("Trying to set %s from %q, but setting global disabled. ", key, file)
+       end,
       -- __pairs = function(_) return pairs(self.env) end,
    }
 end
 
--- Poke at a thing as if it is being touched. -- TODO
---function This:poke(file, location)
---   for _, el in pairs(location) do
---   end
---end
+function This:assumed_require_fun(file)
+   -- TODO use the information in values.
+end
 
--- Copy it. (TODO wait, this is so general to be defaultly in my metas?)
-function This:copy() return setmetatable(c.copy_table(self), getmetatable(self)) end
+function This:require_fun(file)
+   if self.mode == "record" then
+      return SimpleBase.require_fun(self, file)
+   elseif self.mode == "assume" then
+      return self:assumed_require_fun(file)
+   else
+      error("Aint got mode %s", mode)
+   end
+end
 
--- From `self.vals` produce something that _only_ has access to those things.
--- (of course, in real use, it assumes all potential accesses have already happened.)
-function This:current_only_env()
-   -- TODO need a different require-replacement for it.
+-- Finds the place to poke
+function This:info_at_spot(file, location)
+   local cnts, vals = self:_ensure_tablestarts(file)
+   local got = self:require(file)
+   local i = 1
+   for _, k in pairs(location) do
+      if type(got) == "table" and cnts[k] == "table"then
+         assert(vals[k] == "table")
+         got = got[k]
+         local next_cnts, next_vals = cnts[k] or {}, vals[k] == nil and {} or vals[k]
+         cnts[k] = next_cnts
+         vals[k] = next_vals
+      else
+         return false  -- Already a non-tabe thing there.
+      end
+   end
+   return true, got, cnts, vals
 end
 
 return c.metatable_of(This)
