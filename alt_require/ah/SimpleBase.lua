@@ -55,20 +55,20 @@ function This:init()
    if self.record_require_file then
       -- Otherwise it will just access the existing one.
       local oldrequire = self.env.require
-      self.env.require = function(str)
-         self:record_require(str)
-         return oldrequire(str)
+      self.env.require = function(file)
+         self:record_require(file)
+         return oldrequire(file)
       end
    end
 end
 
 function This:require_fun()
-   return function(str)
-      local ret = self.loaded[str]
+   return function(file)
+      local ret = self.loaded[file]
       if not retgot then
-         local file = ar.alt_findfile(str)
-         ret = file and loadfile(file, nil, setmetatable({}, self:meta(str)))()
-         self.loaded[str] = ret
+         local file_path = ar.alt_findfile(file)
+         ret = file_path and loadfile(file_path, nil, setmetatable({}, self:meta(file)))()
+         self.loaded[file] = ret
       end   
       return ret
    end
