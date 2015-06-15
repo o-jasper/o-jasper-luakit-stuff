@@ -62,12 +62,15 @@ function This:init()
    end
 end
 
-function This:require_fun()
+function This:envfun(file) return setmetatable({}, self:meta(file)) end
+
+function This:require_fun(envfun)
+   local envfun = envfun or self.envfun
    return function(file)
       local ret = self.loaded[file]
       if not retgot then
          local file_path = ar.alt_findfile(file)
-         ret = file_path and loadfile(file_path, nil, setmetatable({}, self:meta(file)))()
+         ret = file_path and loadfile(file_path, nil, envfun(self, file))()
          self.loaded[file] = ret
       end   
       return ret
