@@ -9,19 +9,12 @@
 -- and searches in html tags for login forms.
 
 local lousy = require("lousy")
-c = require "o_jasper_common"
+local c = require "o_jasper_common"
 
 local config = globals.search_login or {}
 
-local executable = config.executable or "/usr/bin/pass"
-local pass_args  = config.pass_args or ""
 -- Force default accounts to use. Otherwise the first one of `pass`.
-local account_default = config.account_default or {}
 local pass_pre_domain = config.pass_pre_domain or ""
-
-local js_file = config.js_file or "search_login/enter_pw.js"
-
-local buf_bind = config.buf or "^,l$"
 
 local function default_true(x) if x == nil then return true else return x end end
 
@@ -30,7 +23,8 @@ local check_domain = default_true(config.check_domain)
 
 -- Call pass with this arg string
 function pass_call(args)
-   return executable .. ' ' .. pass_args .. args
+   return config.executable or "/usr/bin/pass" .. ' ' .. (config.pass_args or "")
+      .. " " .. args
 end
 
 local function say(w, what, more)
@@ -39,10 +33,12 @@ end
 
 local function str_bool(bool) if bool then return "true" else return "false" end end
 
-local js = c.load_asset(js_file) or "alert(\"JS of search_login not found\");"
+local js = c.load_asset(config.js_file or "search_login/enter_pw.js") or
+   "alert(\"JS of search_login not found\");"
 
--- TODO Would be handy to have this as util/common.
+-- TODO Would be handy to have this as util/common. (TODO it is?..)
 local function domain_of_uri(uri) return string.lower(lousy.uri.parse(uri).host) end
+
 function figure_account(domain)
    local exit, stdout, stderr = luakit.spawn_sync(pass_call("ls " .. domain));
    if exit ~= 0 then return nil end 
@@ -64,7 +60,8 @@ function search_login(w, account, seek_form, fill_user_form)
    end
    
    if not account then  -- If account not pre-given, use first in pass.
-      account = account_default[domain] or figure_account(pass_pre_domain .. domain)
+      account = (config.account_default or {})[domain] or 
+         figure_account(pass_pre_domain .. domain)
       if not account then
          return say(w, "Cant find account for", pass_pre_domain .. domain)
       end
@@ -108,8 +105,8 @@ add_cmds({cmd("search_login", "Searches for password and way to login, tries to 
 add_cmds({cmd("login", "Searches for password and way to login, tries to fill in.",
               search_login)})
 
-if buf_bind then
+if config.buf_bind then
    add_binds("normal", -- TODO magically disappearing function?
-             { buf(buf_bind, "Try the auto-login", function(w) search_login(w) end) })
+             { buf(config.buf_bind, "Try the auto-login", function(w) search_login(w) end) })
 end
 
