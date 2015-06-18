@@ -15,5 +15,9 @@ local function str_tab(tab, prep)
    return ret
 end
 
+print("r")
 print(str_tab(tab.cnts))
 print(str_tab(tab.vals))
+
+tab.mode = "enforce"
+tab:require("alt_require.test.reqme")

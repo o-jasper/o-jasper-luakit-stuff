@@ -110,6 +110,7 @@ function This:enforced_indexat(from, cnts)
 end
 
 function This:enforced_meta(file)
+   assert(self.cnts, "Nothing to allow in enforcing.")
    local cnts = self.cnts[file]
    if not cnts then error("disallowed require %q", file) end
 
@@ -119,9 +120,15 @@ function This:enforced_meta(file)
    }
 end
 
-function This:enforced_require_fun(file)
-   return self.require_fun(self.enforced_meta)
+function This:enforced_envfun(file)
+   return setmetatable({}, self:enforced_meta(file))
 end
+
+function This:enforced_require_fun(file)
+   return SimpleBase.require_fun(self, self.enforced_envfun)
+end
+
+This.record_require_fun = SimpleBase.require_fun
 
 function This:require_fun(file, mode)
    local mode = self.mode or more
@@ -158,52 +165,7 @@ end
 -- TODO dubious mess..
 -- Poke at a thing as if it is being touched. 
 function This:poke(file, location, way)
-   local final_lo
-   way = way or {}
-   local cnts, vals = self:_ensure_tablestarts(file)
-   local got = self:require(file)
-   local i = 1
-   while i < #location -1 do
-      local k = location[i]
-      if type(got) == "table" then
-         got = got[k]
-         local next_cnts, next_vals = cnts[k] or {}, vals[k] == nil and {} or vals[k]
-         cnts[k] = next_cnts
-         vals[k] = next_vals
-      else
-         return "nothing to reach"  -- Failure, cant go deeper.
-      end
-      i = i + 1
-   end
-   local k = location[i]
-   vals[k] = vals[k] == nil and {} or vals[k]
-   if getmetatable(got[k]) and way.w_meta and way.w_meta == "disallow" then
-      return "disallow metatables"
-   end
-   if type(got[k]) == "table" then  -- TODO Hrmm..
-      if vals[k] and type(vals[k]) ~= "table" then
-         return "incompatible to set as table"
-      end
-      if way.table == "disallow" then 
-         return "disallow tables"
-      elseif way.table == "via pairs" then
-         vals[k] = vals[k] or {}
-         for k2,v in pairs(got[k]) do
-            vals[k][k2] = v
-         end
-      elseif way.table == "set, no meta" then
-         if getmetatable(vals[k])  then return "disallow meta" end
-         vals[k] = got[k]
-      elseif way.table == nil or way.table == "set" then
-         vals[k] = got[k]
-      else
-         error("Dont know what to do with %s for `way.table`", way.table)
-         return "fail"
-      end
-   else
-      vals[k] = got[k]
-   end
-   return "success"
+   -- self:info_at_spot(file, location)
 end
 
 return c.metatable_of(This)
