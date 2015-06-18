@@ -75,6 +75,10 @@ This.tab_repl = {
       end,
    },
    
+   table = function(self)
+      return c.html.table(self.e)
+   end,
+
    default = function(self, _, key)
       local got = self.e[key]
       if got then  -- Gsub does not do zero-length output.

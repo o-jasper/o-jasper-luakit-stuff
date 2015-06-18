@@ -49,3 +49,10 @@ are stored at `paged_chrome_dict[]`, you can add more afterward.
 ## TODO
 
 * Make the template-based one usable as a server. (ajax-like bindings)
+
+* Perhaps being able to make one page with a lot of embedded other pages
+  could be nice.
+  
+  Perhaps some kind of frame thing. Certainly getting everything to work past
+  each other(js bindings, js,css definitions, ids..)
+  would be tricky and complex.

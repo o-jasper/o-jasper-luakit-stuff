@@ -9,8 +9,8 @@ local function dont_index(_, _)
 end
 
 function Public.copy_meta(of, mod)
+   assert(of, "Nothing to copy")
    assert(not mod, "Dont do mod anymore, makes sub-tables too messy.")
-
    local oldindex = of.__index  -- TODO not handy.
    of.__index = nil
    local ret = copy_table(of)
