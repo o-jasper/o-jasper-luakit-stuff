@@ -19,7 +19,7 @@ local This = {
    cmd_dict = {  -- TODO make these automatically function-able.
       selectid = "SELECT {%idname} FROM {%table_name} WHERE {%idname} == ?",
       get_id   = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
-      delete_entry_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
+      delete_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
 
       enter = function(self)
          return string.format("INSERT INTO %s VALUES (%s)",
@@ -41,34 +41,45 @@ local This = {
 
 -- Intended as replacable ("virtual") or just change self.entry_meta
 function This:entry_fun(self, data)
-   assert(type(data) == "table")
-   data.origin = self
-   setmetatable(data, self.entry_meta)  -- self.entry_meta == nil is fine.
-   return data
+   if data then
+      assert(type(data) == "table")
+      data.origin = self
+      setmetatable(data, self.entry_meta)  -- self.entry_meta == nil is fine.
+      return data
+   end
 end
 function This:list_fun(self, list)
-   for _, data in pairs(list) do
-      self:entry_fun(data)
-   end
+   for _, data in pairs(list) do self:entry_fun(data) end
    return list
 end
 
-This.classhelp = {
-   sqlcmd_to_method = function(Into, name, is_entries)
-      if is_entries then
-         Into[name] = function(self, ...)
-            return self:entry_fun((self:sql_cmd(name):exec{...} or {})[1])
+This.classhelp = {}
+
+This.classhelp.sqlcmd = {
+   to_method_no_return = function(name)
+      return function(self, ...) 
+         self:sql_cmd(name):exec{...}
+      end
+   end,
+   to_method = function(name, dont_assert)
+      return function(self, ...)
+         local got = self:sql_cmd(name):exec{...} or {}
+         assert( dont_assert or #got < 2 )
+         return self:entry_fun(got[1])
+      end
+   end,
+   to_method_list = function(name)
+      return function(self, ...) 
+         return self:list_fun(self:sql_cmd(name):exec{...} or {})
+      end
+   end,
+   to_method_list_col = function(name, col)
+      return function(self, ...) 
+         local ret, got = {}, self:list_fun(self:sql_cmd(name):exec{...} or {})
+         for _, el in pairs(got) do
+            table.insert(ret, el[col])
          end
-         Into["list_" .. name] = function(self, ...)
-            return self:list_fun(self:sql_cmd(name):exec{...} or {})
-         end
-      else
-         Into[name] = function(self, ...)
-            return (self:sql_cmd(name):exec{...} or {})[1]
-         end
-         Into["list_" .. name] = function(self, ...)
-            return self:sql_cmd(name):exec{...} or {}
-         end         
+         return ret
       end
    end,
 }
@@ -137,20 +148,8 @@ function This:force_update(entry)
 end
 
 -- Delete an entry.
-function This:delete_id(id)
-   self:sqlcmd("delete_entry_id"):exec({id})
-   
-   if self.values.taggings then
-      self:sqlcmd("delete_tags_id"):exec({id})
-   end
-end
-
-function This:get_id(id)
-   local got = self:sqlcmd("get_id"):exec({id})[1]
-   if got then
-      return self:entry_fun(got)
-   end
-end
+This.delete_id = This.classhelp.sqlcmd.to_method_no_return("delete_id")
+This.delete_id = This.classhelp.sqlcmd.to_method("get_id")
 
 local c = require "o_jasper_common"
 

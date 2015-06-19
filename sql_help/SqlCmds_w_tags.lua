@@ -44,19 +44,14 @@ function This:enter(entry)
    return ret
 end
 
-function This:just_tags(id)
-   -- Get the tags.
-   local tags = {}
-   for _, el in pairs(self:sqlcmd("just_tags"):exec({id})) do
-      table.insert(tags, el.tag)
+function This:delete_id(id)
+   SqlCmds.delete_id(id)
+   if self.values.taggings then
+      self:sqlcmd("delete_tags_id"):exec({id})
    end
-   return tags      
 end
 
-function This:has_tag(id, tagname)
-   local got = self:sqlcmd("has_tag"):exec({id, tagname})
-   assert(not got or #got < 2)  -- Otherwise.. i dunno.
-   return #got == 1
-end
+This.just_tags = SqlCmds.classhelp.sqlcmd.to_method_list_col("just_tags", "tag")
+This.has_tag   = SqlCmds.classhelp.sqlcmd.to_method("has_tag")
 
 return c.metatable_of(This)
