@@ -149,21 +149,6 @@ local SqlHelp = {
          end
       }
    },
-   
-   -- Intended as replacable ("virtual")
-   entry_fun = function(self, data)
-      assert(type(data) == "table")
-      data.origin = self
-      setmetatable(data, self.entry_meta)
-      return data
-   end,
-   list_fun = function(self, list)
-      for _, data in pairs(list) do
-         self:entry_fun(data)
-      end
-      return list
-   end,
-   
    -- Important: gotta be a _new_ one!
    -- Note: use this is you want to "build" a search.
    -- Otherwise the state is hanging around. (you can use it just the same)
@@ -424,7 +409,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
 
 local c = require("o_jasper_common")
 
-local This = c.copy_meta(require "sql_help.SqlCmds")
+local This = c.copy_meta(require "sql_help.SqlCmds_w_tags")
 
 for k, v in pairs(SqlHelp) do This[k] = v end
 

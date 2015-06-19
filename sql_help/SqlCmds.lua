@@ -5,7 +5,6 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
-
 local function qmarks(n)  -- Makes a string with a number of question marks in it.
    if n == 0 then return "" end
    local str = "?"
@@ -16,9 +15,8 @@ local function qmarks(n)  -- Makes a string with a number of question marks in i
    return str
 end
 
-
 local This = {
-   cmd_dict = {
+   cmd_dict = {  -- TODO make these automatically function-able.
       selectid = "SELECT {%idname} FROM {%table_name} WHERE {%idname} == ?",
       get_id   = "SELECT * FROM {%table_name} WHERE {%idname} == ?",
       delete_entry_id = "DELETE FROM {%table_name} WHERE {%idname} == ?",
@@ -37,29 +35,61 @@ local This = {
                               table.concat(changer, ", "),
                               self.values.idname)
       end,
-
-      -- Tag stuff, less likely to apply for the user, but here anyway.
-      just_tags = "SELECT tag FROM {%taggings} WHERE to_id == ?",
-      has_tag   = "SELECT tag FROM {%taggings} WHERE to_id == ? AND {%tagname} == ?",
-
-      tags_insert     = "INSERT INTO {%taggings} VALUES (?, ?);",
-      delete_tags_id  = "DELETE FROM {%taggings} WHERE to_{%idname} == ?",
    },
    sql_compiled = {}
 }
-   
+
+-- Intended as replacable ("virtual") or just change self.entry_meta
+function This:entry_fun(self, data)
+   assert(type(data) == "table")
+   data.origin = self
+   setmetatable(data, self.entry_meta)  -- self.entry_meta == nil is fine.
+   return data
+end
+function This:list_fun(self, list)
+   for _, data in pairs(list) do
+      self:entry_fun(data)
+   end
+   return list
+end
+
+This.classhelp = {
+   sqlcmd_to_method = function(Into, name, is_entries)
+      if is_entries then
+         Into[name] = function(self, ...)
+            return self:entry_fun((self:sql_cmd(name):exec{...} or {})[1])
+         end
+         Into["list_" .. name] = function(self, ...)
+            return self:list_fun(self:sql_cmd(name):exec{...} or {})
+         end
+      else
+         Into[name] = function(self, ...)
+            return (self:sql_cmd(name):exec{...} or {})[1]
+         end
+         Into["list_" .. name] = function(self, ...)
+            return self:sql_cmd(name):exec{...} or {}
+         end         
+      end
+   end,
+}
+
+-- Gets/makes a command,
+-- Compiles into the metatable. That assumes the same `self.db`, 
+-- and consistent `cmd_dicts`.
 function This:sqlcmd(what)
    local got = self.sql_compiled[what]
-   if got then return got end
-   local maybefun = self.cmd_dict[what]
-   if type(maybefun) == "string" then
-      got = string.gsub(maybefun, "{%%([_./%w]+)}", self.values)
-   else
-      got = maybefun(self)
+   if not got then
+      local maybefun = self.cmd_dict[what]
+      if type(maybefun) == "string" then
+         got = string.gsub(maybefun, "{%%([_./%w]+)}", self.values)
+      else
+         got = maybefun(self)
+      end
+      got = self.db:compile(got)
+      -- *If* `sql_compiled` not set, actually sets the metatable.
+      self.sql_compiled[what] = got
    end
-   got = self.db:compile(got)
-      getmetatable(self).__index.sql_compiled[what] = got
-      return got
+   return got
 end
 
 local cur_time = require "o_jasper_common.cur_time"
@@ -78,17 +108,7 @@ function This:enter(entry)
       entry.id = self.cur_id
    end
    
-   local ret = { add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
-   -- And all the tags, if we do those.
-   if entry.tags and #entry.tags > 0 and self.values.taggings then
-      self.tags_last = cur_time.raw()  -- Note time last changed.
-      local tags_insert = self:sqlcmd("tags_insert")
-      ret.tags = {}
-      for _, tag in pairs(entry.tags) do
-         table.insert(ret.tags, tags_insert:exec({entry[self.values.idname], tag}))
-      end
-   end
-   return ret
+   return { add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
 end
 -- Modify an entry.
 function This:update(entry)
@@ -132,21 +152,6 @@ function This:get_id(id)
    end
 end
 
-function This:just_tags(id)
-   -- Get the tags.
-   local tags = {}
-   for _, el in pairs(self:sqlcmd("just_tags"):exec({id})) do
-      table.insert(tags, el.tag)
-   end
-   return tags      
-end
-
-function This:has_tag(id, tagname)
-   local got = self:sqlcmd("has_tag"):exec({id, tagname})
-   assert(not got or #got < 2)  -- Otherwise.. i dunno.
-   return #got == 1
-end
-
-local c = require("o_jasper_common")
+local c = require "o_jasper_common"
 
 return c.metatable_of(This)
