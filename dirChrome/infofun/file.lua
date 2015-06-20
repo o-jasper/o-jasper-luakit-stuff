@@ -11,8 +11,10 @@ local lfs = require "lfs"
 local This = c.copy_meta(require "dirChrome.infofun.show_1")
 
 function This.maybe_new(creator, entry)
+   local e = lfs.attributes(entry.file)
+   for k, v in pairs(entry) do e[k] = v end
    if not string.match(entry.file, "^[.]#.+") then
-      return setmetatable({ from_dir=creator.from_dir, e=entry }, This)
+      return setmetatable({ from_dir=creator.from_dir, e=e }, This)
    end
 end
 

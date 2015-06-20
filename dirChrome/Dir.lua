@@ -96,7 +96,8 @@ This.searchinfo.matchable = {
    "sizelt:", "sizegt:",
    "before:", "after:",
    "access_before:", "access_after:",
-   "limit:"
+   "limit:",
+   "order:", "sort:", "orderby:",
 }  -- TODO need the functions.
 
 local mod_match_funs = {
@@ -116,6 +117,7 @@ local mod_match_funs = {
    end,
 }
 
+-- Adds collumn-specific searches.
 for _, el in pairs{"mode", "dir", "file"} do
    for _, kind in pairs{"=", "like:", ":"} do
       mod_match_funs[el .. kind] = This.searchinfo.match_funs["uri" .. kind]
