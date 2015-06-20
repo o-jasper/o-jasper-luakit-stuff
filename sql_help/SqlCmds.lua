@@ -40,7 +40,7 @@ local This = {
 }
 
 -- Intended as replacable ("virtual") or just change self.entry_meta
-function This:entry_fun(self, data)
+function This:entry_fun(data)
    if data then
       assert(type(data) == "table")
       data.origin = self
@@ -48,7 +48,8 @@ function This:entry_fun(self, data)
       return data
    end
 end
-function This:list_fun(self, list)
+function This:list_fun(list)
+   assert(type(list) == "table")
    for _, data in pairs(list) do self:entry_fun(data) end
    return list
 end
@@ -58,24 +59,31 @@ This.classhelp = {}
 This.classhelp.sqlcmd = {
    to_method_no_return = function(name)
       return function(self, ...) 
-         self:sql_cmd(name):exec{...}
+         self:sqlcmd(name):exec{...}
       end
    end,
    to_method = function(name, dont_assert)
       return function(self, ...)
-         local got = self:sql_cmd(name):exec{...} or {}
+         local got = self:sqlcmd(name):exec{...} or {}
+         assert( dont_assert or #got < 2 )
+         return got[1]
+      end
+   end,
+   to_method_el = function(name, dont_assert)
+      return function(self, ...)
+         local got = self:sqlcmd(name):exec{...} or {}
          assert( dont_assert or #got < 2 )
          return self:entry_fun(got[1])
       end
    end,
    to_method_list = function(name)
       return function(self, ...) 
-         return self:list_fun(self:sql_cmd(name):exec{...} or {})
+         return self:list_fun(self:sqlcmd(name):exec{...} or {})
       end
    end,
    to_method_list_col = function(name, col)
       return function(self, ...) 
-         local ret, got = {}, self:list_fun(self:sql_cmd(name):exec{...} or {})
+         local ret, got = {}, self:list_fun(self:sqlcmd(name):exec{...} or {})
          for _, el in pairs(got) do
             table.insert(ret, el[col])
          end
@@ -119,7 +127,7 @@ function This:enter(entry)
       entry.id = self.cur_id
    end
    
-   return { add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
+   return { id = entry.id, add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
 end
 -- Modify an entry.
 function This:update(entry)
@@ -149,7 +157,7 @@ end
 
 -- Delete an entry.
 This.delete_id = This.classhelp.sqlcmd.to_method_no_return("delete_id")
-This.delete_id = This.classhelp.sqlcmd.to_method("get_id")
+This.get_id = This.classhelp.sqlcmd.to_method_el("get_id")
 
 local c = require "o_jasper_common"
 
