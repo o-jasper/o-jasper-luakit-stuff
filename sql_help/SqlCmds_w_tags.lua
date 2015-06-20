@@ -45,7 +45,7 @@ function This:enter(entry)
 end
 
 function This:delete_id(id)
-   SqlCmds.delete_id(id)
+   SqlCmds.delete_id(self, id)
    if self.values.taggings then
       self:sqlcmd("delete_tags_id"):exec({id})
    end

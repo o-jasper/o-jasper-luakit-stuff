@@ -401,7 +401,7 @@ WHERE to_id == m.id]], w or "", taggingsname or self.values.taggings)
       db = db or self.db
       local list = self:raw_result(self, db)
       for _, entry in pairs(list) do -- Then delete all of them.
-         self:delete_id(self, entry[self.values.idname], table_name)
+         self:delete_id(entry[self.values.idname])
       end
       return list
    end,
