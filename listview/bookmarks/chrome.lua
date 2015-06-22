@@ -37,7 +37,7 @@ local Enter = require "listview.bookmarks.Enter"
 local BookmarksSearch = require "listview.bookmarks.BookmarksSearch"
 
 local function mk_page(meta, name)
-   return paged_chrome.templated_page(meta.new{bookmarks, "*listview/bookmarks"}, name)
+   return meta.new{name, bookmarks, "*listview/bookmarks"}
 end
 
 local bookmarks_paged = {
@@ -48,13 +48,13 @@ local bookmarks_paged = {
    aboutChrome = mk_page(listview.AboutChrome, "aboutChrome"),
 }
 
-paged_chrome.paged_chrome("listviewBookmarks", bookmarks_paged)
+paged_chrome.chrome("listviewBookmarks", bookmarks_paged)
 
 local take = config.take or {}
 if take.all then take = setmetatable({}, {__index=function(...) return true end}) end
 
 if take.bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
-   paged_chrome.paged_chrome("bookmarks", bookmarks_paged)
+   paged_chrome.chrome("bookmarks", bookmarks_paged)
 end
 
 -- Add bindings.

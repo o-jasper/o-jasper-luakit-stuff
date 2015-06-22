@@ -9,7 +9,6 @@ local config = globals.listview_bookmarks or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
-local entry_html = require "listview.entry_html"
 
 local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 

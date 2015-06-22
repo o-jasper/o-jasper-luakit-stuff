@@ -20,20 +20,18 @@ local function chrome_describe()
    return {
       default_name = "search",
       search = function(args)
-         local search =  DirSearch.new{figure_Dir(args), where}
-         return paged_chrome.templated_page(search, "search")
+         return DirSearch.new{"search", figure_Dir(args), where}
       end,
       aboutChrome = function(args)
          -- NOTE: inefficient, it mostly doesnt care about the result of dir_fun.
-         local page = AboutChrome.new{figure_Dir(args), where}
-         return paged_chrome.templated_page(page, "aboutChrome")
+         return AboutChrome.new{"aboutChrome", figure_Dir(args), where}
       end,
    }
 end
 
 -- Make the chrome page.
 local dir_paged = chrome_describe()
-paged_chrome.paged_chrome("dirChrome", dir_paged)
+paged_chrome.chrome("dirChrome", dir_paged)
 
 -- Grabbing another `luakit://` name.
 local config = globals.dirChrome or {}

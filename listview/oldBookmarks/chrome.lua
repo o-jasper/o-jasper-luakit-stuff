@@ -21,15 +21,13 @@ local function chrome_describe(log)
    local where = config.assets or {}
    table.insert(where, "*listview/oldBookmarks")
 
-   local search = setmetatable({log=log, where=where},
+   local search = setmetatable({name = "search", log=log, where=where},
       require "listview.oldBookmarks.OldBookmarksSearch")
 
    local pages = {
       default_name = default_name or "search",
-      search = paged_chrome.templated_page(search, "search"),
-      aboutChrome = paged_chrome.templated_page(
-         listview.AboutChrome.new{log, where},
-         "aboutChrome"),
+      search = search,
+      aboutChrome = listview.AboutChrome.new{"aboutChrome", log, where},
    }
    pages.search.limit_cnt = config.page.cnt or 20
    pages.search.limit_step = config.page.step or pages.search.step_cnt
@@ -38,5 +36,5 @@ end
 
 -- Make the chrome page.
 local paged = chrome_describe(old_bookmarks)
-assert(paged.search.page.log.initial_state)
-paged_chrome.paged_chrome("listviewOldBookmarks", paged)
+assert(paged.search.log.initial_state)
+paged_chrome.chrome("listviewOldBookmarks", paged)
