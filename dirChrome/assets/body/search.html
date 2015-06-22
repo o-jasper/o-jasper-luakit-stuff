@@ -1,0 +1,25 @@
+{%before}
+
+<div id="list_area">
+  <span id="list"></span>
+  <span id="list_subsequent"></span>
+</div>
+
+<div id="side_panel">
+  {%parts/searchbuttons.html}
+</div>
+
+<div id="top_panel">
+  <h3>Directory <span class="cur_dir">{%cur_dir}</span></h3>
+  {%parts/search.html}
+  {%parts/addsearch.html}
+</div>
+
+<div id="right_panel">
+  <span id="infofuns_select"></span>
+  {%infofuns_immediate}
+</div>
+
+<p hidden="true" class="minor">search_cnt: <span id="search_cnt">1</span></p>
+
+{%after}
