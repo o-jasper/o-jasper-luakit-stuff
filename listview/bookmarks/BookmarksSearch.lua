@@ -1,4 +1,3 @@
-
 local c = require "o_jasper_common"
 local listview = require "listview"
 
@@ -15,8 +14,8 @@ This.to_js = c.copy_table(This.to_js, require("listview.bookmarks.Enter").to_js)
 
 local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 
-function This:repl_list(args, view, meta)
-   local got = listview.Search.repl_list(self, args, view, meta)
+function This:repl(args, view, meta)
+   local got = listview.Search.repl(self, args, view, meta)
    
    got.above_title = self:asset("parts/enter_span.html")
    got.right_of_title = [[&nbsp;&nbsp;

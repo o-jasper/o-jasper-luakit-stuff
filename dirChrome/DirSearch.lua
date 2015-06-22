@@ -2,7 +2,7 @@ local config = globals.dirChrome or globals.listview or {}
 
 local c = require "o_jasper_common"
 
-local Search = require("listview.Search")
+local Search = require "listview.Search"
 
 local This = c.copy_meta(Search)
 This.__name = "dirChrome.DirSearch"
@@ -26,9 +26,9 @@ function This.to_js:html_of_id()
    end
 end
 
-function This:repl_list(args)
+function This:repl(args)
    self.log:update_whole_directory()  -- Ensure in the sql table.
-   local ret = Search.repl_list(self, args)
+   local ret = Search.repl(self, args)
    ret.cur_dir = self.log.path
    -- TODO better..
    ret.initial_query = "dir=" .. self.log.path

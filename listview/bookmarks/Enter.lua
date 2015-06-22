@@ -20,9 +20,9 @@ end
 
 local default_data_uri = config.default_data_uri or default_data_uri_fun
 
-local this = c.copy_meta(require "listview.Base")
+local This = c.copy_meta(require "listview.Base")
 
-this.to_js = {
+This.to_js = {
    manual_enter = function(self)
       return function(inp)
          if not inp.data_uri or inp.data_uri == "" then
@@ -45,10 +45,10 @@ this.to_js = {
 
 local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 
-function this:repl_list(args)
+function This:repl(args)
    local ret = { title = "Add bookmark", }
    plus_cmd_add(ret, self.log)
    return ret
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)

@@ -5,7 +5,7 @@ local html = c.html
 
 local lfs = require "lfs"
 
-local This = {}
+local This = c.copy_meta(require "paged_chrome.Suggest")
 
 function This.maybe_new(_, entry)
    return setmetatable({ e=entry }, This)
@@ -46,11 +46,11 @@ This.tab_repl = {
    end,
    
    resay_time = function(self, state)
-      return html.resay_time(state, self.e:ms_t(), (state.config.resay or {}).long)
+      return html.resay_time(state, self.e:ms_t(), (state.conf.resay or {}).long)
    end,
    
    short_resay_time = function(self, state)
-      local config = (state.config.resay or {}).short or {
+      local config = (state.conf.resay or {}).short or {
          {"year", "Year {%year}"},
          {"yday", "{%month}/{%day} {%short_dayname}"},
          init = " ", nochange = " ", }
@@ -84,7 +84,7 @@ This.tab_repl = {
       if got then  -- Gsub does not do zero-length output.
          return got == "" and " " or got
       else
-         return string.match(key, "^[/_.%w]+$") and self.asset_fun(key)
+         return string.match(key, "^[/_.%w]+$") and self:asset(key)
       end
    end,
 }
@@ -115,17 +115,14 @@ This.tab_pat = {
    end,
 }
 
-function This:repl(state, asset_fun)
+function This:repl(state)
    return c.repl(self, state, {}, self.tab_repl, self.tab_pat)
 end
 
+-- TODO.. make paged_chrome.suggest do it.
 This.asset_file = "parts/show_1.html"
-function This:repl_pattern(asset_fun) return asset_fun(self.asset_file) end
-
-function This:html(state, asset_fun)
-   state.config = state.config or {}
-   self.asset_fun = asset_fun
-   return c.apply_subst(self:repl_pattern(asset_fun), self:repl(state, asset_fun))
+function This:repl_pattern(state)
+   return state.asset_fun(self.asset_file)
 end
 
 return c.metatable_of(This)
