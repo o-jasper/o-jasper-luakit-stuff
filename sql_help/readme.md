@@ -29,14 +29,16 @@ Here:
 
 So do:
 
-    mod_YourEntry = { values={...your values...} }
-    YourEntry = c.metatable_of(c.copy_meta(sql_help.SqlEntry, mod_YourEntry))
+    YourEntry = c.copy_meta(sql_help.SqlEntry)
+    ... add your stuff ... 
+    YourEntry = c.metatable_of(YourEntry)
     
-    mod_YourHelp = { values=mod_YourEntry.values, entry_meta=YourEntry }  -- happens to be good.
-    YourHelp = c.metatable_of(c.copy_meta(sql_help.SqlHelp, mod_YourHelp))
+    YourHelp = c.copy_meta(sql_help.SqlHelp)
+    YourHelp.values = YourEntry.values
+    ... add your stuff ...
+    YourHelp = c.metatable_of(mod_YourHelp)
     
 Basically this is just some class derivation, where you change some values.
-The `mod_` tables could add methods to the 'class' aswel.
 
 Setting `entry_meta` in the latter is so the correct entry is given to the return
 values. Alternatively you can change `entry_fun(self, data)` instead.
@@ -52,25 +54,25 @@ the metatable instead.
 
 The object is *stateful*; basically, for a query, you make a copy;
 (of course, here the metatable is not copied)
-`copy = helper:new_SqlHelp()` then put in information in about the search
-you want to do, and then at the end use `copy:result()` to get the resulting list.
-(with entry metatables, `copy:raw_result()` for without) Or `help:sql_code()` to
+`h = helper:new_SqlHelp()` then put in information in about the search
+you want to do, and then at the end use `h:result()` to get the resulting list.
+(with entry metatables, `h:raw_result()` for without) Or `help:sql_code()` to
 get the SQL code for it, or `help:sql_pattern()` to get the pattern 
 *with values not filled in*.
 
-The main useful function is the search; `copy:search(search_string)`, where
+The main useful function is the search; `h:search(search_string)`, where
 `search_string` based on a user-facing-like search string.
 
 There are other functions that `search` will use, but can be used directly,
-like `copy:tags(list_of_tags)`, `copy:not_tags(list_of_tags)` or
-less then; `copy:lt(column, value)`, `gt` greater then, `:after(time)`,
+like `h:tags(list_of_tags)`, `h:not_tags(list_of_tags)` or
+less then; `h:lt(column, value)`, `gt` greater then, `:after(time)`,
 `:before(time)`, `like(string, column)`, `not_like(string, column)`,
 `:text_like(search, negate)`
 
-And there are other things to do, for instance with `copy:order_by(what, way)`, you can
+And there are other things to do, for instance with `h:order_by(what, way)`, you can
 add ordering. (`way` defaultly descending, `"ASC"` will make that ascending)
 
-`copy:limit(from, count)` sets limitations.
+`h:limit(from, count)` sets limitations.
 
 #### Search customization
 `.searchinfo.matchable` controls what it looks for, and in what order,
@@ -90,6 +92,11 @@ There is also some stuff to `helper:enter(entry)`
 these will also do tags, `entry.tags` being expected to be a list of them.
 
 Aswel as `helper:delete_id(id)`, `helper:get_id(id)`.
+
+There is the info-function facility. Basically, having a function put
+indicate importants of information it is giving, and sorting it.
+Listview later-on uses added `paged_chrome` functions to write html
+based on that too.
 
 #### Note
 Rthe `metatable_of` and `copy_meta` are for future ability to make sure
