@@ -88,8 +88,9 @@ function This:js_listupdate(list, as_msg)
 end
 
 function This:list_to_html(list, state)
+   state.asset_fun = self:asset_fun()
    local html = "<table>"
-   for _, info in pairs(list) do html = html .. info:html(state, self:asset_fun()) end
+   for _, info in pairs(list) do html = html .. info:html(state) end
    return html .. "</table>"
 end
 
