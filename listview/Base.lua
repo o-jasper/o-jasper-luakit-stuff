@@ -14,7 +14,7 @@ local ensure = require("o_jasper_common.ensure")
 local mod = {
    __name = "listview.Base",
 
-   new_remap = {"log", "append_where"},
+   new_remap = {"name", "log", "append_where"},
    new_prep = { append_where = ensure.table },
    new_assert_types = {log="table", append_where="table"},
    

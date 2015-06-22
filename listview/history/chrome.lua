@@ -12,12 +12,12 @@ local paged_chrome = require("paged_chrome")
 
 -- Make the chrome page.
 local history_paged = listview.new_Chrome(history, "*listview/history")
-paged_chrome.paged_chrome("listviewHistory", history_paged)
+paged_chrome.chrome("listviewHistory", history_paged)
 
 local config = (globals.listview or {}).history or {}
 
 if config.take_history_chrome then  -- Take over the 'plain name'. (default:no)
-   paged_chrome.paged_chrome("history", history_paged)
+   paged_chrome.chrome("history", history_paged)
 end
 
 -- Add bindings.

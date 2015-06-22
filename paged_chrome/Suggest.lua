@@ -20,11 +20,11 @@ return {
          pat = self.repl_pattern
       else         
          pat = asset(self.where,
-                     (not state.conf.whole and "body" .. "/" or "") .. self.name .. ".html")
+                     (not state.whole and "body" .. "/" or "") .. self.name .. ".html")
       end
 
       local repl = self:repl(state)
-      local asset_fun = state.conf.asset_fun or self.asset_fun and self:asset_fun()
+      local asset_fun = state.asset_fun or self.asset_fun and self:asset_fun()
       if asset_fun then
          local function index(_, key) return repl[key] or asset_fun(key) end
          return apply_subst(pat, setmetatable({}, {__index = index}))
@@ -38,7 +38,7 @@ return {
    end,
 
    on_first_visual = function(self, args)
-      for name, fun in pairs(self.to_js or {}) do
+     for name, fun in pairs(self.to_js or {}) do
          args.view:register_function(name, fun(self, name))
       end
    end,
