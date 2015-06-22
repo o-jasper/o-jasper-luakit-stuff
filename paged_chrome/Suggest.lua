@@ -19,7 +19,8 @@ return {
       elseif type(self.repl_pattern) == "string" then
          pat = self.repl_pattern
       else         
-         pat = asset(self.where, (not state.conf.whole and "body" .. "/" or "") .. self.name)
+         pat = asset(self.where,
+                     (not state.conf.whole and "body" .. "/" or "") .. self.name .. ".html")
       end
 
       local repl = self:repl(state)
