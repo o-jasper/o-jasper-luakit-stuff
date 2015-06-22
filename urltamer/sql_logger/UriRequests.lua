@@ -41,8 +41,6 @@ end
 
 function this:config() return config end
 
-local entry_html = require "listview.entry_html"
-
 local fancy_uri = require("o_jasper_common.html.uri").fancy_uri
 
 -- TODO replace with new approach..

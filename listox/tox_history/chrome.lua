@@ -16,7 +16,7 @@ local function chrome_describe(log)
 end
 
 -- Make the chrome page.
-paged_chrome.paged_chrome("listoxHistory", chrome_describe(log))
+paged_chrome.chrome("listoxHistory", chrome_describe(log))
 
 -- Add bindings.
 local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key

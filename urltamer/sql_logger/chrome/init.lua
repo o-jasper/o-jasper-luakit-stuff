@@ -13,13 +13,12 @@ local function chrome_describe(log)
    local where = {"urltamer/sql_logger/chrome", "listview"}
    return {
       default_name = "search",
-      search      = paged_chrome.templated_page(UriRequestsSearch.new{log, where}, "search"),
-      aboutChrome = paged_chrome.templated_page(listview.AboutChrome.new{log, where},
-                                                "aboutChrome"),
+      search      = UriRequestsSearch.new{"search", log, where},
+      aboutChrome = listview.AboutChrome.new{"aboutChrome", log, where},
    }
 end
 
-paged_chrome.paged_chrome("listviewURLs", chrome_describe(sql_logger))
+paged_chrome.chrome("listviewURLs", chrome_describe(sql_logger))
 
 -- Add bindings.
 local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
