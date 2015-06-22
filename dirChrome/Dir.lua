@@ -56,11 +56,11 @@ function This:entry_from_file(file, path)
    end
 end
 
-function This:update_file(file)
+function This:update_file(file)  -- NOTE is this right..?
    local entry = self:entry_from_file(file)
    if entry then
       self:update_or_enter(entry)
-      return This:entry_fun(entry)
+      return self:entry_fun(entry)
    end
 end
 
