@@ -2,7 +2,7 @@ local c = require("o_jasper_common")
 
 local this = c.copy_meta(require "listview.Base")
 
-function this:repl_list(args)
+function this:repl(args)
    return setmetatable(
       {   title = string.format("%s:%s", self.chrome_name, self.name),
       },
