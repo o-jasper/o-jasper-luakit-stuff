@@ -6,13 +6,12 @@
 --  (at your option) any later version.
 
 local c = require("o_jasper_common")
-local asset = require("paged_chrome").asset
 
 local config = globals.listview or {}
 local ensure = require("o_jasper_common.ensure")
 
 -- Base metatable of templated html page.
-local This = {
+local mod = {
    __name = "listview.Base",
 
    new_remap = {"log", "append_where"},
@@ -21,6 +20,9 @@ local This = {
    
    repl_pattern = false, to_js = {},
 }
+
+local This = c.copy_meta(require "paged_chrome.Suggest")
+for k,v in pairs(mod) do This[k] = v end
 
 function This:config() return config end
 
@@ -34,22 +36,6 @@ function This:init()
       end
       self.append_where = nil
    end
-end
-
-function This:asset(file)
-   return asset(self.where, file)
-end
-
-function This:asset_fun()
-   return function(file) return self:asset(file) end
-end
-
-function This:repl_list_suggest(args)
-   return { title = string.format("%s:%s", self.chrome_name, self.name) }
-end
-function This:repl_list(args)
-   error([[Thou shalt not use the base repl list.
-`repl_list_suggest` for some suggestions, like title]])
 end
 
 return c.metatable_of(This)

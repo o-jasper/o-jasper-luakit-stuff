@@ -9,29 +9,6 @@
     <script type="text/javascript">{%js/search.js}</script>
 </head>
 <body>
-
-<!-- TODO "Enter" should submit them -->
-
-{%before}
-
-<div id="list_area">
-  <span id="list"></span>
-  <span id="list_subsequent"></span>
-</div>
-
-<div id="side_panel">
-  {%parts/searchbuttons.html}
-  {%parts/actions.html}
-</div>
-
-<div id="top_panel">
-  {%parts/search.html}
-  {%parts/addsearch.html}
-</div>
-
-<p hidden="true" class="minor">search_cnt: <span id="search_cnt">1</span></p>
-
-<script type="text/javascript">{%js/search_init.js}</script>
-{%after}
+{%body/search.html}
 </body>
 </html>
