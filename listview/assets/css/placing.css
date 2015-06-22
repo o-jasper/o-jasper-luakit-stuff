@@ -22,4 +22,21 @@
     position:absolute;
     left:6.6em;
     top:6em;
+    width:40%
+}
+#right_panel {
+/*    float:right; */
+    position:absolute;
+
+    width:40%;
+    left:50%; 
+}
+
+#infofuns_select_area {
+    position:absolute;
+    background-color:white;  /* Otherwise you see straight through */
+
+    padding:0.5em;
+    border-style:solid;
+    border-width:2px;    
 }

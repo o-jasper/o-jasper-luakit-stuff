@@ -1,3 +1,7 @@
+// TODO
+// * Move this to listview
+// * Make it change the sizes of things as needed.
+
 function set_main_sel(to) {
     if(to) {
         var html = html_of_id(to);
