@@ -26,7 +26,7 @@ function This.to_js:html_of_id()
       return html and #html > 0 and html  -- Makes sense.
    end
 end
---
+
 function This:js_listupdate(list, as_msg)
    local ret = BaseSearch.js_listupdate(self, list, as_msg)
 
@@ -42,13 +42,5 @@ function This:js_listupdate(list, as_msg)
    end      
    return ret
 end
-
---      if entry then
---         local list  =infofun_lib.entry_thresh_priority(self, entry, self:side_infofun(), 0)
---         infofun_lib.priority_sort(list, self:config().priority_override)
---         for _, el in pairs(list) do
---            table.insert(self.info_from_dir_list, el)
---         end
---      end
 
 return c.metatable_of(This)
