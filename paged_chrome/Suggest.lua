@@ -7,15 +7,29 @@ return {
 
    asset = function(self, file) return asset(self.where, file) end,
    
-   asset_fun = function(self) return function(file) return self:asset(file) end end,
+   asset_fun = function(self)
+      return self.where and function(file) return self:asset(file) end
+   end,
 
    html = function(self, state)
       state.conf = state.conf or {}
-      state.conf = state.conf or {}
-      local pat = self.repl_pattern and self:pattern(state) or
-         asset(self.where, (not state.conf.whole and "body" .. "/" or "") .. self.name)
-      
-      return apply_subst(pat, self:repl(state))   
+      local pat
+      if type(self.repl_pattern) == "function" then
+         pat = self:pattern(state)
+      elseif type(self.repl_pattern) == "string" then
+         pat = self.repl_pattern
+      else         
+         pat = asset(self.where, (not state.conf.whole and "body" .. "/" or "") .. self.name)
+      end
+
+      local repl = self:repl(state)
+      local asset_fun = state.conf.asset_fun or self.asset_fun and self:asset_fun()
+      if asset_fun then
+         local function index(_, key) return repl[key] or asset_fun(key) end
+         return apply_subst(pat, setmetatable({}, {__index = index}))
+      else
+         return apply_subst(pat, repl)
+      end
    end,
 
    repl_suggest = function(self, args)
@@ -26,7 +40,7 @@ return {
       for name, fun in pairs(self.to_js or {}) do
          args.view:register_function(name, fun(self, name))
       end
-   end
+   end,
 
    repl = function() error([[Thou shalt not use the base repl list.
 `repl_list_suggest` for some suggestions, like title]]) end,

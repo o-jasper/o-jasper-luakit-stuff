@@ -1,19 +1,21 @@
-local paged_chrome = require"paged_chrome"
-
 local chrome_name = "pagedChromeExample"  --pointlessly illegal chars?
 
+local Suggest = require "paged_chrome.Suggest"
+
 local direct = {
+   name = "direct",
    -- Suggest using just args.path, allows it to maybe be server-servable in the future.
    -- NOTE: 
    html = function(args, view)
       return string.format([[<p>Direct, no replacements.</p><hr>
 <a style="font-size:70%%" href="luakit://%s/templated">to templated</a>]], chrome_name)
    end,
-   init = false,  -- To say we dont need an init.
 }
 
 -- This is the recommended way.
 local templated = {
+   name = "templated",
+
    repl_pattern = [[<p>Templated, using replacements</p>
 <p id="add"></p><hr>
 <a style="font-size:70%" href="luakit://{%chrome_name}/direct">to direct</a>
@@ -34,11 +36,14 @@ local templated = {
       end,
    },
    
-   repl_list = function(args, view)
+   repl = function(args, view)
       return { chrome_name = chrome_name, date = os.date() }
    end,
+   
+   asset = Suggest.asset,
+   asset_fun = Suggest.asset_fun,
 
-   where = {"paged_chrome/example"}
+   where = {"paged_chrome/examples"}
 }
 
 local pages = {
@@ -50,7 +55,8 @@ local pages = {
 
    -- Unfortunately have to repeat ourselves here.(`templated` twice)
    -- (well repeat ourselves more to get stuff in variables so indentation decent)
-   templated = paged_chrome.templated_page(templated, "templated"),
+   templated = templated,
 }
 
-paged_chrome.paged_chrome(chrome_name, pages)
+local paged_chrome = require"paged_chrome"
+paged_chrome.chrome(chrome_name, pages)

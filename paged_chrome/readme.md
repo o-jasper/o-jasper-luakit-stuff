@@ -19,36 +19,42 @@ The table is one of pages by directory names, except for
 `page_table.default_name`,
 which indicates where to redirect if the page does not exist.
 
-## Defining by template
-It is advised to use this interface, and then use `templated_page(page)`
-to turn it into the object below.
-
-`page.to_js` dictionary of lua functions you want it to be able to use.
-
-`page.repl_list(args, view)` dictionary of values to replace in a template.
-
-`page.repl_pattern` is the template itself, just as a value. Can instead
-create the file `"assets/{%page_name}.html"`, where it looks alternatively.
-
 ## Paged chrome.
-This is the actual interface that is used, as said, the above is turned
-into this one via `templated_page(page)`
-
 `paged_chrome.paged_chrome(chrome_name, pages)` adds a chrome page, pages
 are stored at `paged_chrome_dict[]`, you can add more afterward.
 
-`pages.default_name` indicates a default page. Other ones are pages themselves;
+`page.name` *must* the be name.
 
-`page.html(args, view)` should return the html of the page.
+`page:html(state)` should return the html body of the page.
+`state.conf` contains configurations.
 
-`page.init(args, view)` initialized the page.
+`page:on_first_visual(state)` is used on that signal. If not defined,
+anything in `page:to_js` is bound to javascript.
+
+*If* `page.html` does not exist, effectively the following is used;
+Can be obtained from `require "paged_chrome.pattern_html"`
+
+    local asset = require("paged_chrome").asset
+    function This:html(state)
+        state.conf = state.conf or {}
+        -- Pattern from the function or the asset file.
+        local pat = self.repl_pattern and self:pattern(state) or
+            asset(self.where, (not state.conf.whole and "body" .. "/" or "") .. self.name)
+
+        return c.apply_subst(pat, self:repl(state))
+    end
+
+`state.view` contains the view.(if applicable)
+`state.whole` indicates if also the headers and stuff.
+
+`Page.new(args)` creates a new page.
 
 ## Example:
 `example/init.lua` shows how to use both of the above.
 
 ## TODO
 
-* Make the template-based one usable as a server. (ajax-like bindings)
+* When template-like, usable as server.
 
 * Perhaps being able to make one page with a lot of embedded other pages
   could be nice.
