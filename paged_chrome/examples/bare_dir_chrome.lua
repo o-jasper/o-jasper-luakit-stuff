@@ -1,5 +1,4 @@
 local lfs = require "lfs"
-local paged_chrome = require("paged_chrome")
 
 local info = {
    chrome_name = "bareDirChrome",
@@ -9,18 +8,20 @@ local info = {
 
 local pages = {
    default_name = "nopage",
-   nopage = paged_chrome.templated_page({
+   nopage = {
+      name = "nopage",
       to_js = {},
       repl_pattern = [[<h1>Directory viewer</h1>
 Use this to view directories, by going to 
 <a href="{%chrome_uri}/dir/">{%chrome_uri}/dir/</a>]],
-      repl_list = function(_, _, _) return info end
-   }, "nopage"),
-   dir = paged_chrome.templated_page({
+      repl = function(_, _, _) return info end
+   },
+   dir = {
+      name = "dir",
       where = "paged_chrome/examples",
       to_js = {},
       --repl_pattern="{%dir.html}",
-      repl_list = function(self, meta, _)
+      repl = function(self, meta, _)
             local ret = {}
             for k,v in pairs(info) do ret[k] = v end
             ret.directory = string.sub(meta.path, 4)
@@ -50,6 +51,7 @@ Use this to view directories, by going to
             end
             return ret
       end
-   }, "dir")
+   },
 }
-paged_chrome.paged_chrome(info.chrome_name, pages)
+local paged_chrome = require("paged_chrome")
+paged_chrome.chrome(info.chrome_name, pages)
