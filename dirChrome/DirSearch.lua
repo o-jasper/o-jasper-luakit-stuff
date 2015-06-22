@@ -13,17 +13,10 @@ function This:infofun()
    return self:config().infofun or {require "dirChrome.infofun.show_1"}
 end
 
-local infofun_lib = require "sql_help.infofun"
-
-function This.to_js:html_of_id()
-   return function(id)
-      local entry = self.log:get_id(id)
-      local list = infofun_lib.entry_thresh_priority(self.log, entry, 
-                                                     self.log:dir_infofun(), -1)
-      infofun_lib.priority_sort(list, self.config().priority_override)
-      local html = self:list_to_html(list, {})
-      return html and #html > 0 and html  -- Makes sense.
-   end
+function This:side_infofun()  -- TODO should be in DirSearch..
+   return self:config().side_infofun or {
+      require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
+      require "dirChrome.infofun.file"}
 end
 
 function This:repl(args)

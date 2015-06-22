@@ -70,24 +70,11 @@ function This:update_whole_directory()
    self.info_from_dir_list = {}
    for file, _ in lfs.dir(self.path) do
       local entry = self:update_file(file)
-      if entry then
-         local list = infofun_lib.entry_thresh_priority(self, entry, self:dir_infofun(), 0)
-         infofun_lib.priority_sort(list, self:config().priority_override)
-         for _, el in pairs(list) do
-            table.insert(self.info_from_dir_list, el)
-         end
-      end
    end
 end
 
 function This:info_from_dir()
    return self.info_from_dir_list
-end
-
-function This:dir_infofun()
-   return config.dir_infofun or {
-      require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
-      require "dirChrome.infofun.file"}
 end
 
 -- Scratch some search matchabled that arent allowed.

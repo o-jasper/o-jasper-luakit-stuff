@@ -7,14 +7,15 @@ local config = config_from.file or config_from.basic_file or {}
 local c = require "o_jasper_common"
 local lfs = require "lfs"
 
--- TODO derive from show_1
 local This = c.copy_meta(require "dirChrome.infofun.show_1")
 
 function This.maybe_new(creator, entry)
-   local e = lfs.attributes(entry.file)
-   for k, v in pairs(entry) do e[k] = v end
-   if not string.match(entry.file, "^[.]#.+") then
-      return setmetatable({ from_dir=creator.from_dir, e=e }, This)
+   local e = lfs.attributes(entry.dir .. "/" .. entry.file)
+   if e then
+      for k, v in pairs(entry) do e[k] = v end
+      if not string.match(entry.file, "^[.]#.+") then
+         return setmetatable({ from_dir=creator.from_dir, e=e }, This)
+      end
    end
 end
 

@@ -22,9 +22,17 @@ function This.to_js:html_of_id()
       local list = infofun_lib.entry_thresh_priority(self.log, entry, 
                                                      self:side_infofun(), -1)
       infofun_lib.priority_sort(list, self.config().priority_override)
-      local html = self:list_to_html(list, {}) .. "ALWAYSGOTSOME4DEBUG"
+      local html = self:list_to_html(list, {})
       return html and #html > 0 and html  -- Makes sense.
    end
 end
+
+--      if entry then
+--         local list = infofun_lib.entry_thresh_priority(self, entry, self:side_infofun(), 0)
+--         infofun_lib.priority_sort(list, self:config().priority_override)
+--         for _, el in pairs(list) do
+--            table.insert(self.info_from_dir_list, el)
+--         end
+--      end
 
 return c.metatable_of(This)
