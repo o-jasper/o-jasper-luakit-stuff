@@ -39,7 +39,6 @@ function This:js_listupdate(list, as_msg)
       -- Sort the relevant info by importance.
       infofun_lib.priority_sort(infos, self:config().priority_override)
       ret.info = self:list_to_html(infos, {})
-      print(#infos, #ret.info)
    end      
    return ret
 end
