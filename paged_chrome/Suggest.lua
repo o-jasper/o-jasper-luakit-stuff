@@ -15,7 +15,7 @@ return {
       state.conf = state.conf or {}
       local pat
       if type(self.repl_pattern) == "function" then
-         pat = self:pattern(state)
+         pat = self:repl_pattern(state)
       elseif type(self.repl_pattern) == "string" then
          pat = self.repl_pattern
       else         
@@ -44,5 +44,5 @@ return {
    end,
 
    repl = function() error([[Thou shalt not use the base repl list.
-`repl_list_suggest` for some suggestions, like title]]) end,
+`repl_suggest` for some suggestions, like title]]) end,
 }
