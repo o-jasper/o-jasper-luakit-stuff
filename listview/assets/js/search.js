@@ -102,13 +102,16 @@ function update_sql_shown() {
     if( sql_shown && !sql_locked ) { set_ids(show_sql(full_search_input())); }
 }
 
+function reset_state_c1(){}
+
 // TODO time it and turn off continuous, which then has 'force continuous' option.
 function search(reset_state) {
     if(reset_state == null){ reset_state = true; }
-    if(reset_state) { // Burn the existing stuff.
+    if(reset_state) {
         thresh_y = 0;
-        ge("list_area").innerHTML = '<span id="list"></span><span id="list_subsequent"></span>'
+        ge("list_area").innerHTML  = '<span id="list"></span><span id="list_subsequent"></span>';
         reset_limit_values();
+        reset_state_c1();
     }
     if(by_search){ 
         set_ids(do_search(full_search_input(), as_msg));
@@ -206,11 +209,15 @@ function touch_addsearch_name() {
     }
 }
 
+function load_next_chunk_c1() {}  // For replacing.
+
 function load_next_chunk() {
     ge("list").id = null; // Note this is a bit hacky.
     var el = ge("list_subsequent");
     el.innerHTML = '<span id="list"></span><span id="list_subsequent"></span>';
     el.id = null;
+
+    load_next_chunk_c1();
 
     cycle_limit_values(+1); //Just change the parameters and search.
     search(false);
