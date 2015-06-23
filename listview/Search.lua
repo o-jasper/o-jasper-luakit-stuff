@@ -13,7 +13,7 @@ local This = c.copy_meta(BaseSearch)
 local infofun_lib = require "sql_help.infofun"
 
 function This:side_infofun()
-   return self:config().side_infofun or {}
+   return self:config().side_infofun or { require "listview.infofun.show_elaborate" }
 end
 
 function This.to_js:html_of_id()
@@ -31,7 +31,7 @@ function This:js_listupdate(list, as_msg)
    local ret = BaseSearch.js_listupdate(self, list, as_msg)
 
    local infofuns = self:side_infofun()
-   if true then --infofuns and #infofuns > 0 then
+   if infofuns and #infofuns > 0 then
       local infos = {}  -- Collect relevant information.
       for _, entry in pairs(list) do
          infofun_lib.entry_thresh_priority(self, entry, infofuns, 0, infos)
