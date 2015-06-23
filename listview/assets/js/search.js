@@ -1,3 +1,9 @@
+//  Copyright (C) 23-06-2015 Jasper den Ouden.
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 
 function full_search_input() {
     return ge('addsearch_input').value + " " + ge('search_input').value
