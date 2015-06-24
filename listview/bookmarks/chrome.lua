@@ -16,23 +16,6 @@ local bookmarks  = require "listview.bookmarks.bookmarks"
 local config = (globals.listview or {}).bookmarks or {}
 
 -- Make the chrome page.
-
-local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")   -- TODO
-local topics    = config.topics or {"entity", "idea", "project", "data_source", "vacancy"}
-
-local function default_data_uri_fun(entry)
-   for _,name in pairs(topics) do
-      if bookmarks:has_tag(entry.id, name) then
-         -- TODO file-appropriatize the title.
-         local dir = string.format("%s/%s/%s", topicsdir, name, entry.title)
-         return dir
-      end
-   end
-end
-
--- TODO doesnt seem to be used.
-local default_data_uri = config.default_data_uri or default_data_uri_fun
-
 local Enter = require "listview.bookmarks.Enter"
 local BookmarksSearch = require "listview.bookmarks.BookmarksSearch"
 
