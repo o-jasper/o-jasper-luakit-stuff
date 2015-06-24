@@ -19,9 +19,8 @@ The table is one of pages by directory names, except for
 `page_table.default_name`,
 which indicates where to redirect if the page does not exist.
 
-## Paged chrome.
-`paged_chrome.paged_chrome(chrome_name, pages)` adds a chrome page, pages
-are stored at `paged_chrome_dict[]`, you can add more afterward.
+## Single page;
+This is the "raw" interface, it is better to use the templated one.
 
 `page.name` *must* the be name.
 
@@ -31,23 +30,22 @@ are stored at `paged_chrome_dict[]`, you can add more afterward.
 `page:on_first_visual(state)` is used on that signal. If not defined,
 anything in `page:to_js` is bound to javascript.
 
-*If* `page.html` does not exist, effectively the following is used;
-Can be obtained from `require "paged_chrome.pattern_html"`
+## Suggested templated page
+If the above do not exist, it tries instead to make things work with
+`require "paged_chrome.Suggest"`. You could instead put that in your metatable.
 
-    local asset = require("paged_chrome").asset
-    function This:html(state)
-        state.conf = state.conf or {}
-        -- Pattern from the function or the asset file.
-        local pat = self.repl_pattern and self:pattern(state) or
-            asset(self.where, (not state.conf.whole and "body" .. "/" or "") .. self.name)
+It instead has the requirements:
 
-        return c.apply_subst(pat, self:repl(state))
-    end
+`.name` simply remains a requirement.
 
-`state.view` contains the view.(if applicable)
-`state.whole` indicates if also the headers and stuff.
+`.to_js` field or `:to_js(args)` method, giving a table of functions to
+bind tojavascript.
 
-`Page.new(args)` creates a new page.
+`.where` field indicating where to look for assets. Used to create
+`:asset(file)` for you. This will also imply how to find the first template,
+and fill in parts of the template referring to files. (`:repl` takes precidence)
+
+`:repl(state)` returning a table that is used to replace things in the template.
 
 ## Example:
 `example/init.lua` shows how to use both of the above.

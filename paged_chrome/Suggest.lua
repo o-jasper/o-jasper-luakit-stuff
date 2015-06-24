@@ -38,7 +38,9 @@ return {
    end,
 
    on_first_visual = function(self, args)
-     for name, fun in pairs(self.to_js or {}) do
+      local to_js = self.to_js or {}
+      if type(to_js) == "function" then to_js = to_js(self, args) end
+      for name, fun in pairs(to_js) do
          args.view:register_function(name, fun(self, name))
       end
    end,
