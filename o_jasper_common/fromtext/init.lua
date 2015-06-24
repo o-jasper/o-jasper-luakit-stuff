@@ -3,7 +3,7 @@ local function index(self, key)  -- Get until we got it.
       for k,v in pairs(require("o_jasper_common.fromtext." .. name)) do
          self[k] = v
       end
-      if rawget(self, k) then return rawget(self, k) end
+      if rawget(self, key) then return rawget(self, key) end
    end
 end
 
