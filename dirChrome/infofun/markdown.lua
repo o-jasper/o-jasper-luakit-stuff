@@ -4,9 +4,9 @@ local c = require "o_jasper_common"
 
 local this = c.copy_meta(require "listview.infofun.show_1")
 
-function this.maybe_new(creator, entry)
+function this.newlist(creator, entry)
    if string.match(string.lower(entry.file), "[.]md$") then
-      return setmetatable({ dir=entry.dir, file=entry.file }, this)
+      return {setmetatable({ dir=entry.dir, file=entry.file }, this)}
    end
 end
 

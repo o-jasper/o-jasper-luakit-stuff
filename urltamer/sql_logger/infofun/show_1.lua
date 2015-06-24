@@ -2,8 +2,6 @@ local c = require "o_jasper_common"
 
 local This = c.copy_meta(require "listview.infofun.show_1")
 
-function This.maybe_new(_, entry) return setmetatable({ e=entry }, This) end
-
 function This.tab_repl:resultHTML()
    return ({["true"]="{%urlallowed}", ["false"]="{%urlblocked}"})[self.e.result] or
       [[<span class="redirect_ann">redirected:</span>

@@ -2,15 +2,11 @@ local c = require "o_jasper_common"
 
 local This = c.copy_meta(require "listview.infofun.show_1")
 
-function This.maybe_new(creator, entry) 
-   return setmetatable({ from_dir = creator.path, e=entry }, This)
-end
-
 -- TODO these two functions to common.
 local string_split = require("lousy").util.string.split
 
 local function ensure_listpath(path)
-   assert(path, "Cannot turn this into path")
+   assert(path, string.format("Cannot turn this into path, %s", path))
    return (type(path) == "string" and string_split(path, "/")) or path
 end
 
@@ -41,7 +37,7 @@ local function rel_pathname(from_dir, path)
 end
 
 function This.tab_repl:rel_dir()
-   return rel_pathname(self.from_dir, self.e.dir)
+   return rel_pathname(self.creator.path, self.e.dir)
 end
 
 function This.tab_repl:size_gist()

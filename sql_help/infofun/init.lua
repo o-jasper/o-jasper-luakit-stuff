@@ -12,20 +12,32 @@ function Public.infofun_highest_priority(infofun_list)
    return best and {best} or {}
 end
 
-function Public.entry_highest_priority(creator, entry, infofuns)
-   local list = {}
-   for key, fun in pairs(infofuns or creator:config().infofuns) do
-      local got = fun.maybe_new(creator, entry)
-      if got then table.insert(list, got) end
+local function newlist(fun, creator, entry)
+   if fun.newlist then
+      return fun.newlist(creator, entry) or {}
+   else  -- Defaults to just creating one and stuffing the creator on.
+      return {fun.new({ creator = creator, e=entry })}
    end
-   return Public.infofun_highest_priority(list)
+end
+
+function Public.entry_highest_priority(creator, entry, infofuns, into)
+   into = into or {}
+   for key, fun in pairs(infofuns or creator:config().infofuns) do
+      for _, el in pairs(newlist(fun, creator, entry)) do
+         table.insert(into, el)  -- Add all of them.
+      end
+   end
+   return Public.infofun_highest_priority(into)
 end
 
 function Public.entry_thresh_priority(creator, entry, infofuns, thresh, into)
    into = into or {}
    for key, fun in pairs(infofuns or creator:config().infofuns) do
-      local got = fun.maybe_new(creator, entry)
-      if got and got:priority() > thresh then table.insert(into, got) end
+      for _, el in pairs(newlist(fun, creator, entry)) do
+         if el:priority() > thresh then-- Add those with sufficient priority.
+            table.insert(into, el)  
+         end
+      end
    end
    return into
 end

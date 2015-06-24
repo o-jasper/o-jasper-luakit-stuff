@@ -7,10 +7,6 @@ local lfs = require "lfs"
 
 local This = c.copy_meta(require "paged_chrome.Suggest")
 
-function This.maybe_new(_, entry)
-   return setmetatable({ e=entry }, This)
-end
-
 function This:priority()
    return 1
 end

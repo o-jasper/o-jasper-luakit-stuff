@@ -9,18 +9,17 @@ local lfs = require "lfs"
 
 local This = c.copy_meta(require "dirChrome.infofun.show_1")
 
-function This.maybe_new(creator, entry)
-   local e = lfs.attributes(entry.dir .. "/" .. entry.file)
-   if e then
-      for k, v in pairs(entry) do e[k] = v end
-      if not string.match(entry.file, "^[.]#.+") then
-         return setmetatable({ from_dir=creator.from_dir, e=e }, This)
-      end
+function This.new(args)
+   local ret = { e = args.e, from_dir=args.creator.path }
+   -- More more info from lfs.attributes.(dont override)
+   for k, v in pairs(lfs.attributes(args.e.dir .. "/" .. args.e.file) or {}) do
+      ret.e[k] = ret.e[k] or v
    end
+   return setmetatable(ret, This)
 end
 
 function This:priority()
-   return 0
+   return (string.match(self.e.file, "^[.]#.+") and -2) or 0
 end
 
 This.asset_file = "parts/show_elaborate.html"

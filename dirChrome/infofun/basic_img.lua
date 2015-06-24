@@ -4,11 +4,11 @@ local c = require "o_jasper_common"
 
 local this = {}
 
-function this.maybe_new(creator, entry)
+function this.newlist(creator, entry)
    for _, pat in pairs({"[.]jpg$", "[.]jpeg$",
                         "[.]gif$", "[.]bmp$", "[.]png$", "[.]svg$" }) do
       if string.match(string.lower(entry.file), pat) then
-         return setmetatable({ dir=entry.dir, file=entry.file }, this)
+         return {setmetatable({ dir=entry.dir, file=entry.file }, this)}
       end
    end
 end

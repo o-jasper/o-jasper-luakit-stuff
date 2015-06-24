@@ -3,17 +3,13 @@
 local c = require "o_jasper_common"
 local lfs = require "lfs"
 
-local this = {}
+local This = {}
 
-function this.maybe_new(path, file)
-   return setmetatable({ path=path, file=file }, this)
-end
-
-function this:priority()
+function This:priority()
    return 0
 end
 
-function this:html()  -- TODO not allowed to touch local shit..
+function This:html()  -- TODO not allowed to touch local shit..
    local fp = self.path .. "/" .. self.file
    local ret = {}
    for k,v in pairs(lfs.attributes(fp)) do
@@ -22,4 +18,4 @@ function this:html()  -- TODO not allowed to touch local shit..
    return table.concat(ret, ", ")
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)

@@ -1,11 +1,16 @@
 # Info-function sorting by importance.
 
-`Class.maybe_new(args)` may or may not create a new instance.(really low priority,
-it just doesnt make a new one)
+`Class.newlist(args)`, if exists, can return a list of new infofun objects.
+`nil` is interpreted as `{}`. `args.creator` contains the creator, and
+`args.e` contains the entry as provided.
 
-Currently, basically only `:priority()` indicating a priority. Want to have
+`Class.newlist` does not exist, `{Class.new({ creator = creator, e=entry })}`
+is used.
+
+Otherwise `:priority()` indicating a priority. Want to have
 importance-based-on-context. I.e. image-viewing, the image has high importance,
 file-viewing, it just shows as filename.(maybe tiny-fied version)
 
-If there are dditionally requires paged-chrome interfacing to make html of entries.
-(sorted and selected by priority.
+## Use is listview
+*Listview* additionally requires a `:html(state)` method. Currently does not
+support javascript.
