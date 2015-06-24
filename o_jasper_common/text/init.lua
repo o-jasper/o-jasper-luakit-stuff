@@ -17,17 +17,31 @@ function Public.tableText(herp, tab, first, ln)
    return tableText(herp, tab or "  ", first or "", ln or "\n")
 end
 
--- Whole integer to string.
-function Public.int_to_string(i)
-   local largenum = 10000000000000
-   if math.floor(i/largenum) == 0 then
-      return tostring(i)
-   else
-      local str = tostring(i%largenum)
-      while #str ~= 13 do  -- TODO is it right.. didnt i solve this before..?
-         str = "0" .. str
+-- Whole integer to string.  -- TODO completely untested!
+function Public.int_to_string(i, base, symbs)
+   if not base then
+      local largenum = 10000000000000
+      if math.floor(i/largenum) == 0 then
+         return tostring(i)
+      else
+         local str = tostring(i%largenum)
+         while #str ~= 13 do  -- TODO is it right.. didnt i solve this before..?
+            str = "0" .. str
+         end
+         return tostring(math.floor(i/largenum)) .. str
       end
-      return tostring(math.floor(i/largenum)) .. str
+   else
+      local symbs = symbs or {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                             "A",  "B", "C", "D", "E", "F",
+                             "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+                             "Q", "R", "S", "T", "U", "V", "X", "Y", "Z"}
+      assert(type(base) == "number" and base > 2)
+      assert( type(symbs) == "table" and base <= #symbs )
+      local x, ret = i, ""
+      while x > 0 do
+         ret = ret .. symbs[x % base]
+         x = math.floor(x / base)
+      end
    end
 end
 

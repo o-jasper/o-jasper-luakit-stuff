@@ -34,7 +34,7 @@ function This:enter(entry)
    local ret = SqlCmds.enter(self, entry)
    -- And all the tags, if we do those.
    if entry.tags and #entry.tags > 0 and self.values.taggings then
-      self.tags_last = cur_time.raw()  -- Note time last changed.
+      self.tags_last = c.cur_time.raw()  -- Note time last changed.
       local tags_insert = self:sqlcmd("tags_insert")
       ret.tags = {}
       for _, tag in pairs(entry.tags) do

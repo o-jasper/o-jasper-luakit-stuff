@@ -1,7 +1,7 @@
 local c = require "o_jasper_common"
 
-local this = c.copy_meta(require "sql_help.SqlEntry")
-this.values = {
+local This = c.copy_meta(require "sql_help.SqlEntry")
+This.values = {
    table_name = "bookmarks",
    taggings = "bookmark_taggings", tagname="tag",
    
@@ -16,4 +16,4 @@ this.values = {
    int_els = {"id", "created"},
 }
 
-return c.metatable_of(this)
+return c.metatable_of(This)

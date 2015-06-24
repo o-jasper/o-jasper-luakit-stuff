@@ -9,7 +9,6 @@ local config = globals.listview_bookmarks or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
-local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 
 local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 
@@ -23,32 +22,28 @@ This.entry_meta = BookmarksEntry
 
 function This:config() return config end
 
-local function disannoy_filename(file)
-   local function handler(c)
-      local respond = {
-         [" "] = "_", ["\n"] = "_", ["\t"] = "_",
-      }
-      if respond[c] then return respond[c] end
-      return string.format ("%%%02X", string.byte(c))
-   end
-   return string.gsub(file, [[ ][()<>$|&~"']], handler)
-end
-
 function This:default_new_data_uri_fun()
    local config = self:config()
    local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")
    -- Topics named by tags.
-   local topics    = config.topics or {"entity", "idea", "project", "data_source", "vacancy"}
+   local topics    = config.topics or {entity=true, idea=true, project=true, 
+                                       data_source=true, refer=true, vacancy=true
+                                      }
+
+   local function figure_name(id)
+      for name, to in pairs(topics) do
+         if self:has_tag(id, name) then
+            return (to == true and name) or to
+         end
+      end
+   end
 
    return function(entry)
-      local name = "other"
-      for _,iter_name in pairs(topics) do
-         if self:has_tag(entry.id, name) then name = iter_name break end
-      end
+      local name = figure_name(entry.id) or "other"
       -- TODO file-appropriatize the title.
       local dir = string.format("%s/%s/%s_%s", topicsdir, name,
-                                domain_of_uri(entry.to_uri),
-                                disannoy_filename(entry.title))
+                                c.fromtext.domain_of_uri(entry.to_uri),
+                                c.fromtext.disannoy_filename(entry.title))
       local n, opened = 0, io.open(dir)
       while opened do  -- Count up until no longer taken.
          io.close(opened)
