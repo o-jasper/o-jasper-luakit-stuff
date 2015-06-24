@@ -77,7 +77,7 @@ local SqlHelp = {
    c = false, tags_last = 0, last_id_time = 0,
    
    searchinfo = {
-      matchable = {"like:", "-like:", "tag:", "tags:", "-tag:", "-tags:",
+      matchable = {"like:", "-like:", "-tag:", "-tags:", "tag:", "tags:",
                    "-", "not:", "\\-", "or:",
                    "uri:", "desc:", "title:",
                    "uri=", "desc=", "title=",
@@ -89,7 +89,7 @@ local SqlHelp = {
          ["lk:"]   = matchfun.text_like, ["-lk:"]   = matchfun.text_like,
 
          ["tags:"]  = matchfun.tags,     ["tag:"]  = matchfun.tags,
-         ["-tags:"] = matchfun.not_tags, ["-tag:"] = matchfun.tags,
+         ["-tags:"] = matchfun.not_tags, ["-tag:"] = matchfun.not_tags,
 
          ["not:"] = matchfun["not"], ["-:"] = matchfun["not"],
          ["\\-"] = function(self, state, m, v)  -- Should escape it.
@@ -254,7 +254,7 @@ local SqlHelp = {
    text_like = function(self, search, n)
       if self.first then 
          if n then
-            self.first = self.first .. "NOT ("
+            self.first = self.first .. " NOT ("
          else
             self.first = self.first .. "(" 
          end
