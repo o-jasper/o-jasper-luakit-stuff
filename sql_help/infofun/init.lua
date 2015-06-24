@@ -21,13 +21,13 @@ function Public.entry_highest_priority(creator, entry, infofuns)
    return Public.infofun_highest_priority(list)
 end
 
-function Public.entry_thresh_priority(creator, entry, infofuns, thresh)
-   local ret = {}
+function Public.entry_thresh_priority(creator, entry, infofuns, thresh, into)
+   into = into or {}
    for key, fun in pairs(infofuns or creator:config().infofuns) do
       local got = fun.maybe_new(creator, entry)
-      if got and got:priority() > thresh then table.insert(ret, got) end
+      if got and got:priority() > thresh then table.insert(into, got) end
    end
-   return ret
+   return into
 end
 
 local function fun_on_each(fun)
