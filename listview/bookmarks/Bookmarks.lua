@@ -22,26 +22,43 @@ This.entry_meta = BookmarksEntry
 
 function This:config() return config end
 
-function This:default_new_data_uri_fun()
-   local config = self:config()
-   local topicsdir = config.topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")
-   -- Topics named by tags.
-   local topics    = config.topics or {entity=true, idea=true, project=true, 
+function This:topicsdir() 
+   return self:config().topicsdir or ((os.getenv("HOME") or "TODO") .. "/topics")
+end
+
+function This:tag_topics()
+   return self:config().tag_topics or {entity=true, idea=true, project=true, 
                                        data_source=true, refer=true, vacancy=true
                                       }
+end
 
-   local function figure_name(id)
-      for name, to in pairs(topics) do
-         if self:has_tag(id, name) then
-            return (to == true and name) or to
+function This:init()
+   SqlHelp.init(self)
+   -- Make all the directories needed, if do not exist yet.
+   local lfs = require "lfs"
+   lfs.mkdir(self:topicsdir())
+   for name, to in pairs(self:tag_topics()) do
+      lfs.mkdir(self:topicsdir() .. "/" .. (to == true and name or to))
+   end
+end
+
+function This:default_new_data_uri_fun()
+   local config = self:config()
+   local function figure_name(entry)
+      for name, to in pairs(self:tag_topics()) do
+         -- Search in the to-be-set entry, not the DB.
+         for _, tag in pairs(entry.tags) do
+            if name == tag then
+               return (to == true and name) or to
+            end
          end
       end
    end
 
    return function(entry)
-      local name = figure_name(entry.id) or "other"
+      local name = figure_name(entry) or "other"
       -- TODO file-appropriatize the title.
-      local dir = string.format("%s/%s/%s_%s", topicsdir, name,
+      local dir = string.format("%s/%s/%s_%s", self:topicsdir(), name,
                                 c.fromtext.domain_of_uri(entry.to_uri),
                                 c.fromtext.disannoy_filename(entry.title))
       local n, opened = 0, io.open(dir)
@@ -50,7 +67,10 @@ function This:default_new_data_uri_fun()
          n = n + 1
          opened = io.open(dir .. "_" .. tostring(n))
       end
-      return dir .. ((n == 0 and "") or "_" .. tostring(n))
+      local lfs = require "lfs"
+      dir = dir .. ((n == 0 and "") or "_" .. tostring(n))
+      lfs.mkdir(dir)
+      return dir
    end
 end
 
