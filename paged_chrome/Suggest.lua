@@ -24,7 +24,9 @@ return {
       end
 
       local repl = self:repl(state)
-      local asset_fun = state.asset_fun or self.asset_fun and self:asset_fun()
+      local asset_fun = (self.asset_fun and self:asset_fun()) or
+                        (self.where and function(file) return asset(self.where, file) end)
+         
       if asset_fun then
          local function index(_, key) return repl[key] or asset_fun(key) end
          return apply_subst(pat, setmetatable({}, {__index = index}))

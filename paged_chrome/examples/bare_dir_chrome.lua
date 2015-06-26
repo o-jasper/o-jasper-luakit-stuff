@@ -53,5 +53,4 @@ Use this to view directories, by going to
       end
    },
 }
-local paged_chrome = require("paged_chrome")
-paged_chrome.chrome(info.chrome_name, pages)
+require("paged_chrome").chrome(info.chrome_name, pages)

@@ -58,5 +58,4 @@ local pages = {
    templated = templated,
 }
 
-local paged_chrome = require"paged_chrome"
-paged_chrome.chrome(chrome_name, pages)
+require("paged_chrome").chrome(chrome_name, pages)
