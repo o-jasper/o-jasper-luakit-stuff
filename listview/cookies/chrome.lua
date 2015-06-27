@@ -12,6 +12,15 @@ local paged_chrome = require("paged_chrome")
 
 -- Make the chrome page.
 local pages = listview.new_Chrome(history, "*listview/cookies")
+
+-- NOTE: really maybe better via new metatable, but lazy.
+pages.search.infofun = function(self)
+   return self:config().infofun or {require "listview.cookies.infofun.show_1"}
+end
+pages.search.side_infofun = function(self)
+   return self:config().side_infofun or {}
+end
+
 paged_chrome.chrome("listviewCookies", pages)
 
 local config = (globals.listview or {}).cookies or {}

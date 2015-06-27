@@ -1,11 +1,12 @@
 {%resay_time}
 <tr id="id_{%identifier}" onclick="select_toggle('{%identifier}')">
 <td>
-<span class="time">{%hour}:{%min}</span>
+<span class="time">{%hour}:{%min}<br>left:{%expiry_left}</span>
 </td>
 <td>
-<b>{%host}; {%path}</b><br>
-{%name} = {%value}<br>
-(secure={%isSecure}, httpOnly={%isHttpOnly}}
+{%resay_host_path}<span class="security_info">{%security_info}</span>
+<code>{%name}</code> = <code>{%value}</code><br>
+</td>
+<td>
 </td>
 </tr>
