@@ -73,8 +73,9 @@ Public.short_month_names = {"Jan", "Feb", "Mar", "Apr", "May",
                             "Nov", "Dec"}
 
 function Public.additional_time_strings(d)
-   d.dayname = Public.day_names[d.wday]
+   d.dayname       = Public.day_names[d.wday]
    d.short_dayname = Public.short_day_names[d.wday]
+   d.monthname       = Public.month_names[d.month]
    d.short_monthname = Public.short_month_names[d.month]
    return d
 end
