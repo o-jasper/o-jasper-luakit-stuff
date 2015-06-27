@@ -25,7 +25,7 @@ local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
 
 local function on_command(w, query)
    history.cmd_query = query  -- Bit "global-value-ie.
-   local v = w:new_tab("luakit://listviewHistory/search")
+   w:new_tab("luakit://listviewHistory/search")
 end
 
 add_cmds({ cmd("listviewHistory", on_command) })

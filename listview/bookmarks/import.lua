@@ -5,6 +5,9 @@
 --  by the Free Software Foundation, either version 3 of the License, or
 --  (at your option) any later version.
 
+-- TODO also export? Or have the same format as the old bookmarks and have
+-- data_uri external?
+
 local string_split = require("lousy").util.string.split
 
 return function(from_db, into)

@@ -13,16 +13,16 @@ local data
 --  translated into lua properly?
 local acquire = {
    referrer = "document.referrer",
---   anchors = "document.anchors",  -- crash
+   --anchors = "document.anchors",  -- crash
    anchors_cnt = "document.anchors.length",
-   links     = "document.links",
+--   links     = "document.links",
    links_cnt = "document.links.length",
 
-   applets     = "document.applets",
+--   applets     = "document.applets",
    applets_cnt = "document.applets.length",
-   embeds      = "document.embeds",
+--   embeds      = "document.embeds",
    embeds_cnt  = "document.embeds.length",
-   cookie  = "document.cookie",
+   cookie      = "document.cookie",
    cookie_cnt  = "document.cookie.length",
    --images  = "document.images", -- crash
    images_cnt = "document.images.length",
