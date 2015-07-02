@@ -11,7 +11,7 @@ return function(mirror)
    
    local function open_cmd(w, query)
       if mirror.notice_open then mirror:notice_open(query or w.view.uri) end
-      w:new_tab(w:search_open(mirror:dir(query or w.view.uri)))
+      w:new_tab(w:search_open(mirror:mirror_uri(query or w.view.uri)))
    end
 
    --Starting with nc it will no-clobber, not overwrite.
