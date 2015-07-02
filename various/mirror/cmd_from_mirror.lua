@@ -6,12 +6,12 @@ return function(mirror)
       if clobber then
          arg = string.sub(arg, #clobber)
       end
-      mirror:do_uri((arg and #arg > 0 and arg) or w.view.uri)
+      mirror:do_uri((arg and #arg > 0 and arg) or w.view.uri, clobber, w)
    end
    
    local function open_cmd(w, query)
-      if mirror.notice_open then mirror:notice_open(query or w.view.uri) end
-      w:new_tab(w:search_open(mirror:mirror_uri(query or w.view.uri)))
+      if mirror.notice_open then mirror:notice_open(query or w.view.uri, w) end
+      w:new_tab(w:search_open(mirror:mirror_uri(query or w.view.uri, w)))
    end
 
    --Starting with nc it will no-clobber, not overwrite.

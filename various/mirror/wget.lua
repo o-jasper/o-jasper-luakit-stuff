@@ -10,13 +10,15 @@ local c = require "o_jasper_common"
 local This = c.copy_table(require "various.mirror.base")
 
 function This:do_uri(uri, clobber)
-   luakit.spawn("mkdir -p " .. self:mirror_dir()) -- TODO better way of making directory.
+   local path = self:clear_path(self:page_path(uri))
+   luakit.spawn_sync("mkdir -p " .. self:mirror_dir()) -- TODO better way of making directory.
    -- E = adjust−extension, k = convert−links,
    -- p = page−requisites.
    -- nv = lower verbosity.
    -- It will make the path for us.
-   luakit.spawn(string.format("wget --directory-prefix %s -E %s -nv --page-requisites -k %s",
-                              self:mirror_dir(), clobber and "-nc" or "", uri))
+   luakit.spawn(string.format("wget --directory-prefix %s -E %s -nv --page-requisites -k %s -o %s",
+                              self:mirror_dir(), clobber and "-nc" or "", uri. path))
+   return path
 end
 
 function This.new() return This end  -- Dont really care for that.
