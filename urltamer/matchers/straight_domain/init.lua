@@ -1,6 +1,7 @@
 -- Specific things to do.
+local Public = {}
 
-shortlist["www.reddit.com"] = function(info, result)
+Public["www.reddit.com"] = function(info, result)
    handler.everywhere(info, result,
                   {"^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]jpg$",
                    "^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]css",
@@ -24,9 +25,11 @@ shortlist["www.reddit.com"] = function(info, result)
    end
 end
 
-shortlist["www.np.reddit.com"] = shortlist["www.reddit.com"]
+-- Oh, np stands for non-participation. It means you should not act like a 
+--  vote-brigade and stuff.
+Public["www.np.reddit.com"] = Public["www.reddit.com"]
 
-shortlist["www.youtube.com"] = function(info, result)
+Public["www.youtube.com"] = function(info, result)
    handler.everywhere(info, result,
                   {"^https://s[.]ytimg[.]com/yts/jsbin/www-pageframe-.+/www-pageframe[.]js^",
                    "^https://s[.]ytimg.com/yts/jsbin/www-en_US-[.]+/common[.]js^",
@@ -41,31 +44,34 @@ shortlist["www.youtube.com"] = function(info, result)
    end
 end
 
-shortlist["www.tvgids.nl"] = function(info, result)
+Public["www.tvgids.nl"] = function(info, result)
    handler.everywhere(info, result, {"^http://www[.]tvgids[.]nl/json/lists/.+",
                                  "^https*://www[.]tvgids[.]nl/*.+",
                                  "^https*://tvgidsassets[.]nl/*.+"})
 end
 
-shortlist["imgur.com"] = function(info, result)
+Public["imgur.com"] = function(info, result)
+   handler.everywhere(info, result, "^http://.[.]imgur[.]com/.+")
+end
+Public["i.imgur.com"] = function(info, result)
    handler.everywhere(info, result, "^http://.[.]imgur[.]com/.+")
 end
 
---shortlist["duckduckgo.com"] = {
+--Public["duckduckgo.com"] = {
 --   -- TODO special redirect rule.
 --   -- https://duckduckgo.com/html/?q=.+
 --}
 -- Exceptions instead?
-function permissive(info, result)
+local function permissive(info, result)
    --print("permissive", info.uri, info.vuri)
    result.allow = true
 end
 
-shortlist["en.wikipedia.org"] = permissive
-shortlist["nl.wikipedia.org"] = permissive
-shortlist["bits.wikimedia.org"] = permissive
+Public["en.wikipedia.org"] = permissive
+Public["nl.wikipedia.org"] = permissive
+Public["bits.wikimedia.org"] = permissive
 
-shortlist["okturtles.slack.com"] = permissive
+Public["okturtles.slack.com"] = permissive
 
 function bland_info(info, from_to)
    for k,v in pairs(from_to) do
@@ -85,7 +91,7 @@ function bland_info(info, from_to)
    end
 end
 
-shortlist["github.com"] = function(info, result)
+Public["github.com"] = function(info, result)
    handler.everywhere(info, result,
                       {"^https://github.com/.+/.+/issue_comments$",
                        "^https://github.com/.+/.+/pullrequest_comments$",
@@ -94,19 +100,19 @@ shortlist["github.com"] = function(info, result)
                       })
 end
 
-shortlist["xkcd.com"] = function(info, result)
+Public["xkcd.com"] = function(info, result)
    handler.everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
 end
 
-shortlist["&about:blank$"] = permissive
-pattern_shortlist["^$"] = permissive
-pattern_shortlist["^luakit://.+"] = permissive
+Public["&about:blank$"] = permissive
 
-shortlist["stackoverflow.com"] = function(info, result)
+Public["stackoverflow.com"] = function(info, result)
    handler.everywhere(info, result)
    bland_info(info, {["^http://cdn.sstatic.net/stackoverflow/all.css.+"] = "s"})
 end
 
-shortlist["fileformat.info"] = function(info, result)
+Public["fileformat.info"] = function(info, result)
    handler.everywhere(info, result, {"^https*://emoji.fileformat.info/gemoji/.+[.]png$"})
 end
+
+return Public

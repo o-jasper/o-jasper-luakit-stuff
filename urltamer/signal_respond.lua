@@ -22,41 +22,19 @@ config.late_dt = config.late_dt or 4000
 config.log_all = (config.log_all == nil) or config.log_all
 config.logger = require "urltamer.sql_logger"
 
-handler = {}
-
-function handler.base(info, result, also_allow)
-   if info.uri == "about:blank" or info.by_userevent then
-      result.allow = true
-   elseif also_allow and info:uri_match(also_allow) then  -- (Doesnt excuse tardiness)
-      result.specific_allow = true
-      result.allow = true
-   elseif info.dt > config.late_dt or
-        info:uri_match({"^.+[.][fF][lL][vV]$", "^.+[.][sS][wW][fF]$"}) then
-      result.was_late = true
-      result.allow = false
-   else
-      result.allow = true
-   end
-end
-
-function handler.everywhere(info, result, also_allow)
-   handler.base(info, result, also_allow)
-   if not info:own_domain() and not (info.by_userevent or result.specific_allow) then
-      result.allow = false
-   end
-end
+local handler = require "urltamer.handler"
 
 -- If not shortlisted, keep it on own domain,
-not_listed = handler.everywhere
-shortlist = {}
-pattern_shortlist = {}
+not_listed = handler.default
+
+local matchers = require "urltamer.matchers"
 
 function respond_to(info, result)
    local domain_way = nil
-   for k,v in pairs(pattern_shortlist) do
+   for k,v in pairs(matchers.patterns) do
       if string.match(info.vuri, k) then domain_way = v end
    end
-   domain_way = domain_way or shortlist[info.from_domain] or not_listed
+   domain_way = domain_way or matchers.straight_domain[info.from_domain] or not_listed
 
    -- TODO sql table. (possibly via metatable)
    if type(domain_way) == "string" then
@@ -124,6 +102,8 @@ webview.init_funcs.url_respond_signals = function (view, w)
                 config.logger:insert(info, result)
              end
           end
+
+          if result.stop_view then v:stop() end
           
           return result.ret
    end)
