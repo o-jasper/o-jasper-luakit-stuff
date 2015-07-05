@@ -1,4 +1,4 @@
-local This = {}
+local This = { __name = "mirror.base" }
 
 function This:conf()       return globals.mirror or {} end
 function This:mirror_dir()
