@@ -15,6 +15,7 @@ local domain_of_uri = require("o_jasper_common.fromtext.uri").domain_of_uri
 local cur_time = require "o_jasper_common.cur_time"
 
 local config = globals.urltamer or {}
+globals.urltamer = config
 
 local new_info  = require("urltamer.info").new_info
 
