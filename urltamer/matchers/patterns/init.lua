@@ -1,9 +1,6 @@
 local Public = {}
 
-local function permissive(info, result)
-   --print("permissive", info.uri, info.vuri)
-   result.allow = true
-end
+local permissive = require("urltamer.handler").permissive
 
 Public["^$"] = permissive
 Public["^luakit://.+"] = permissive

@@ -1,5 +1,4 @@
 
-local require_index = require("o_jasper_common.require_index")
 local Public = {}
 
 -- TODO configurations.

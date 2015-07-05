@@ -1,6 +1,8 @@
 -- Specific things to do.
 local Public = {}
 
+local handler = require "urltamer.handler"
+
 Public["www.reddit.com"] = function(info, result)
    handler.everywhere(info, result,
                   {"^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]jpg$",
@@ -50,6 +52,7 @@ Public["www.tvgids.nl"] = function(info, result)
                                  "^https*://tvgidsassets[.]nl/*.+"})
 end
 
+-- Allow that other one too.
 Public["imgur.com"] = function(info, result)
    handler.everywhere(info, result, "^http://.[.]imgur[.]com/.+")
 end
@@ -61,17 +64,12 @@ end
 --   -- TODO special redirect rule.
 --   -- https://duckduckgo.com/html/?q=.+
 --}
--- Exceptions instead?
-local function permissive(info, result)
-   --print("permissive", info.uri, info.vuri)
-   result.allow = true
-end
 
-Public["en.wikipedia.org"] = permissive
-Public["nl.wikipedia.org"] = permissive
-Public["bits.wikimedia.org"] = permissive
+Public["en.wikipedia.org"] = handler.permissive
+Public["nl.wikipedia.org"] = handler.permissive
+Public["bits.wikimedia.org"] = handler.permissive
 
-Public["okturtles.slack.com"] = permissive
+Public["okturtles.slack.com"] = handler.permissive
 
 function bland_info(info, from_to)
    for k,v in pairs(from_to) do
@@ -104,7 +102,7 @@ Public["xkcd.com"] = function(info, result)
    handler.everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
 end
 
-Public["&about:blank$"] = permissive
+Public["&about:blank$"] = handler.permissive
 
 Public["stackoverflow.com"] = function(info, result)
    handler.everywhere(info, result)
