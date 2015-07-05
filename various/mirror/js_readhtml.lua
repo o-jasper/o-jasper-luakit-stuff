@@ -2,7 +2,8 @@ local c = require "o_jasper_common"
 
 local attr_replace = require "o_jasper_common.xml.attr_replace"
 
-local This = c.copy_table(require "various.mirror.base")
+local This = c.copy_meta(require "various.mirror.base")
+This.__name = "js_readhtml"
 
 function This:localize_src_fun()
    return function(_, name, val)
@@ -35,6 +36,6 @@ function This:do_uri(uri, clobber, window)
    return path
 end
 
-return This
+return c.metatable_of(This)
 
 

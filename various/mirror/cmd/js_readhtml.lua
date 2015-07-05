@@ -1,1 +1,1 @@
-return require("various.mirror.cmd_from_mirror")(require "various.mirror.js_readhtml")
+return require("various.mirror.fn_mirror_cmd")(require("various.mirror.js_readhtml").new())

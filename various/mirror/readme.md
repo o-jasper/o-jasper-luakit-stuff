@@ -17,8 +17,13 @@ examples.
   `src` tag to that local file.
 * wget version, actually not sure if the files are going the right way! 
 
+Note: javascript itself didnt seem to have the ability to grab the data behind
+those tags. Nor did luakit.. Perhaps a proxy+browser implementation could do
+this stuff.
+
 ### TODO
 * Sql-table keeping track of it a bit more. Listview incorporation.
 
-* Not well tested/tried
+* UrlTamer use-local-mirror mode.
 
+* Not well tested/tried

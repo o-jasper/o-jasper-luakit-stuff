@@ -1,6 +1,6 @@
 local c = require "o_jasper_common"
 
-local This = c.copy_table(require "various.mirror.base")
+local This = c.copy_meta(require "various.mirror.base")
 
 -- Basically it is :dump, but with a pre-calculated path.
 -- Still loads *all* the assets besides.
@@ -12,4 +12,4 @@ function This:do_uri(uri, clobber, window)
    return path
 end
 
-return This
+return c.metatable_of(This)

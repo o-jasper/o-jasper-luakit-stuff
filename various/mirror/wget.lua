@@ -1,4 +1,4 @@
--- Not-for-use.
+-- Not-for-use. Not sure if it puts the files in proper places.
 
 -- Does not work because wget seems to fail at --page-requisites.
 -- mailing lists are too annoying to me. Thunderbird doesnt even recognize them
@@ -7,7 +7,7 @@
 
 local c = require "o_jasper_common"
 
-local This = c.copy_table(require "various.mirror.base")
+local This = c.copy_meta(require "various.mirror.base")
 
 function This:do_uri(uri, clobber)
    local path = self:clear_path(self:page_path(uri))
@@ -16,11 +16,9 @@ function This:do_uri(uri, clobber)
    -- p = page−requisites.
    -- nv = lower verbosity.
    -- It will make the path for us.
-   luakit.spawn(string.format("wget --directory-prefix %s -E %s -nv --page-requisites -k %s -o %s",
+   luakit.spawn(string.format("wget --directory-prefix %s -p -k %s -o %s",
                               self:mirror_dir(), clobber and "-nc" or "", uri. path))
    return path
 end
 
-function This.new() return This end  -- Dont really care for that.
-
-return This
+return c.metatable_of(This)
