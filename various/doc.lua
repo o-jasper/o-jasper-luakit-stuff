@@ -39,6 +39,10 @@ add_cmds( {
       cmd("doc", "Various documentation",
           function(w, query)
              local got = dict[query] or find_otherwise(query)
-             if got then w:new_tab(got) end
+             if got then
+                w:new_tab(got)
+             else
+                w:set_prompt("Couldnt find doc")
+             end
       end)
 })
