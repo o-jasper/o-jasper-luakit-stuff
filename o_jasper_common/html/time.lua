@@ -2,7 +2,7 @@ local Public = {}
 
 -- Functions helping out in writing time as text/html.
 
-function Public.delta_t_html(dt, pre, aft)
+function Public.delta_t_html(dt, pre, aft)  -- TODO tad messy..
    pre, aft = pre or "", aft or ""
    local adt = math.abs(dt)
    local s, min, h, d = 1000, 60000, 3600000, 24*3600000
@@ -80,7 +80,7 @@ function Public.additional_time_strings(d)
    return d
 end
 
-function Public.resay_time(state, ms_t, config)
+function Public.resay_time(state, ms_t, config, dontupdate)
    local tm = state.resay_timemarks
    local timemarks = config or
       { {"year", [[<<tr><td colspan="2"><span class="year_change">Newyear {%year}<br><hr></span></td></tr>]]},
@@ -97,9 +97,9 @@ function Public.resay_time(state, ms_t, config)
    local d = os.date("*t", math.floor(ms_t/1000))
    for _, el in pairs(timemarks) do -- Things we care to mark.
       local k, pattern = el[1], el[2]
-      -- If that aspect of the date is no longer the same, increament it.
+      -- If that aspect of the date is no longer the same, increment it.
       if d[k] ~= tm[k] then
-         tm[k] = d[k]
+         if not dontupdate then tm[k] = d[k] end
          return string.gsub(pattern, "{%%([_./%w]+)}", Public.additional_time_strings(d))
       end
    end
