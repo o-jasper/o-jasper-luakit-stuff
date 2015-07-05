@@ -5,7 +5,7 @@ local Public = {}
 -- TODO configurations.
 local alt_dir = os.getenv("HOME") .. ".luakit/urltamer/"
 
-Public.straight_domains = require("urltamer.matchers.straight_domains")
+Public.straight_domains = require "urltamer.matchers.straight_domains"
 
 -- Note: patterns is iterated. 
 Public.patterns = require "urltamer.matchers.patterns"

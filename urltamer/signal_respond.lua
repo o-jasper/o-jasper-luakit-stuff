@@ -21,7 +21,7 @@ local new_info  = require("urltamer.info").new_info
 
 config.late_dt = config.late_dt or 4000
 config.log_all = (config.log_all == nil) or config.log_all
-config.logger = require "urltamer.sql_logger"
+config.logger = require "urltamer.print_logger"
 
 local handler = require "urltamer.handler"
 
@@ -35,7 +35,7 @@ function respond_to(info, result)
    for k,v in pairs(matchers.patterns) do
       if string.match(info.vuri, k) then domain_way = v end
    end
-   domain_way = domain_way or matchers.straight_domain[info.from_domain] or not_listed
+   domain_way = domain_way or matchers.straight_domains[info.from_domain] or not_listed
 
    -- TODO sql table. (possibly via metatable)
    if type(domain_way) == "string" then
