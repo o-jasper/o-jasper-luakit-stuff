@@ -47,9 +47,15 @@ if `result.allow and not result.disallow`, then it is allowed.
 `result.redirect` contains a string if you want to redirect. 
 It has to be allowed to do that.
 
+## Note:
+At the moment, probably espeically bad idea to use this with Tor,
+you're probably one of few with this configuration.
+
 ## TODO
 
 * Storing config in SQL and an interface to quickly configure.
+  (maybe.. not sure, could alternatively just put it into a temporary one,
+   and just have reloadable-source-code.)
 
 * Make stuff for this:
   + Handles Cookies? Javascript?
@@ -57,13 +63,12 @@ It has to be allowed to do that.
   + Caching files, resorting to cache if file not expected to change.
   + Adding rules based on user interaction with the pages? ("Regex golf?")
   + Adblock integration.
+  + Basically attaching a state to each view?
 
 * Have a system of reasons. I.e. `result.allow = {"blacklist", "late"}`,
   and then later, something might "excuse" *particular* reasons.
   (or fail to excuse)
   
   Or some other way to keep the overview.
-
-* Make it a proper package.
 
 * When it is an image, can we get it only when we reach it?

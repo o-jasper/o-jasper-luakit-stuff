@@ -5,12 +5,12 @@ local handler = require "urltamer.handler"
 
 Public["www.reddit.com"] = function(info, result)
    handler.everywhere(info, result,
-                  {"^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]jpg$",
-                   "^https*://.[.]thumbs[.]redditmedia[.]com/.+[.]css",
+                  {"^https?://.[.]thumbs[.]redditmedia[.]com/.+[.]jpg$",
+                   "^https?://.[.]thumbs[.]redditmedia[.]com/.+[.]css",
                    "^https://www[.]reddit.com/api/login/.+",
-                   "^https*://www[.]reddit.com/*.+",
-                   "^https*://www[.]redditstatic[.]com/*.+"})
-   if info:uri_match("^https*://pixel[.]redditmedia[.]com/pixel/of_doom[.]png.+") then
+                   "^https?://www[.]reddit.com/*.+",
+                   "^https?://www[.]redditstatic[.]com/*.+"})
+   if info:uri_match("^https?://pixel[.]redditmedia[.]com/pixel/of_doom[.]png.+") then
       result.allow = false
       result.disallow = true
    else  -- And allow some api stuff.
@@ -20,7 +20,7 @@ Public["www.reddit.com"] = function(info, result)
                        "store_visits", "submit", "unhide", "unmarknsfw", "unsave", "vote",
       }
       for _, el in pairs(apilist) do
-         if string.match(info.uri, string.format("^https*://www.reddit.com/api/%s$", el)) then
+         if string.match(info.uri, string.format("^https?://www.reddit.com/api/%s$", el)) then
             result.allow = true
          end
       end
@@ -35,21 +35,21 @@ Public["www.youtube.com"] = function(info, result)
    handler.everywhere(info, result,
                   {"^https://s[.]ytimg[.]com/yts/jsbin/www-pageframe-.+/www-pageframe[.]js^",
                    "^https://s[.]ytimg.com/yts/jsbin/www-en_US-[.]+/common[.]js^",
-                   "^https*://clients1[.]google.com/generate_204$",
-                   "^https*://s[.]ytimg[.]com/yts/jsbin/.+",
-                   "^https*://s[.]ytimg[.]com/yts/cssbin/.+[.]css",
-                   "^https*://s[.]ytimg[.]com/yts/img/favicon.+[.]ico$"
+                   "^https?://clients1[.]google.com/generate_204$",
+                   "^https?://s[.]ytimg[.]com/yts/jsbin/.+",
+                   "^https?://s[.]ytimg[.]com/yts/cssbin/.+[.]css",
+                   "^https?://s[.]ytimg[.]com/yts/img/favicon.+[.]ico$"
                   })
    -- Images are not time-limited.
-   if string.match(info.uri, "^https*://i[.]ytimg[.]com/vi/.+/m*q*default[.]jpg$") then
+   if string.match(info.uri, "^https?://i[.]ytimg[.]com/vi/.+/m*q*default[.]jpg$") then
       result.allow = true
    end
 end
 
 Public["www.tvgids.nl"] = function(info, result)
    handler.everywhere(info, result, {"^http://www[.]tvgids[.]nl/json/lists/.+",
-                                 "^https*://www[.]tvgids[.]nl/*.+",
-                                 "^https*://tvgidsassets[.]nl/*.+"})
+                                 "^https?://www[.]tvgids[.]nl/*.+",
+                                 "^https?://tvgidsassets[.]nl/*.+"})
 end
 
 -- Allow that other one too.
@@ -99,7 +99,10 @@ Public["github.com"] = function(info, result)
 end
 
 Public["xkcd.com"] = function(info, result)
-   handler.everywhere(info, result, "^http://imgs.xkcd.com/comics/.+.png$")
+   handler.everywhere(info, result,
+                      {"^https?://imgs[.]xkcd[.]com/comics/.+[.]png$",
+                       "^https?://imgs[.]xkcd[.]com/s/.+[.]jpg$"
+   })
 end
 
 Public["&about:blank$"] = handler.permissive
@@ -110,7 +113,22 @@ Public["stackoverflow.com"] = function(info, result)
 end
 
 Public["fileformat.info"] = function(info, result)
-   handler.everywhere(info, result, {"^https*://emoji.fileformat.info/gemoji/.+[.]png$"})
+   handler.everywhere(info, result, {"^https?://emoji.fileformat.info/gemoji/.+[.]png$"})
 end
+
+Public["firstlook.org"] = function(info, result)
+   handler.everywhere(info, result,
+                      {"^https?://prod[%d]*-cdn[%d]+[.]cdn[.]firstlook[.]org"
+   })
+   
+end
+
+Public["www.unvanquished.net"] = function(info, result)
+   handler.everywhere(info, result,
+                      {"^https?://maxcdn.bootstrapcdn.com/bootstrap/[%d]+[.][%d]+[.][%d]/css/bootstrap.min.css?ver=[%d]+[.][%d]+[.][%d]$",
+                       "^https?://stats.unvanquished.net/serverlist.css?ver=[%d]+[.][%d]+[.][%d]"})
+end
+
+print("UPDATE")
 
 return Public

@@ -1,37 +1,27 @@
 
 local Public = {}
 
+local conf = globals.urltamer or {}
+
 -- TODO configurations.
-local alt_dir = os.getenv("HOME") .. ".luakit/urltamer/"
+local reload_require = conf.reload_require -- or "userconf.urltamer"
 
-Public.straight_domains = require "urltamer.matchers.straight_domains"
+local function require_reload(what)
+   package.loaded[what] = nil
+   return require(what)
+end
 
--- Note: patterns is iterated. 
-Public.patterns = require "urltamer.matchers.patterns"
-
+-- Easier integration of changes.
 function Public.reload()
-   -- TODO 
-   local sd_dir = alt_dir .. "straight_domains/"
-   if lfs.attributes(sd_dir) then
-      for file in lfs.dir(sd_dir) do
-         if string.match(file, "[%w]+.lua") then  -- Lua file.
-            -- List of responses.
-            for k,v in pairs(loadfile(sd_dir .. file)()) do
-               Public.straight_domains[k] = v
-            end
-         end
+   Public.patterns = require_reload("urltamer.matchers.patterns")
+   Public.straight_domains = require_reload("urltamer.matchers.straight_domains")
+   
+   if reload_require then
+      for k,v in pairs(require_reload(reload_require .. ".patterns") or {}) do
+         Public.patterns[k] = v
       end
-   end
-   -- Yep... the same.. inefficient.
-   local pat_dir = alt_dir .. "patterns/"
-   if lfs.attributes(pat_dir) then
-      for file in lfs.dir(pat_dir) do
-         if string.match(file, "[%w]+.lua") then  -- Lua file.
-            -- List of responses.
-            for k,v in pairs(loadfile(pat_dir .. file)()) do
-               Public.patterns[k] = v
-            end
-         end
+      for k,v in pairs(require_reload(reload_require .. ".straight_domains") or {}) do
+         Public.straight_domains[k] = v
       end
    end
 end
