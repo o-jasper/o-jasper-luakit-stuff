@@ -8,9 +8,16 @@ function This:config() return (globals.listview or {}).bookmarks or globals.list
 function This:infofun()
    return self:config().infofun or {require "listview.bookmarks.infofun.show_1"}
 end
+function This:side_infofun()
+   return self:config().side_infofun or {}
+   -- TODO somehow doing this makes {%table_name} replaced with `files`.. like dirChrome..
+   --{require "listview.bookmarks.infofun.patchthrough_dirChrome"}
+end
 
 -- Want the adding-entries js api too.
-This.to_js = c.copy_table(This.to_js, require("listview.bookmarks.Enter").to_js)
+for k, v in pairs(require("listview.bookmarks.Enter").to_js) do
+   This.to_js[k] = v
+end
 
 local plus_cmd_add = require "listview.bookmarks.common".plus_cmd_add
 

@@ -15,11 +15,17 @@ end
 
 function This:side_infofun()  -- TODO should be in DirSearch..
    return self:config().side_infofun or {
-      require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
-      require "dirChrome.infofun.file"}
+         require "dirChrome.infofun.markdown", require "dirChrome.infofun.basic_img", 
+         require "dirChrome.infofun.file"}
+end
+
+function This:priority()  -- For when used as side panel ..
+   assert(self.as_info)
+   return 2
 end
 
 function This:repl(args)
+   print("beep")
    self.log:update_whole_directory()  -- Ensure in the sql table.
    local ret = Search.repl(self, args)
    ret.cur_dir = self.log.path

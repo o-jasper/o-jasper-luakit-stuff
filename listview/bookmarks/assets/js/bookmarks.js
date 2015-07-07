@@ -30,6 +30,7 @@ function enter_values() {
 function set_main_sel(to) {
     main_sel = to;
     ge("change_main_sel").disabled = !main_sel;
+    set_main_sel_c1(to);
 }
 
 function change_main_sel() {

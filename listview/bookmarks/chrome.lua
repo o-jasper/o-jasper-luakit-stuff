@@ -7,7 +7,7 @@
 
 local lousy = require "lousy"
 
-local c = require("o_jasper_common")
+local c = require "o_jasper_common"
 
 local paged_chrome = require "paged_chrome"
 local listview = require "listview"
