@@ -58,9 +58,9 @@ function Public.metatable_of(meta)
          -- That is, only if it is a table that the user can change, and it
          -- shouldnt be the metatable-table.
          for k, fun in pairs(meta.new_defaults or {}) do
-            initial[k] = initial[k] == nil and
-               (type(fun) == "function" and fun(initial[k]) or fun) or
-               initial[k]
+            if initial[k] == nil then
+               initial[k] = type(fun) == "function" and fun(initial[k]) or fun
+            end
          end
 
          -- Assert stuff about it.

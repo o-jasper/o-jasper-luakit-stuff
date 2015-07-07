@@ -38,9 +38,7 @@ function Public.copy_table(tab, add)  -- One-deep copy of table.
       end
    end
    if add then
-      for k,v in pairs(add) do
-         ret[k] = v
-      end
+      for k,v in pairs(add) do ret[k] = v end
    end
    return ret
 end
