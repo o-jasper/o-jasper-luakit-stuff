@@ -6,3 +6,4 @@
 --  (at your option) any later version.
 
 require "urltamer.signal_respond"
+require "urltamer.cmd"
