@@ -153,7 +153,10 @@ function incr_selected_cnt(delta) {
 var main_sel = null;
 var selected = {};
 
-function set_main_sel(to) { main_sel = to; }
+function set_main_sel(to) {
+    main_sel = to;
+    set_main_sel_c1(to);
+}
 
 function clear_selected() {
     selected_cnt = 0;

@@ -11,7 +11,7 @@ local Base = require "listview.Base"
 local This = c.copy_meta(Base)
 
 -- This.html_state = nil,
-for k,v in pairs({__name= "listview.Search", name = "search",
+for k,v in pairs({__name= "listview.BaseSearch", name = "search",
                   search_cnt=0, limit_i=0, limit_cnt=20, limit_step=20}) do
    This[k] = v
 end
@@ -57,6 +57,9 @@ function This:repl(args)
       below_search = " ",
       above_sql = " ", below_sql = " ",
       below_acts = " ", before = " ", after = " ",
+
+      list_internal = [[  <span id="list"></span>
+  <span id="list_subsequent"></span>]],
    }
 end
 
@@ -81,7 +84,7 @@ function This:js_listupdate(list, as_msg)
                           math.min(self.limit_i + self.limit_cnt,
                                    self.limit_i + #list))
    end
-   return { list=self:html_list(list, as_msg, reset_state),
+   return { list=self:html_list(list, as_msg),
             cnt=cnt,
             search_cnt=self.search_cnt,
    }
@@ -90,7 +93,10 @@ end
 function This:list_to_html(list, state)
    state.asset_fun = self:asset_fun()
    local html = "<table>"
-   for _, info in pairs(list) do html = html .. info:html(state) end
+   for _, info in pairs(list) do
+      assert(info.html, "one of the info object did not have a :html method")
+      html = html .. info:html(state)
+   end
    return html .. "</table>"
 end
 

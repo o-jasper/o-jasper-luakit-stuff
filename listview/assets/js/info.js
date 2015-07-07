@@ -1,5 +1,5 @@
 
-function set_main_sel(to) {
+function set_main_sel_c1(to) {
     var el = ge("infofuns_select")
     if(to) {
         var html = html_of_id(to);
@@ -13,7 +13,6 @@ function set_main_sel(to) {
     } else {
         el.innerHTML = ""; el.hidden = true;
     }
-    main_sel = to;
 }
 
 function reset_state_c1() {

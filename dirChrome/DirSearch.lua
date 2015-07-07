@@ -21,11 +21,10 @@ end
 
 function This:priority()  -- For when used as side panel ..
    assert(self.as_info)
-   return 2
+   return 0
 end
 
 function This:repl(args)
-   print("beep")
    self.log:update_whole_directory()  -- Ensure in the sql table.
    local ret = Search.repl(self, args)
    ret.cur_dir = self.log.path

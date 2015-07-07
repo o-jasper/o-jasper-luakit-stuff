@@ -10,6 +10,8 @@ local c = require("o_jasper_common")
 local BaseSearch = require "listview.BaseSearch"
 local This = c.copy_meta(BaseSearch)
 
+This.__name = "listview.Search"
+
 local infofun_lib = require "sql_help.infofun"
 
 function This:side_infofun()
@@ -19,11 +21,14 @@ end
 function This.to_js:html_of_id()
    return function(id)
       local entry = self.log:get_id(id)
+      -- Get infofun results over the threshhold priority.
       local list = infofun_lib.entry_thresh_priority(self.log, entry, 
                                                      self:side_infofun(), -1)
+      -- Sort by priority.
       infofun_lib.priority_sort(list, self.config().priority_override)
+      -- Return resulting html.
       local html = self:list_to_html(list, {})
-      return html and #html > 0 and html  -- Makes sense.
+      return html and #html > 0 and html
    end
 end
 
@@ -38,6 +43,7 @@ function This:js_listupdate(list, as_msg)
       end
       -- Sort the relevant info by importance.
       infofun_lib.priority_sort(infos, self:config().priority_override)
+      -- The 'info' tag filled with the html.
       ret.info = self:list_to_html(infos, {})
    end      
    return ret

@@ -3,15 +3,16 @@ local listview = require "listview"
 
 local This = c.copy_meta(listview.Search)
 
+
 function This:config() return (globals.listview or {}).bookmarks or globals.listview or {} end
 
 function This:infofun()
    return self:config().infofun or {require "listview.bookmarks.infofun.show_1"}
 end
+
 function This:side_infofun()
-   return self:config().side_infofun or {}
-   -- TODO somehow doing this makes {%table_name} replaced with `files`.. like dirChrome..
-   --{require "listview.bookmarks.infofun.patchthrough_dirChrome"}
+   return self:config().side_infofun or
+      { require "listview.bookmarks.infofun.readme" }
 end
 
 -- Want the adding-entries js api too.

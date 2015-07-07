@@ -15,6 +15,8 @@ local BookmarksEntry = require "listview.bookmarks.BookmarksEntry"
 local SqlHelp = require("sql_help").SqlHelp
 
 local This = c.copy_meta(SqlHelp)
+This.__name = "Bookmarks"
+
 This.values = BookmarksEntry.values
 
 This.cur_id_add = 0
