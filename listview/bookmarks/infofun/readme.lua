@@ -5,6 +5,7 @@ local lfs = require "lfs"
 local This = c.copy_meta(require "dirChrome.infofun.markdown")
 
 function This.newlist(creator, entry)
+   if not entry.data_uri then return {} end
    local file = entry.data_uri .. "/readme.md"
    local attrs = lfs.attributes(file)
    if attrs then
