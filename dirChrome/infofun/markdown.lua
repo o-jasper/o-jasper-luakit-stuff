@@ -2,19 +2,25 @@
 
 local c = require "o_jasper_common"
 
-local this = c.copy_meta(require "listview.infofun.show_1")
+local This = c.copy_meta(require "listview.infofun.show_1")
 
-function this.newlist(creator, entry)
+function This.newlist(creator, entry)
    if string.match(string.lower(entry.file), "[.]md$") then
-      return {setmetatable({ dir=entry.dir, file=entry.file }, this)}
+      local got = io.open(entry.dir .. "/" .. entry.file)
+      if got then
+         got:close()
+         return {setmetatable({ dir=entry.dir, file=entry.file }, This)}
+      else
+         return {}
+      end
    end
 end
 
-function this:priority()
-   return string.match(string.lower(self.file), "readme[.]md$") and 2 or -1
+function This:priority()
+   return string.lower(self.file) == "readme.md" and 2 or -1
 end
 
-function this:html()
+function This:html()
    local got = io.open(self.dir .. "/" .. self.file)
    if got then
       local ret = got:read("*a")
@@ -25,4 +31,5 @@ function this:html()
    end
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)
+
