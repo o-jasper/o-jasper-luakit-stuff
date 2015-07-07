@@ -91,7 +91,7 @@ local SqlHelp = {
          ["tags:"]  = matchfun.tags,     ["tag:"]  = matchfun.tags,
          ["-tags:"] = matchfun.not_tags, ["-tag:"] = matchfun.not_tags,
 
-         ["not:"] = matchfun["not"], ["-:"] = matchfun["not"],
+         ["not:"] = matchfun["not"], ["-"] = matchfun["not"],
          ["\\-"] = function(self, state, m, v)  -- Should escape it.
             self:text_sw("-" .. v, state.n)
          end,
