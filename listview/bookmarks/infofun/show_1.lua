@@ -14,11 +14,14 @@ function This.tab_repl:title()  -- TODO history should have This too.
    return self.e.title or self.e.uri or "(no title)"
 end
 
-function This.tab_repl.data_uri_html()
-   if package.loaded["dirChrome.chrome"] then
-      return [[<a href="luakit://dirChrome/search/{%data_uri}"><code>{%data_uri}</code></a>]]
+function This.tab_repl:data_uri_html()
+   if not self.e.data_uri or self.e.data_uri == "" then
+      return [[<span class="minor">(no data uri)</span>]]
+   elseif package.loaded["dirChrome.chrome"] then
+      return string.format([[<a href="luakit://dirChrome/search/%s"><code>%s</code></a>]],
+         self.e.data_uri, self.e.data_uri)
    else
-      return "<code>{%data_uri}</code>"
+      return string.format("<code>%s</code>", self.e.data_uri)
    end
 end
 
