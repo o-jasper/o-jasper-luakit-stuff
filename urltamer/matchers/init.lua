@@ -17,10 +17,11 @@ function Public.reload()
    Public.straight_domains = require_reload("urltamer.matchers.straight_domains")
    
    if reload_require then
-      for k,v in pairs(require_reload(reload_require .. ".patterns") or {}) do
+      local got = require_reload(reload_require)
+      for k,v in pairs(got.patterns or {}) do
          Public.patterns[k] = v
       end
-      for k,v in pairs(require_reload(reload_require .. ".straight_domains") or {}) do
+      for k,v in pairs(got.straight_domains or {}) do
          Public.straight_domains[k] = v
       end
    end
