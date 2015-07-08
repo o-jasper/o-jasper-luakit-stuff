@@ -17,7 +17,7 @@ function This.newlist(creator, entry)
 end
 
 function This:priority()
-   return string.lower(self.file) == "readme.md" and 2 or -1
+   return string.lower(self.file) == "readme.md" and 2 or 0.5
 end
 
 function This:html()

@@ -10,6 +10,8 @@ Additionally, the objects, `.path`, `.file` get the respective things back.
   check it can be reversed.
   
   Maybe want buttons for this? It is listview-general though.
+  
+* Also listview-general: priority of infofun should depend on stuff.
 
 * Deal with it when files/directories may not be accessed.
 
