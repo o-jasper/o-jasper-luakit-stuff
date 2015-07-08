@@ -13,4 +13,6 @@ Additionally, the objects, `.path`, `.file` get the respective things back.
 
 * Deal with it when files/directories may not be accessed.
 
+  + Deal with mistypes, current goes to default directory, could be confusing.
+
 * (optionally, defaultly)Hide dot files
