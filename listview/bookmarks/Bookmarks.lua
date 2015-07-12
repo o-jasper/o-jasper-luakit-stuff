@@ -18,9 +18,19 @@ local This = c.copy_meta(SqlHelp)
 This.__name = "Bookmarks"
 
 This.values = BookmarksEntry.values
+local via_link_columns = {"from_id", "to_id"}
+This.values.via_link = {  -- TODO implement this way.
+   table_name = "via_link",
+   columns = via_link_columns,
+   
+   ids = via_link_columns,
+   int_els = via_link_columns,
+}
 
 This.cur_id_add = 0
 This.entry_meta = BookmarksEntry
+
+This.cmd_dict.get_to_uri = "SELECT {%idname} FROM {%table_name} WHERE to_uri == ?"
 
 function This:config() return config end
 
@@ -76,19 +86,23 @@ function This:default_new_data_uri_fun()
    end
 end
 
+function This:ensure_data_uri(entry)
+   if not entry.data_uri or entry.data_uri == "" then
+      entry.data_uri = self:default_new_data_uri(entry)
+   end
+end
+
 function This:default_new_data_uri(entry)
    return (self:config().default_new_data_uri_fun or self:default_new_data_uri_fun())(entry)
 end
 
--- Apply the defaults.. I dont want to depend on the above being perfectly
--- deterministic forever.
-function This:update(entry)
-   if entry.data_uri == "" then entry.data_uri = self:default_new_data_uri(entry) end
-   return SqlHelp.update(self, entry)
-end
-
 function This:enter(entry)
-   if entry.data_uri == "" then entry.data_uri = self:default_new_data_uri(entry) end
+   self:ensure_data_uri(entry)
+   -- Find if uri already obtained.
+   local got = self:sqlcmd("get_to_uri"):exec{entry.to_uri}
+   --assert(#got > 1, "One-bookmark-per-uri failed before?")
+   if #got > 0 then entry.id = got[1].id end
+
    return SqlHelp.enter(self, entry)
 end
 

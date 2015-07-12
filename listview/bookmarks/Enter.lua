@@ -38,7 +38,7 @@ This.to_js = {
                --(these are not done directly)
             tags = lousy.util.string.split(inp.tags, "[,; ]+")
          }
-         self.log:update_or_enter(add)
+         self.log:enter(add)
       end
    end,
 }

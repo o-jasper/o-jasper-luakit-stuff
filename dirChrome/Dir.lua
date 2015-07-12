@@ -59,7 +59,7 @@ end
 function This:update_file(file)  -- NOTE is this right..?
    local entry = self:entry_from_file(file)
    if entry then
-      self:update_or_enter(entry)
+      self:enter(entry)
       return self:entry_fun(entry)
    end
 end
@@ -116,11 +116,11 @@ for k, v in pairs(mod_match_funs) do This.searchinfo.match_funs[k] = v end
 
 function This:config() return config end
 
-function This:update_or_enter(entry)
+function This:enter(entry)
    -- Delete pre-existing.
    self:sqlcmd("delete_path"):exec({entry.dir, entry.file})
    assert(not entry.id) -- Re enter.,
-      return SqlHelp.update_or_enter(self, entry)
+      return SqlHelp.enter(self, entry)
 end
 
 return c.metatable_of(This)

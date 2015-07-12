@@ -21,6 +21,11 @@ db:exec [[
      to_id INTEGER NOT NULL,
      tag TEXT NOT NULL
    );
+
+   CREATE TABLE IF NOT EXISTS via_link (
+     from_id INTEGER NOT NULL,
+     to_id INTEGER NOT NULL
+   );
 ]]
 
 local ret

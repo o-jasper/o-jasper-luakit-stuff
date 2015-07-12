@@ -114,7 +114,7 @@ end
 local cur_time = require "o_jasper_common.cur_time"
 
 -- Add an entry.
-function This:enter(entry)
+function This:_enter(entry)
    assert(self.values.table_name and self.values.row_names)
    
    if not entry.id then
@@ -130,26 +130,26 @@ function This:enter(entry)
    return { id = entry.id, add = self:sqlcmd("enter"):exec(self:args_in_order(entry)) }
 end
 -- Modify an entry.
-function This:update(entry)
+function This:_update(entry)
    if not entry.id then return nil end
    local got = self:sqlcmd("selectid"):exec({entry.id})
    if #got == 1 then  -- It must exist, otherwise it isnt an update.
       return self:force_update(entry) or self:get_id(entry.id) or true
    end
 end
-function This:update_or_enter(entry)
-   local got = self:update(entry)
+function This:enter(entry)
+   local got = self:_update(entry)
    if got then
       return got
    else
-      return self:enter(entry)
+      return self:_enter(entry)
    end
 end
 
 function This:force_update(entry)
    assert(entry.id)
    self:delete_id(entry.id)  -- Delete previous
-   return self:enter(entry)
+   return self:_enter(entry)
    --      local inp = self:args_in_order(entry) -- Does it matter?
    --      table.insert(inp, entry.id)
    --      return self:sqlcmd("update"):exec(inp)
