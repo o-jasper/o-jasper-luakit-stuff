@@ -412,5 +412,6 @@ local c = require("o_jasper_common")
 local This = c.copy_meta(require "sql_help.SqlCmds_w_tags")
 
 for k, v in pairs(SqlHelp) do This[k] = v end
+This.new_Search = SqlHelp.new_SqlHelp
 
 return c.metatable_of(This)

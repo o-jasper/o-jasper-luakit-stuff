@@ -33,7 +33,7 @@ end
 function This:total_query(search)
    -- How we end up searching.
    assert(type(search) == "string", "Search not string; " .. tostring(search))
-   local query = self.log:new_SqlHelp()
+   local query = self.log:new_Search()
    if search ~= "" then query:search(search) end
 
    query:auto_order_by()
