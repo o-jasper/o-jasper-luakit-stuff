@@ -8,7 +8,7 @@ local direct = {
    -- NOTE: 
    html = function(args, view)
       return string.format([[<p>Direct, no replacements.</p><hr>
-<a style="font-size:70%%" href="luakit://%s/templated">to templated</a>]], chrome_name)
+<a style="font-size:70%%" href="/%s/templated">to templated</a>]], chrome_name)
    end,
 }
 
@@ -18,7 +18,7 @@ local templated = {
 
    repl_pattern = [[<p>Templated, using replacements</p>
 <p id="add"></p><hr>
-<a style="font-size:70%" href="luakit://{%chrome_name}/direct">to direct</a>
+<a style="font-size:70%" href="/{%chrome_name}/direct">to direct</a>
 
 <span style="color:gray;font-size:70%">{%date}</span>
 
