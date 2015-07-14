@@ -9,10 +9,10 @@ return function(register)
    server:start(function (req, rep)
          local _,t = string.find(req.path, "/", 2, true)
          local chrome_name = t and string.sub(req.path, 2, t - 1) or ""
-         local _, t2 = string.find(req.path, "/", t + 1, true)
+         local _, t2 = t and string.find(req.path, "/", t + 1, true)
          local args = { 
             chrome_name = chrome_name,
-            page = string.sub(req.path, t + 1, t2 and t2 - 1),
+            page = string.sub(req.path, t and t + 1 or 2, t2 and t2 - 1),
             --uri  = req.,  --how?
             path = t2 and string.sub(req.path, t2 + 1) or "",
             whole = true,
@@ -31,18 +31,24 @@ return function(register)
             for k, v in pairs(args) do
                html = html .. string.format("<tr><td>%s =</td><td>%s</td></tr>", k,v)
             end
-            if not chrome then
-               local list = {}
-               for k,v in pairs(register.sites) do
-                  table.insert(list, v.chrome_name == k  and v.chrome_name or
-                                  string.format("%s != %s", k, v.chrome_name))
-                  if k == chrome_name then table.insert(list, "hmm") end
+            html = html .. "</table>"
+            if not chrome then  -- TODO link them too.
+               html = html .. 
+                  string.format("<p>Dont have chrome %s, to have chromes:</p><table>",
+                                chrome_name)
+               for k, v in pairs(register.sites) do
+                  local val = v.chrome_name == k  and v.chrome_name or
+                     string.format("%s != %s", k, v.chrome_name)
+                  html = html .. string.format("<tr><td>%s</td></tr>", val)
                end
-               html = html .. string.format("</table><h4>List of chromes(%d):</h4>%s",
-                                            #list, table.concat(list, ", <br>"))
             else
-               html = html .. "TODO list the pages.."
+               html = html .. string.format("<p>Dont have page %s, to have pages:</p><table>",
+                                            args.page)
+               for k in pairs(chrome.pages) do
+                  html = html .. string.format("<tr><td>%s</td></tr>", k)
+               end
             end
+            html = html .. "</table>"
          end
 
          rep:addHeader('Content-Type', 'text/html'):write(html)

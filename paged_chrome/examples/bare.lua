@@ -25,10 +25,13 @@ local templated = {
 <p>{%auto.html}</p>
 
 <script>document.getElementById("add").innerText = get_str();</script>
-<script src="luakit://{%chrome_name}/js.js"></script>
 
 <p>All the arg values:({%all_arg_cnt})<p><table>{%all_arg}</table>
 <p>All the conf values:({%all_conf_cnt})<p><table>{%all_conf}</table>
+
+<p id="serverlike">Not serverlike/javascript disabled</p>
+
+<script src="/{%chrome_name}/js.js"></script>
 ]],
    
    to_js = { 
@@ -71,7 +74,7 @@ return {
       
       direct = direct,
       
-      ["js.js"] = { html=function(...) return [[alert("This probably wont execute.");]] end,
+      ["js.js"] = { html=function(...) return [[document.getElementById("serverlike").innerText = "could get src asset";]] end,
                  init=false },
       
       -- Unfortunately have to repeat ourselves here.(`templated` twice)
