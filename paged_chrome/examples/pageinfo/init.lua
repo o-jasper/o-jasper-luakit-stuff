@@ -30,14 +30,6 @@ local acquire = {
    images_cnt = "document.images.length",
 }
 
-local cmd = lousy.bind.cmd
-add_cmds({ cmd("pageinfo", function(w, query)
-                  data = {}  -- Sluurp
-                  for k,v in pairs(acquire) do data[k] = w.view:eval_js(v) end
-                  w:new_tab("luakit://" .. Public.chrome_name .. "/view")
-              end) 
-})
-
 local html = require "o_jasper_common.html"
 
 local function list_text(list, name, between)
