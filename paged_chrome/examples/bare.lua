@@ -17,7 +17,7 @@ local templated = {
    name = "templated",
 
    repl_pattern = [[<p>Templated, using replacements</p>
-<p id="add"></p><hr>
+<p id="add">Javascript -via-lua did <b>not</b> operate</p><hr>
 <a style="font-size:70%" href="/{%chrome_name}/direct">to direct</a>
 
 <span style="color:gray;font-size:70%">{%date}</span>

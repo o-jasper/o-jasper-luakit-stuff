@@ -38,8 +38,8 @@ return function(register)
                                   string.format("%s != %s", k, v.chrome_name))
                   if k == chrome_name then table.insert(list, "hmm") end
                end
-               html = html .. string.format("</table><h4>Chromes(%d):</h4>%s",
-                                            #list, table.concat(list, ", "))
+               html = html .. string.format("</table><h4>List of chromes(%d):</h4>%s",
+                                            #list, table.concat(list, ", <br>"))
             else
                html = html .. "TODO list the pages.."
             end
