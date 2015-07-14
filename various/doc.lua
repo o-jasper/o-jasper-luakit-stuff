@@ -7,6 +7,7 @@ local dict = {
 --python  = "file:///usr/share/doc/python/html/index.html",
    pylib   = "file:///usr/share/doc/python/html/library/index.html",
    pylang  = "file:///usr/share/doc/python/html/reference/index.html",
+   polipo  = "file:///usr/share/polipo/www/doc/index.html",
 }
 
 for k,v in pairs(config.urls or {}) do dict[k] = v end  -- `false` is allowed.

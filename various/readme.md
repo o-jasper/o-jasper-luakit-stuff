@@ -7,3 +7,5 @@
 
 * `doc.lua` goes to a list of named pages, or locally searches documentation/files
   by a list of patterns. (with defaults searching `/usr/share/doc/`
+
+* `pydoc.lua` uses `/usr/bin/pydoc -w {%page}` and immediately views it.
