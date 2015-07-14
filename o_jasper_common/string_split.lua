@@ -7,7 +7,7 @@ local function string_split(str, split_by, simple)
       pt = (t or 0) + 1
       f,t = string.find(str, split_by, pt, simple)
       if f then
-         table.insert(list, string.sub(str, pt, f))
+         table.insert(list, string.sub(str, pt, f - 1))
       else
          table.insert(list, string.sub(str, pt))
          return list
