@@ -47,10 +47,10 @@ make things in a principled way. **This is just the current idea.**
 
 * Strive to make tools usable inside usable from commandline or as
   library too;
-
+  + paged_chrome needs to be usable as server.
+    (partway currently, still need to connect js to lua)
   + The SqlHelp(derived) stuff needs work for this.
   + urltamer, need to be able to ask from commandline what a response would be.
-  + paged_chrome needs to be usable as server.
 
 # License
 

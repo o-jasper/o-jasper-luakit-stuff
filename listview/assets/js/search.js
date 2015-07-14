@@ -110,7 +110,6 @@ function update_sql_shown() {
 
 function reset_state_c1(){}
 
-// TODO time it and turn off continuous, which then has 'force continuous' option.
 function search(reset_state) {
     if(reset_state == null){ reset_state = true; }
     if(reset_state) {

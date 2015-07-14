@@ -18,14 +18,6 @@ local This = c.copy_meta(SqlHelp)
 This.__name = "Bookmarks"
 
 This.values = BookmarksEntry.values
-local via_link_columns = {"from_id", "to_id"}
-This.values.via_link = {  -- TODO implement this way.
-   table_name = "via_link",
-   columns = via_link_columns,
-   
-   ids = via_link_columns,
-   int_els = via_link_columns,
-}
 
 This.cur_id_add = 0
 This.entry_meta = BookmarksEntry
