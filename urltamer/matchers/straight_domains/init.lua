@@ -29,7 +29,7 @@ end
 
 -- Oh, np stands for non-participation. It means you should not act like a 
 --  vote-brigade and stuff.
-Public["www.np.reddit.com"] = Public["www.reddit.com"]
+Public["np.reddit.com"] = Public["www.reddit.com"]
 
 Public["www.youtube.com"] = function(info, result)
    handler.everywhere(info, result,
@@ -123,12 +123,25 @@ Public["firstlook.org"] = function(info, result)
    
 end
 
-Public["www.unvanquished.net"] = function(info, result)
+Public["www.reuters.com"] = function(info, result)
    handler.everywhere(info, result,
-                      {"^https?://maxcdn.bootstrapcdn.com/bootstrap/[%d]+[.][%d]+[.][%d]/css/bootstrap.min.css?ver=[%d]+[.][%d]+[.][%d]$",
-                       "^https?://stats.unvanquished.net/serverlist.css?ver=[%d]+[.][%d]+[.][%d]"})
+                      {"^s[%d]?[.]reutersmedia[.]net",
+                       "^https?://cdn[.]betrad[.]com/pub/icon[%d]?[.]png$"
+   })
 end
 
-print("UPDATE")
+Public["www.wsj.com"] = function(info, result)
+   handler.everywhere(info, result,
+                      { "^https?://asset[.]wsj[.]net" })
+end
+
+Public["www.rollingstone.com"] = function(info, result)
+   handler.everywhere(info, result,
+                      { "^https?://asset[.]rollingstone[.]com" })
+end
+
+Public["www.bloomberg.com"] = function(info, result)
+   handler.everywhere(info, result, "^https?://assets.bwbx.io")
+end
 
 return Public
