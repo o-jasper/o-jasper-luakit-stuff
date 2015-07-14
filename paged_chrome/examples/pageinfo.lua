@@ -1,10 +1,12 @@
 -- Uses javascript to extract a bunch of information, and then 
 -- shows it back.
 
-local info = {
+local Public = {
    chrome_name = "pageInfo",
    chrome_uri  = "luakit://{%chrome_name}",
    title       = "{%chrome_name}",
+
+   default_name = "view",
 }
 
 local data
@@ -32,7 +34,7 @@ local cmd = lousy.bind.cmd
 add_cmds({ cmd("pageinfo", function(w, query)
                   data = {}  -- Sluurp
                   for k,v in pairs(acquire) do data[k] = w.view:eval_js(v) end
-                  w:new_tab("luakit://" .. info.chrome_name .. "/view")
+                  w:new_tab("luakit://" .. Public.chrome_name .. "/view")
               end) 
 })
 
@@ -46,7 +48,7 @@ local function list_text(list, name, between)
    return table.concat(ret, between or ", ")
 end
 
-local pages = {
+Public.pages = {
    default_name = "view",
    view = {
       name = "view",
@@ -63,4 +65,4 @@ local pages = {
    }
 }
 
-require("paged_chrome").chrome(info.chrome_name, pages)
+return Public

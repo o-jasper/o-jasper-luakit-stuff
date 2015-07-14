@@ -9,7 +9,6 @@ local lousy = require "lousy"
 
 local c = require "o_jasper_common"
 
-local paged_chrome = require "paged_chrome"
 local listview = require "listview"
 local bookmarks  = require "listview.bookmarks.bookmarks"
 
@@ -22,8 +21,8 @@ local BookmarksSearch = require "listview.bookmarks.BookmarksSearch"
 local function mk_page(meta, name)
    return meta.new{name, bookmarks, "*listview/bookmarks"}
 end
-
-local bookmarks_paged = {
+ 
+local bookmarks_pages = {
    default_name = "search",
    enter  = mk_page(Enter, "enter"),
    import  = mk_page(require "listview.bookmarks.import_page", "import"),
@@ -31,13 +30,21 @@ local bookmarks_paged = {
    aboutChrome = mk_page(listview.AboutChrome, "aboutChrome"),
 }
 
-paged_chrome.chrome("listviewBookmarks", bookmarks_paged)
+local Public = {
+   listviewBookmarks = {
+      chrome_name = "listviewBookmarks",
+      pages = bookmarks_pages,
+   },
+}
 
 local take = config.take or {}
 if take.all then take = setmetatable({}, {__index=function(...) return true end}) end
 
 if take.bookmarks_chrome then  -- Take over the 'plain name'. (default:no)
-   paged_chrome.chrome("bookmarks", bookmarks_paged)
+   Public.bookmarks = {
+      chrome_name = "bookmarks",
+      pages = bookmarks_pages,
+   }
 end
 
 -- Add bindings.
@@ -65,4 +72,4 @@ if take.binds then
                key({}, "B", function(w) cmd_bookmark_new(w) end), })
 end
 
--- TODO export some stuff.
+return Public

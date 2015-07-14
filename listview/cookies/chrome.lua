@@ -6,14 +6,20 @@
 --  (at your option) any later version.
 
 local listview = require "listview"
-local history  = require "listview.cookies.cookies"
+local cookies  = require "listview.cookies.cookies"
 
-local paged_chrome = require("paged_chrome")
+local function mk_page(meta, name)
+   return meta.new{name, cookies, "*listview/cookies"}
+end
 
 -- Make the chrome page.
-local pages = listview.new_Chrome(history, "*listview/cookies")
+local pages = {
+   default_name = "search",
+   search = mk_page(listview.Search, "search"),
+   aboutChrome = mk_page(listview.AboutChrome, "aboutChrome"),
+}
 
--- NOTE: really maybe better via new metatable, but lazy.
+-- NOTE: really maybe (tiny bit)better via new metatable, but lazy.
 pages.search.infofun = function(self)
    return self:config().infofun or {require "listview.cookies.infofun.show_1"}
 end
@@ -21,7 +27,11 @@ pages.search.side_infofun = function(self)
    return self:config().side_infofun or {}
 end
 
-paged_chrome.chrome("listviewCookies", pages)
+local Public = {}
+Public.listviewCookies = {
+   chrome_name = "listviewCookies",
+   pages = pages,
+}
 
 local config = (globals.listview or {}).cookies or {}
 
@@ -34,3 +44,5 @@ local function on_command(w, query)
 end
 
 add_cmds({ cmd("listviewCookies", on_command) })
+
+return Public

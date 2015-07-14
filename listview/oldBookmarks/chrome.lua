@@ -10,31 +10,26 @@ local c = require "o_jasper_common"
 local listview = require("listview")
 local old_bookmarks  = require "listview.oldBookmarks.old_bookmarks"
 
-local paged_chrome = require("paged_chrome")
+local chrome_reg = require "paged_chrome.reg"
 
 local config = (globals.listview or {}).old_bookmarks or {}
 config.page = config.page or {}
 
-local function chrome_describe(log)
-   assert(log)
-   
-   local where = config.assets or {}
-   table.insert(where, "*listview/oldBookmarks")
+local where = config.assets or {}
+table.insert(where, "*listview/oldBookmarks")
 
-   local search = setmetatable({name = "search", log=log, where=where},
-      require "listview.oldBookmarks.OldBookmarksSearch")
+local search = setmetatable({name = "search", log=old_bookmarks, where=where},
+   require "listview.oldBookmarks.OldBookmarksSearch")
 
-   local pages = {
-      default_name = default_name or "search",
-      search = search,
-      aboutChrome = listview.AboutChrome.new{"aboutChrome", log, where},
-   }
-   pages.search.limit_cnt = config.page.cnt or 20
-   pages.search.limit_step = config.page.step or pages.search.step_cnt
-   return pages
-end
+local pages = {
+   default_name = default_name or "search",
+   search = search,
+   aboutChrome = listview.AboutChrome.new{"aboutChrome", old_bookmarks, where},
+}
+pages.search.limit_cnt = config.page.cnt or 20
+pages.search.limit_step = config.page.step or pages.search.step_cnt
 
--- Make the chrome page.
-local paged = chrome_describe(old_bookmarks)
-assert(paged.search.log.initial_state)
-paged_chrome.chrome("listviewOldBookmarks", paged)
+return {{
+   chrome_name = "listviewOldBookmarks",
+   pages = pages,
+}}

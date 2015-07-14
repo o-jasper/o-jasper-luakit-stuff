@@ -30,16 +30,17 @@ This is the "raw" interface, it is better to use the templated one.
 `page:on_first_visual(state)` is used on that signal. If not defined,
 anything in `page:to_js` is bound to javascript.
 
-## Suggested templated page
+## Intended to be server-able (TODO)
+Instead of defining `page:on_first_visual`, define `page:to_js(args)` or
+`page.to_js`.
+
+## Templating
 If the above do not exist, it tries instead to make things work with
-`require "paged_chrome.Suggest"`. You could instead put that in your metatable.
+`require "paged_chrome.Suggest"`, 
 
 It instead has the requirements:
 
 `.name` simply remains a requirement.
-
-`.to_js` field or `:to_js(args)` method, giving a table of functions to
-bind tojavascript.
 
 `.where` field indicating where to look for assets. Used to create
 `:asset(file)` for you. This will also imply how to find the first template,

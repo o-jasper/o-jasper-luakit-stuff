@@ -1,20 +1,21 @@
 local lfs = require "lfs"
 
-local info = {
+local Public = {
    chrome_name = "bareDirChrome",
+   default_name = "nopage",
+
    chrome_uri  = "luakit://{%chrome_name}",
    title       = "{%chrome_name}",
 }
 
-local pages = {
-   default_name = "nopage",
+Public.pages = {
    nopage = {
       name = "nopage",
       to_js = {},
       repl_pattern = [[<h1>Directory viewer</h1>
 Use this to view directories, by going to 
 <a href="{%chrome_uri}/dir/">{%chrome_uri}/dir/</a>]],
-      repl = function(_, _, _) return info end
+      repl = function(_, _, _) return Public end
    },
    dir = {
       name = "dir",
@@ -23,7 +24,7 @@ Use this to view directories, by going to
       --repl_pattern="{%dir.html}",
       repl = function(self, meta, _)
             local ret = {}
-            for k,v in pairs(info) do ret[k] = v end
+            for k,v in pairs(Public) do ret[k] = v end
             ret.directory = string.sub(meta.path, 4)
             if ret.directory == "" then
                ret.directory = lfs.currentdir()
@@ -53,4 +54,5 @@ Use this to view directories, by going to
       end
    },
 }
-require("paged_chrome").chrome(info.chrome_name, pages)
+
+return Public

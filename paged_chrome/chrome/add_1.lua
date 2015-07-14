@@ -1,21 +1,20 @@
 local chrome = require "chrome"
 local string_split = require("lousy").util.string.split
 
-local paged_chrome_dict = {}
-
 local Suggest = require "paged_chrome.Suggest"
 
--- Each page has an `init(args, view, meta)` and `html(args, view, meta)`
-local function paged_chrome(chrome_name, pages)
-   paged_chrome_dict[chrome_name] = pages
+-- Each page has an `init(args)` and `html(args)`
+return function(pageset)
+   local chrome_name = pageset.chrome_name
+   local pages = pageset.pages
+   assert(type(chrome_name) == "string", string.format("%s not string", chrome_name))
    chrome.add(chrome_name,
               function (view, meta)
                  local use_path = meta.path
                  local use_name = string_split(use_path, "/")[1]
-                 local pages = paged_chrome_dict[chrome_name]
                  local page  = pages[use_name]
-                 if not page then
-                    use_name = pages.default_name
+                 if not page or type(page) == "string" then
+                    use_name = page or pages.default_name
                     use_path = chrome_name .. "/" .. use_name
                     page = pages[use_name]
                  end
@@ -27,7 +26,7 @@ local function paged_chrome(chrome_name, pages)
                  page.chrome_name = chrome_name
                  page.page_list = pages
                  local use_uri = "luakit://" .. chrome_name .. "/" .. use_path
-                 view:load_string(page.html and page:html(meta) or Suggest.html(page, meta),
+                 view:load_string((page.html or Suggest.html)(page, meta),
                                   use_uri)
 
                  local function on_first_visual(view, status)
@@ -44,5 +43,3 @@ local function paged_chrome(chrome_name, pages)
                  view:add_signal("load-status", on_first_visual)
               end)
 end
-
-return paged_chrome
