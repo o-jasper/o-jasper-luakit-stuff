@@ -1,5 +1,5 @@
 
-local string_split = require("lousy").util.string.split
+local string_split = require "o_jasper_common.string_split"
 
 local Public = {}
 

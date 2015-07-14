@@ -1,4 +1,4 @@
-local string_split = require("lousy").util.string.split
+local string_split = require "o_jasper_common.string_split"
 
 -- This should be in lib/lousy/uri.lua ?
 local Public = {}

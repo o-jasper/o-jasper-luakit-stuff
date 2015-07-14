@@ -1,8 +1,5 @@
-
--- Get luakit environment
 local package_path = require("package").path
-local string_split = require("lousy").util.string.split
-local capi = { luakit = luakit }
+local string_split = require "o_jasper_common.string_split"
 
 local search_dirs = {} -- Directories where assets may be.
 
