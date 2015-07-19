@@ -16,7 +16,9 @@ local direct = {
 local templated = {
    name = "templated",
 
-   repl_pattern = [[<p>Templated, using replacements</p>
+   repl_pattern = [[
+{%inject}
+<p>Templated, using replacements</p>
 <p id="add">Javascript -via-lua did <b>not</b> operate</p><hr>
 <a style="font-size:70%" href="/{%chrome_name}/direct">to direct</a>
 
@@ -55,7 +57,8 @@ local templated = {
                                   all_conf, k, v)
          m = m + 1
       end
-      return { chrome_name = chrome_name, date = os.date(),
+      return { inject = args.inject or " ",
+               chrome_name = chrome_name, date = os.date(),
                all_arg = all_arg,   all_arg_cnt = n,
                all_conf = all_conf, all_conf_cnt = m }
    end,

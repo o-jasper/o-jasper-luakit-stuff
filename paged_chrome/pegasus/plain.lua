@@ -1,5 +1,8 @@
+-- NOTE both seem still subject to change.
 local Pegasus = require 'pegasus'
-local pages = req
+-- NOTE: thats my pull request, does not reflect on pegasus.
+-- (infact somewhat likely not getting pulled)
+local PegasusJs = require 'PegasusJs'
 
 local Suggest = require "paged_chrome.Suggest"
 
@@ -35,11 +38,20 @@ return function(register)
       return html .. "</table>"
    end
    
-   server:start(function (req, rep)
+   -- TODO/NOTE: fairly messy, 
+   local js_interface = {}
+   server:start(function(req, rep)
+         -- See if need to serve up any of the javascript responses.
+         -- TODO this should follow from the directory, not trying them all.
+         for k,js in pairs(js_interface) do
+            if js:respond(req, rep) then return end
+         end
+
+         -- Get at information.
          local _,t = string.find(req.path, "/", 2, true)
          local chrome_name = t and string.sub(req.path, 2, t - 1) or ""
          local _, t2 = t and string.find(req.path, "/", t + 1, true)
-         local args = { 
+         local args = {
             chrome_name = chrome_name,
             page = string.sub(req.path, t and t + 1 or 2, t2 and t2 - 1),
             --uri  = req.,  --how?
@@ -48,14 +60,33 @@ return function(register)
             --view  = "touching this limits server-ability",
             --conf
          }
+         -- Figure the page, if not, give help.
          local chrome = register.sites[chrome_name]
          local page = chrome and chrome.pages[args.page]
-         local html = ""
-         if page then
-            html = (page.html or Suggest.html)(page, args)
-         else
-            html = help_if_not_found(chrome, args)
+         if not page then
+            rep:addHeader('Content-Type', 'text/html'):write(help_if_not_found(chrome, args))
+            return
          end
+
+         -- Make the javascript interfacing, as needed..
+         local chr_dir = string.format("/%s/%s", chrome_name, args.page)
+         local js = js_interface[chr_dir]
+         if not js then
+            js = PegasusJs.new{string.format("%s/PegasusJs", chr_dir)}
+            local funs = (type(page.to_js) == "function" and page:to_js()) or
+               page.to_js or {}
+            local add_funs = {}
+            for k,v in pairs(funs) do add_funs[k] = v(page) end
+            js:add(add_funs)
+            js_interface[chr_dir] = js
+         end
+
+         -- Injection of the javascript needed to interface.
+         args.inject = string.format(
+            [[<script type="text/javascript" src="%s/PegasusJs/index.js"></script>]],
+            chr_dir
+         )
+         local html = (page.html or Suggest.html)(page, args)
          rep:addHeader('Content-Type', 'text/html'):write(html)
    end)
 end
