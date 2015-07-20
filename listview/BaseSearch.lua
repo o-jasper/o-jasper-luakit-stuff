@@ -46,7 +46,9 @@ function This:total_query(search)
 end
 
 function This:repl(args)
-   return { 
+   return {
+      inject = args.inject or " ",
+
       title = string.format("%s:%s", self.chrome_name, self.name),
       initial_query  = self.log.cmd_query or "",
       table_name    = self.log.values.table_name,
