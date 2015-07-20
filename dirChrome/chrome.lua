@@ -10,30 +10,29 @@ local DirSearch = require "dirChrome.DirSearch"
 
 local dir_fun  = require "dirChrome.dir_fun"
 
-local paged_chrome = require("paged_chrome")
-
 local function figure_path(args)
    return string.sub(args.path, #("search/") + 1)
 end
 local function figure_Dir(args) return dir_fun(figure_path(args)) end
 
-local function chrome_describe()
-   local where = {"dirChrome", "listview"}
-   return {
-      default_name = "search",
-      search = function(args)
-         return DirSearch.new{"search", figure_Dir(args), where}
-      end,
-      aboutChrome = function(args)
-         -- NOTE: inefficient, it mostly doesnt care about the result of dir_fun.
-         return AboutChrome.new{"aboutChrome", figure_Dir(args), where}
-      end,
-   }
-end
+local where = {"dirChrome", "listview"}
 
--- Make the chrome page.
-local dir_paged = chrome_describe()
-paged_chrome.chrome("dirChrome", dir_paged)
+local pages = {
+   default_name = "search",
+   search = function(args)
+      return DirSearch.new{"search", figure_Dir(args), where}
+   end,
+   aboutChrome = function(args)
+      -- NOTE: inefficient, it mostly doesnt care about the result of dir_fun.
+      return AboutChrome.new{"aboutChrome", figure_Dir(args), where}
+   end,
+}
+local Public = {
+   dirChrome = {
+      chrome_name = "dirChrome",
+      pages = pages
+   }
+}
 
 -- Grabbing another `luakit://` name.
 local config = globals.dirChrome or {}
@@ -48,3 +47,5 @@ local function on_command(w, query)
 end
 
 add_cmds({ lousy.bind.cmd("dirChrome", on_command) })
+
+return Public

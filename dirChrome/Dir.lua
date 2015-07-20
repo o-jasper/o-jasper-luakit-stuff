@@ -3,7 +3,6 @@ local config = globals.dirChrome or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
 local c = require "o_jasper_common"
-local string_split = require("lousy").util.string.split
 
 local SqlHelp = require("sql_help").SqlHelp
 local cur_time = require "o_jasper_common.cur_time"
