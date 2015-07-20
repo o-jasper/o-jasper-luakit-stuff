@@ -35,14 +35,6 @@ Public.listviewCookies = {
 
 local config = (globals.listview or {}).cookies or {}
 
--- Add bindings.
-local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
-
-local function on_command(w, query)
-   cookies.cmd_query = query  -- Bit "global-value-ie.
-   w:new_tab("luakit://listviewCookies/search")
-end
-
-add_cmds({ cmd("listviewCookies", on_command) })
+if luakit then require "listview.cookies.binds" end
 
 return Public
