@@ -9,10 +9,17 @@ local ret
 
 if not ret then
    local Cookies = require "listview.cookies.Cookies"
-   local pkg = require("cookies")
-   pkg.init() -- (otherwise used `capi.luakit.idle_add(init)`)
 
-   local db = ((globals.listview or {}).cookies or {}).db or pkg.db
+   local db = ((globals.listview or {}).cookies or {}).db
+   if not db then
+      if luakit then
+         local pkg = require("cookies")
+         pkg.init() -- (otherwise used `capi.luakit.idle_add(init)`)
+      else
+         local Sql = require "sql_help.luasql_port"
+         db = Sql.new(globals.main_db_dir .. "cookies.db")
+      end
+   end
 
    ret = setmetatable({ db = db }, Cookies)
 end

@@ -7,12 +7,20 @@
 
 local OldBookmarks = require "listview.oldBookmarks.OldBookmarks"
 
-local bookmarks = require("bookmarks")
-bookmarks.init()
+local db
+
+if luakit then
+   local bookmarks = require("bookmarks")
+   bookmarks.init()
+   db = bookmarks.db
+else
+   local Sql = require "sql_help.luasql_port"
+   db = Sql.new(globals.main_db_dir .. "bookmarks.db")
+end
 
 local ret
 if not ret then
-   ret = setmetatable({ db = bookmarks.db }, OldBookmarks)
+   ret = setmetatable({ db = db }, OldBookmarks)
 end
 
 return ret

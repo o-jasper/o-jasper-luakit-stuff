@@ -34,6 +34,20 @@ package.path = table.concat(list, ";")
 
 local reg = require "paged_chrome.reg"
 
+globals = {
+    listview = {
+       history   = { take = { all=true } },
+       bookmarks = { take = { all=true } },
+    },
+    main_db_path = "/home/jasper/iso/luakit/.local/share/luakit/history.db",
+    main_db_dir = "/home/jasper/iso/luakit/.local/share/luakit/",
+}
+
 reg:register_table(require "paged_chrome.examples")
+
+reg:register_table(require "listview.history.chrome")
+reg:register_table(require "listview.bookmarks.chrome")
+reg:register_table(require "listview.oldBookmarks.chrome")
+reg:register_table(require "listview.cookies.chrome")
 
 require("paged_chrome.pegasus")(reg)
