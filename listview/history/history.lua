@@ -9,11 +9,7 @@ local ret
 
 if not ret then
    local History = require "listview.history.History"
-   local histpkg = require("history")
-   histpkg.init() -- History package uses `capi.luakit.idle_add(init)`
-
-   local db = ((globals.listview or {}).history or {}).db or histpkg.db
-
+   local db = ((globals.listview or {}).history or {}).db or require "listview.acquire_db"
    ret = setmetatable({ db = db }, History)
 end
 
