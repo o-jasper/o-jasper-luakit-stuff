@@ -17,7 +17,7 @@ assert(type(SqlEntry) == "table")
 local time_interpret = require("o_jasper_common.fromtext.time").time_interpret
 local searchlike = require("o_jasper_common.fromtext.searchlike")
 
-local string_split = lousy.util.string.split
+local string_split = require "o_jasper_common.string_split"
 
 -- NOTE Is actually not less LOC...
 -- local function formatfun(str, inputfun)

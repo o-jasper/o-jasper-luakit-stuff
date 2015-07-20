@@ -8,7 +8,6 @@
 -- Uses/searches `pass` for passwords for domains,
 -- and searches in html tags for login forms.
 
-local lousy = require("lousy")
 local c = require "o_jasper_common"
 
 local config = globals.search_login or {}
@@ -36,14 +35,11 @@ local function str_bool(bool) if bool then return "true" else return "false" end
 local js = c.load_asset(config.js_file or "search_login/enter_pw.js") or
    "alert(\"JS of search_login not found\");"
 
--- TODO Would be handy to have this as util/common. (TODO it is?..)
-local function domain_of_uri(uri) return string.lower(lousy.uri.parse(uri).host) end
-
 function figure_account(domain)
    local exit, stdout, stderr = luakit.spawn_sync(pass_call("ls " .. domain));
    if exit ~= 0 then return nil end 
 
-   local list = lousy.util.string.split(stdout, "\n")
+   local list = c.string_split(stdout, "\n")
    if list[1] ~= domain then print("Didnt start with domain? ", list[1]) end
    if #list < 2 then print("Dont have any logins") return nil end
    return string.sub(list[2], 11)
@@ -53,7 +49,7 @@ function search_login(w, account, seek_form, fill_user_form)
    seek_form      = default_true(seek_form)
    fill_user_form = default_true(fill_user_form)
    
-   local domain = domain_of_uri(w.view.uri)
+   local domain = c.fromtext.domain_of_uri(w.view.uri)
    -- Check domain name in case someone tries to run arbitrary code in `pass` somehow.
    if check_domain and not string.match(domain, "^[.%l%d]+$") then
       return say(w, "Domain is strange?", domain)
@@ -98,6 +94,7 @@ function search_login(w, account, seek_form, fill_user_form)
 end
 
 -- A provided command. You might want something more handy, like :login or shorter.
+local lousy = require("lousy")
 local cmd, buf, any =  lousy.bind.cmd, lousy.bind.buf, lousy.bind.any
 
 add_cmds({cmd("search_login", "Searches for password and way to login, tries to fill in.",
