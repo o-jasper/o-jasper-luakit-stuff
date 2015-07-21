@@ -1,5 +1,7 @@
 -- Makes luasql behave the same as the luakit one.
 
+local string_split = require "o_jasper_common.string_split"
+
 local sqlite3 = require("luasql.sqlite3").sqlite3
 
 local Sql = {}
@@ -12,23 +14,27 @@ function Sql.new(tab)
 end
 
 local SqlCursor = {
-   __index = function(self, key)
-      return function(self, i)  -- Get them if we dont have it already.
-         if not self.done and i < #self.got then
-            local new = true
-            while #self.got < i do  -- Fetch until there or end.
-               if not new then
-                  self.done = true
-                  return nil
-               end
-               new = self.cursor:fetch()
-               table.insert(self.got, new)
+   __index = function(self, i)
+      local got, cur = rawget(self, "got"), rawget(self, "cursor")
+      if not rawget(self, "done") and i < #got then
+         local new = true
+         while #got < i do  -- Fetch until there or end.
+            if not new then
+               self.done = true
+               return nil
             end
-            table.insert(self.got, new)
-            return i, new
-         else
-            return self.got[i]
+
+            local here = table.pack(cur:fetch())
+            new = {}
+            for i, name in pairs(cur:getcolnames()) do
+               new[name] = here[i]
+            end
+            table.insert(got, new)
          end
+         table.insert(got, new)
+         return new
+      else
+         return got[i]
       end
    end,
 
@@ -42,9 +48,20 @@ local SqlCursor = {
    end,
 }
 
-function Sql:exec(statement)  -- TODO question marks and arguments..
+-- NOTE: high security risk zone.
+function Sql:exec(statement, args)  -- TODO question marks and arguments..
+   args = args or {}
+   local parts = string_split(statement, "?")
+   assert( #args == #parts - 1, "not enough arguments")
+   local command_str, j = "", 1
+   while j < #parts do
+      command_str = command_str .. parts[j] .. self.conn:escape(tostring(args[i]))
+      j = j + 1
+   end
+
+   print(command_str)
   -- TODO does it :close() itself automatically? Dont see how to..
-   local cursor = self.conn:execute(statement)
+   local cursor = self.conn:execute(command_str)
    self.conn:commit()  -- Dont really support non-committal.
    return setmetatable({cursor = cursor, got = {}}, SqlCursor)
 end
