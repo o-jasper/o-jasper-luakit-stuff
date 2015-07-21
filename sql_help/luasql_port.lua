@@ -16,22 +16,16 @@ end
 local SqlCursor = {
    __index = function(self, i)
       local got, cur = rawget(self, "got"), rawget(self, "cursor")
-      if not rawget(self, "done") and i < #got then
+      if not rawget(self, "done") and i > #got then
          local new = true
          while #got < i do  -- Fetch until there or end.
-            if not new then
+            new = {}
+            if not cur:fetch(new, "a") then
                self.done = true
                return nil
             end
-
-            local here = table.pack(cur:fetch())
-            new = {}
-            for i, name in pairs(cur:getcolnames()) do
-               new[name] = here[i]
-            end
             table.insert(got, new)
          end
-         table.insert(got, new)
          return new
       else
          return got[i]
@@ -46,6 +40,13 @@ local SqlCursor = {
          end
       end, self
    end,
+
+   --  afaik gotta get them all.
+   __len = function(self)
+      local n = #self.got
+      while self[i] do n = n + 1 end
+      return n
+   end,
 }
 
 -- NOTE: high security risk zone.
@@ -55,11 +56,10 @@ function Sql:exec(statement, args)  -- TODO question marks and arguments..
    assert( #args == #parts - 1, "not enough arguments")
    local command_str, j = "", 1
    while j < #parts do
-      command_str = command_str .. parts[j] .. self.conn:escape(tostring(args[i]))
+      command_str = command_str .. parts[j] .. self.conn:escape(tostring(args[j]))
       j = j + 1
    end
 
-   print(command_str)
   -- TODO does it :close() itself automatically? Dont see how to..
    local cursor = self.conn:execute(command_str)
    self.conn:commit()  -- Dont really support non-committal.
