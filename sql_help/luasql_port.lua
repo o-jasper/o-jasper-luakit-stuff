@@ -13,44 +13,8 @@ function Sql.new(tab)
    return setmetatable(tab, Sql)
 end
 
-local SqlCursor = {
-   __index = function(self, i)
-      local got, cur = rawget(self, "got"), rawget(self, "cursor")
-      if not rawget(self, "done") and i > #got then
-         local new = true
-         while #got < i do  -- Fetch until there or end.
-            new = {}
-            if not cur:fetch(new, "a") then
-               self.done = true
-               return nil
-            end
-            table.insert(got, new)
-         end
-         return new
-      else
-         return got[i]
-      end
-   end,
-
-   __pairs = function(self)
-      return function(self, i)
-         i = (i and i + 1) or 1
-         if self[i] then
-            return i, self[i] 
-         end
-      end, self
-   end,
-
-   --  afaik gotta get them all.
-   __len = function(self)
-      local n = #self.got
-      while self[i] do n = n + 1 end
-      return n
-   end,
-}
-
 -- NOTE: high security risk zone.
-function Sql:exec(statement, args)  -- TODO question marks and arguments..
+function Sql:command_string(statement, args)  -- TODO question marks and arguments..
    args = args or {}
    local command_str = ""
    local parts = string_split(statement, "?")
@@ -62,7 +26,7 @@ function Sql:exec(statement, args)  -- TODO question marks and arguments..
       command_str = command_str .. parts[j] .. val
       j = j + 1
    end
-   return self:list_cursor(self:_cursor(command_str))
+   return command_str
 end
 
 function Sql:_cursor(command_str)
@@ -70,38 +34,43 @@ function Sql:_cursor(command_str)
    if cursor then
       return cursor
    else  -- Close it and try again.
-      print(command_str)
       self.conn:close()
       self.conn = sqlite3:connect(self.filename)
       return self.conn:execute(command_str)
    end
 end
 
-function Sql:list_cursor(cursor)
-   -- TODO does it :close() itself automatically? Dont see how to..
-   if cursor then
-      local ret, new = {}, {}
-      while cursor:fetch(new, "a") do
-         table.insert(ret, new)
-         new = {}
-      end
-      cursor:close()
-      return ret
-   else
-      print("no cursor")
-      return {}
-   end
+function Sql:cursor(statement, args)
+   return self:_cursor(self:command_string(statement, args))
 end
 
-local SqlCompiled = {
+-- Produces an entire list immediately.
+function Sql:list_cursor(cursor)
+   if not cursor then return {} end  -- Hope its alright..
+
+   local ret, new = {}, {}
+   while cursor:fetch(new, "a") do
+      table.insert(ret, new)
+      new = {}
+   end
+   cursor:close()
+   return ret
+end
+
+function Sql:exec(statement, args)
+   return self:list_cursor(self:cursor(statement, args))
+end
+
+Sql.SqlCompiled = {
    __index = {
       exec = function(self, args) return self.sql:exec(self.statement, args) end,
    }
 }
 
 function Sql:compile(statement)  -- Doesnt actually compile anything..
-   return setmetatable({self=sql, statement = statement}, SqlCompiled)
+   return setmetatable({sql=self, statement = statement}, self.SqlCompiled)
 end
 
-Sql.__index = Sql
-return Sql
+local c = require "o_jasper_common"
+
+return c.metatable_of(Sql)
