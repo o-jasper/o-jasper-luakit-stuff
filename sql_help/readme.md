@@ -36,7 +36,7 @@ So do:
     YourHelp = c.copy_meta(sql_help.SqlHelp)
     YourHelp.values = YourEntry.values
     ... add your stuff ...
-    YourHelp = c.metatable_of(mod_YourHelp)
+    YourHelp = c.metatable_of(YourHelp)
     
 Basically this is just some class derivation, where you change some values.
 
@@ -44,7 +44,6 @@ Setting `entry_meta` in the latter is so the correct entry is given to the retur
 values. Alternatively you can change `entry_fun(self, data)` instead.
 
 The `.db` value is the database itself. It is not needed for all the functions.
-because then "how i do it is always the same")
 
 After that, you should be able to make an instance
 `helper = setmetatable({db=yourdb}, YourHelp)`, or you could put the `db` into
@@ -110,12 +109,14 @@ listview.oldBookmarks, which do fairly simple modifications.
 
 # Todo
 
-* Search multiple tables at the same time.
-
-* Make it usable separately aswel
+* Make it more usable separately aswel
   (as a user-search thing, not for programmatic use you expect to be stable)
-  + standalone lua + sql + thislib
+  + <strike>standalone lua + sql + thislib</strike>(done, for the pegasus local server)
   + then commandline thing.
+  
+  Problem: looks like luakit has its own
+  [luasql](https://github.com/keplerproject/luasql) is a lib for it. It works
+  slightly differently, however, i think it can all be made to work together better.
 
 * Figure out security. Do the question marks mean data will stay data, and
   not be interpreted as SQL. Sanitizing?
