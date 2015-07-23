@@ -1,5 +1,4 @@
 local tox = require "ffi.tox"
-local paged_chrome = require"paged_chrome.chrome"
 
 local c = require "o_jasper_common"
 
@@ -61,4 +60,4 @@ local pages = {
    },
 }
 
-paged_chrome("listox", pages)
+return { listox = {  chrome_name = "listox", pages = pages,  } }

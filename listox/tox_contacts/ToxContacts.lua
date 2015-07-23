@@ -13,9 +13,8 @@ This.searchinfo.matchable = {"like:", "-like:", "-", "not:", "\\-", "or:", "limi
 local config = (globals.listox or {}).tox_contacts or globals.listview or {}
 config.addsearch = config.addsearch or { default = "" }
 
-function This:config() return config end
+function This:config() return config end  -- TODO it never uses config..?
+
 This.entry_meta = ToxContactsEntry
-
-
 
 return c.metatable_of(This)

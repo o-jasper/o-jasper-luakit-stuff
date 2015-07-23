@@ -6,23 +6,26 @@
 --  (at your option) any later version.
 
 local listview = require "listview"
-local log  = require "listox.tox_contacts.tox_contacts"
 
-local paged_chrome = require("paged_chrome")
-
-local function chrome_describe(log)
-   assert(log)
-   return listview.new_Chrome(log, {"listox/tox_contacts", "listview"})
+if luakit then
+   require "listox.tox_contacts.binds"
 end
 
--- Make the chrome page.
-paged_chrome.chrome("listoxContacts", chrome_describe(log))
+local tox_contacts  = require "listox.tox_contacts.tox_contacts"
 
--- Add bindings.
-local cmd,buf,key = lousy.bind.cmd, lousy.bind.buf, lousy.bind.key
-
-local function on_command(w, query)
-   local v = w:new_tab("luakit://listoxContacts/search")
+local function mk_page(meta, name)
+   return meta.new{name, tox_contacts, "*listview/history"}
 end
 
-add_cmds({ cmd("listoxContacts", on_command) })
+local pages = {
+   default_name = "search",
+   search = mk_page(listview.Search, "search"),
+   aboutChrome = mk_page(listview.AboutChrome, "aboutChrome"),
+}
+
+return {
+   listoxContacts = {
+      chrome_name = "listoxContacts",
+      pages = pages,
+   }
+}
