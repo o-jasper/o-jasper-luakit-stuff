@@ -107,7 +107,7 @@ function This:html_list(list, as_msg)
    if not as_msg then  -- Plain table.
       local ret = ""
       for _, el in pairs(list) do
-         ret = ret .. [[<table class="plain_table">]] .. c.html.table(el) .. "</table><hr>"
+         ret = ret .. [[<table class="plain_table">]] .. c.html.table(el.e) .. "</table><hr>"
       end
       return ret
    else
