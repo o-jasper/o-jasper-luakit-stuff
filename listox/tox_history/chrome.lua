@@ -14,7 +14,7 @@ end
 local tox_history = require "listox.tox_history.tox_history"
 
 local function mk_page(meta, name)
-   return meta.new{name, tox_history, "*listview/history"}
+   return meta.new{name, tox_history, {"*listox/tox_history/", "listview/"}}
 end
 
 local pages = {
