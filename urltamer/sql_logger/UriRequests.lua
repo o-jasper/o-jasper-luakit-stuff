@@ -5,30 +5,38 @@ config.addsearch = config.addsearch or { default = "" }
 local c = require "o_jasper_common"
 local UriRequestsEntry = require "urltamer.sql_logger.UriRequestsEntry"
 
-local this = c.copy_meta(require("sql_help").SqlHelp)
-this.values = UriRequestsEntry.values
+local This = c.copy_meta(require("sql_help").SqlHelp)
+This.values = UriRequestsEntry.values
 
 -- Scratch some search matchabled that arent allowed.
-this.searchinfo.matchable = {
+This.searchinfo.matchable = {
    "like:", "-like:", "-", "not:", "\\-", "or:",
    "before:", "after:", "limit:",
 }
 
 for _, el in pairs{"uri", "domain", "from_domain", "result"} do
    for _, kind in pairs{"=", "like:", ":"} do
-      this.searchinfo.match_funs[el .. kind] = this.searchinfo.match_funs["uri" .. kind]
-      table.insert(this.searchinfo.matchable, el .. kind)
+      This.searchinfo.match_funs[el .. kind] = This.searchinfo.match_funs["uri" .. kind]
+      table.insert(This.searchinfo.matchable, el .. kind)
    end
 end
 
-this.entry_meta = UriRequestsEntry
+This.entry_meta = UriRequestsEntry
 
 local cur_time = require "o_jasper_common.cur_time"
 
-this.last_id = 1000*cur_time.ms()
+This.last_id = 1000*cur_time.ms()
 
-function this:insert(info, result)
-   info.id = 1000*cur_time.ms()
+This.cmd_dict.apply_expiries = "DELETE FROM {%table_name} WHERE {%time} < ?"
+
+function This:apply_expiries()  -- Defaultly keep a day.
+   if config.expire_duration ~= "forever" then
+      self:sqlcmd("apply_expiries"):exec({1000*(os.time() - (config.expire_duration or 86400))})
+   end
+end
+
+function This:insert(info, result)
+   -- TODO private browsing..
    while info.id <= self.last_id do
       info.id = info.id + 1
    end
@@ -36,15 +44,17 @@ function this:insert(info, result)
    info.result = tostring(result.ret)   -- Just add what isnt in there yet.
    info.time = cur_time.ms()
 
+   self:apply_expiries()
+
    self:enter(info)
 end
 
-function this:config() return config end
+function This:config() return config end
 
 local fancy_uri = require("o_jasper_common.html.uri").fancy_uri
 
--- TODO replace with new approach..
-function this:initial_state()
+-- TODO replace with new approach.. (TODO does this even still do something?
+function This:initial_state()
    local mod_html_calc = {
       resultHTML = function(entry, _)
          return ({["true"]="{%urlallowed}", ["false"]="{%urlblocked}"})[entry.result] or
@@ -66,4 +76,4 @@ function this:initial_state()
    return { html_calc=html_calc }
 end
 
-return c.metatable_of(this)
+return c.metatable_of(This)
