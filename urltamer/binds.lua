@@ -7,7 +7,7 @@ local config = globals.urltamer or {}
 
 if config.add_cmds == nil or config.add_cmds then
    local matchers = require "urltamer.matchers.init"
-   local permissive_for_while = require "urltamer.handler.permissive_for_wile"
+   local permissive_for_while = require "urltamer.handler.permissive_for_while"
 
    local function uri_to_pattern(uri)
       return "^https*://" .. string.gsub(uri, "[-]", {["-"]="[-]"}) .. ".+"
