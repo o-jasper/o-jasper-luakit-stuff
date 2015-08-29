@@ -114,12 +114,8 @@ if vidlist_cmd then
                      assert(type(chain_sequence)== "table")
                      local str = ""
                      for i,el in pairs(chain_sequence) do
-                        str = str .. tostring(i) .. ":"
-                        if type(el) == "table" then
-                           str = (str=="" and "" or str .. ",\n") .. table.concat(el, ":")
-                        else
-                           str = (str=="" and "" or str .. ",\n") .. el
-                        end
+                        str = (str=="" and "" or str .. ",\n") .. tostring(i) .. "="
+                           .. ((type(el) == "table" and table.concat(el, ":")) or el)
                      end
                      w:set_prompt(str)
                   end) })
