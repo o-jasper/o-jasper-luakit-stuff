@@ -96,6 +96,7 @@ webview.init_funcs.url_respond_signals = function (view, w)
           end
 
           if (result.log or config.log_all) and config.logger then
+             -- Private browsing checked for you.
              if not view.enable_private_browsing then
                 config.logger:insert(info, result)
              end
