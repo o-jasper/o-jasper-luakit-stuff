@@ -1,1 +1,1 @@
-return require "require_access_control.alt_require"
+return require "alt_require.alt_require"
